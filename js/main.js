@@ -90,10 +90,11 @@ function handleBuildingClick(map, e) {
     Object.keys(buildingState).forEach(b => removeFloorsFor(map, b));
 
     const lvProp = f.properties?.["building:levels"];
-    const levels = Number.isFinite(+lvProp)
+    const bmProp = f.properties?.["building:basement"];
+    /* const levels = Number.isFinite(+lvProp)
         ? Math.max(1, Math.min(20, +lvProp))
-        : CONFIG.defaultFloorCount;
-    const floorsSpec = autoFloorsArray(levels, CONFIG.buildingDefaults);
+        : CONFIG.defaultFloorCount; */
+    const floorsSpec = autoFloorsArray(lvProp, bmProp, CONFIG.buildingDefaults);
 
     buildingState[bid] = { coords: ring, floorsSpec, floorLayerIds: [], sourceId: `${bid}-floors` };
 
@@ -101,6 +102,7 @@ function handleBuildingClick(map, e) {
     disableCampusHit(map);
     showFloorsFor(map, bid);
     flyCamera(map, CONFIG.camera.clickMode, JSON.parse(f.properties?.["center"]));
+    console.log(bid);
 
     current.buildProp = f.properties;
     current.pos = JSON.parse(f.properties?.["center"]);

@@ -7,71 +7,19 @@
     {
       "type": "Feature",
       "properties": {
-        "@id": "main_1",
+        "@id": "smain_1",
         "name": "본관",
         "building": "university",
-        "building:levels": "4",
-        "building:basement": "1",
-        "center": [126.95290063507855, 37.3471036819912],
+        "building:levels": 4,
+        "building:basement": 1,
+        "center": [
+          126.95290063507855,
+          37.3471036819912
+        ],
         "bearing": -30,
-        "siblings": ["main_2", "main_3"]
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              126.9526751,
-              37.3471029
-            ],
-            [
-              126.9527583,
-              37.3469632
-            ],
-            [
-              126.9529122,
-              37.3469103
-            ],
-            [
-              126.9530861,
-              37.3469906
-            ],
-            [
-              126.9531203,
-              37.3471114
-            ],
-            [
-              126.9530299,
-              37.3472466
-            ],
-            [
-              126.952897,
-              37.3472853
-            ],
-            [
-              126.9527275,
-              37.3472192
-            ],
-            [
-              126.9526751,
-              37.3471029
-            ]
-          ]
+        "siblings": [
+          "smain_2"
         ]
-      },
-      "id": "main_1"
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "@id": "main_2",
-        "name": "본관",
-        "building": "university",
-        "building:levels": "4",
-        "building:basement": "1",
-        "center": [126.95290063507855, 37.3471036819912],
-        "bearing": -30,
-        "siblings": ["main_1", "main_3"]
       },
       "geometry": {
         "type": "Polygon",
@@ -106,10 +54,6 @@
               37.3471171
             ],
             [
-              126.9525363,
-              37.3471119
-            ],
-            [
               126.9525263,
               37.3471082
             ],
@@ -120,10 +64,6 @@
             [
               126.9525459,
               37.3470283
-            ],
-            [
-              126.9525742,
-              37.3469824
             ],
             [
               126.9526063,
@@ -158,12 +98,20 @@
               37.3469103
             ],
             [
-              126.9527583,
-              37.3469632
+              126.9530861,
+              37.3469906
             ],
             [
-              126.9526751,
-              37.3471029
+              126.9531203,
+              37.3471114
+            ],
+            [
+              126.9530299,
+              37.3472466
+            ],
+            [
+              126.952897,
+              37.3472853
             ],
             [
               126.9527275,
@@ -172,19 +120,24 @@
           ]
         ]
       },
-      "id": "main_2"
+      "id": "main_1"
     },
     {
       "type": "Feature",
       "properties": {
-        "@id": "main_3",
+        "@id": "main_2",
         "name": "본관",
         "building": "university",
-        "building:levels": "9",
-        "building:basement": "1",
-        "center": [126.95290063507855, 37.3471036819912],
+        "building:levels": 9,
+        "building:basement": 1,
+        "center": [
+          126.95290063507855,
+          37.3471036819912
+        ],
         "bearing": -30,
-        "siblings": ["main_1", "main_2"]
+        "siblings": [
+          "main_1"
+        ]
       },
       "geometry": {
         "type": "Polygon",
@@ -245,7 +198,7 @@
           ]
         ]
       },
-      "id": "main_3"
+      "id": "main_2"
     },
     {
       "type": "Feature",
@@ -253,11 +206,16 @@
         "@id": "grad_1",
         "name": "대학원관",
         "building": "university",
-        "building:levels": "7",
-        "building:basement": "0",
-        "center": [126.95284908637404, 37.34603289878906],
+        "building:levels": 7,
+        "building:basement": 0,
+        "center": [
+          126.95284908637404,
+          37.34603289878906
+        ],
         "bearing": -10,
-        "siblings": ["grad_2"]
+        "siblings": [
+          "grad_2"
+        ]
       },
       "geometry": {
         "type": "Polygon",
@@ -314,11 +272,16 @@
         "@id": "grad_2",
         "name": "대학원관",
         "building": "university",
-        "building:levels": "2",
-        "building:basement": "0",
-        "center": [126.95284908637404, 37.34603289878906],
+        "building:levels": 2,
+        "building:basement": 0,
+        "center": [
+          126.95284908637404,
+          37.34603289878906
+        ],
         "bearing": -10,
-        "siblings": ["grad_1"]
+        "siblings": [
+          "grad_1"
+        ]
       },
       "geometry": {
         "type": "Polygon",
@@ -371,9 +334,12 @@
         "@id": "design",
         "name": "디자인관",
         "building": "university",
-        "building:levels": "7",
-        "building:basement": "0",
-        "center": [126.95292452350259, 37.34568909478981],
+        "building:levels": 7,
+        "building:basement": 0,
+        "center": [
+          126.95292452350259,
+          37.34568909478981
+        ],
         "bearing": -10
       },
       "geometry": {
@@ -447,9 +413,12 @@
         "@id": "gemi",
         "name": "게미관",
         "building": "university",
-        "building:levels": "6",
-        "building:basement": "0",
-        "center": [126.95295976102352, 37.34537556174354],
+        "building:levels": 6,
+        "building:basement": 0,
+        "center": [
+          126.95295976102352,
+          37.34537556174354
+        ],
         "bearing": -10
       },
       "geometry": {
@@ -523,9 +492,12 @@
         "@id": "music",
         "name": "음악관",
         "building": "university",
-        "building:levels": "5",
-        "building:basement": "2",
-        "center": [126.95348292589188, 37.34506178751063],
+        "building:levels": 5,
+        "building:basement": 2,
+        "center": [
+          126.95348292589188,
+          37.34506178751063
+        ],
         "bearing": -5
       },
       "geometry": {
@@ -563,9 +535,12 @@
         "@id": "rodem",
         "name": "로뎀관",
         "building": "dormitory",
-        "building:levels": "2",
-        "building:basement": "0",
-        "center": [126.95386846948948, 37.34415384000415],
+        "building:levels": 2,
+        "building:basement": 0,
+        "center": [
+          126.95386846948948,
+          37.34415384000415
+        ],
         "bearing": 0
       },
       "geometry": {
@@ -643,9 +618,12 @@
         "@id": "visionCentre",
         "name": "영상비전센터",
         "building": "university",
-        "building:levels": "10",
-        "building:basement": "0",
-        "center": [126.9532423093915, 37.34386020030255],
+        "building:levels": 10,
+        "building:basement": 0,
+        "center": [
+          126.9532423093915,
+          37.34386020030255
+        ],
         "bearing": 0
       },
       "geometry": {
@@ -691,9 +669,12 @@
         "@id": "engineering",
         "name": "이공관",
         "building": "university",
-        "building:levels": "4",
-        "building:basement": "0",
-        "center": [126.95370529778302, 37.34362930298334],
+        "building:levels": 4,
+        "building:basement": 0,
+        "center": [
+          126.95370529778302,
+          37.34362930298334
+        ],
         "bearing": 0
       },
       "geometry": {
@@ -747,9 +728,12 @@
         "@id": "council",
         "name": "학생회관",
         "building": "university",
-        "building:levels": "3",
-        "building:basement": "1",
-        "center": [126.95441884920001, 37.34357139523682],
+        "building:levels": 3,
+        "building:basement": 1,
+        "center": [
+          126.95441884920001,
+          37.34357139523682
+        ],
         "bearing": 85
       },
       "geometry": {
@@ -787,8 +771,12 @@
         "@id": "theology",
         "name": "신학관",
         "building": "university",
-        "building:levels": "6",
-        "center": [126.95395868271589, 37.343143183662114],
+        "building:levels": 6,
+        "building:basement": 0,
+        "center": [
+          126.95395868271589,
+          37.343143183662114
+        ],
         "bearing": -3
       },
       "geometry": {
@@ -826,8 +814,12 @@
         "@id": "vision",
         "name": "비전관",
         "building": "university",
-        "building:levels": "6",
-        "center": [126.95351142436266, 37.342909151946564],
+        "building:levels": 6,
+        "building:basement": 0,
+        "center": [
+          126.95351142436266,
+          37.342909151946564
+        ],
         "bearing": 52
       },
       "geometry": {

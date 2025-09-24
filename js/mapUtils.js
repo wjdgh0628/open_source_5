@@ -4,18 +4,32 @@ export const buildingState = {};
 buildingState.activeBuildingId = null;
 buildingState.activeLevel = null;
 
-export function autoFloorsArray(count, defs) {
-    const { floorThickness, floorGap, colorPalette } = defs;
-    return Array.from({ length: count }, (_, i) => {
+export function autoFloorsArray(fcount, bcount, defs) {
+    const { floorThickness, floorGap, colorPalette, basementPalette } = defs;
+    
+    let basement = Array.from({ length: bcount }, (_, i) => {
+        let bi = bcount - i - 1;
         const base = i * (floorThickness + floorGap);
         return {
             level: i,
+            name: `B${bi + 1}F`,
+            base,
+            height: base + floorThickness,
+            color: basementPalette[bi % basementPalette.length]
+        };
+    });
+    let floors = Array.from({ length: fcount }, (_, i) => {
+        let fi = i + bcount;
+        const base = fi * (floorThickness + floorGap);
+        return {
+            level: fi,
             name: `${i + 1}F`,
             base,
             height: base + floorThickness,
             color: colorPalette[i % colorPalette.length]
         };
     });
+    return basement.concat(floors);
 }
 
 export const buildFloorsGeoJSON = (coords, floors) => ({
