@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8">
+    <title>Campus 3D Floors</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css" rel="stylesheet">
+    <style>
+        html,
+        body,
+        #map {
+            height: 100%;
+            margin: 0;
+        }
+
+        .ml-control {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+            background: rgba(255, 255, 255, .9);
+            border-radius: 12px;
+            padding: 8px 10px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, .12);
+            font: 14px/1.2 -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial;
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .ml-btn {
+            border: 0;
+            padding: 6px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <div class="ml-control">
+        <button id="reset" class="ml-btn">초기화</button>
+    </div>
+
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.js"></script>
+    <script type="module">
+        import { initMap } from './js/main.js';
+        mapboxgl.accessToken = "pk.eyJ1IjoibGF6eWRldjEwMjQiLCJhIjoiY21mdW91NnNyMTVkZDJtcHd4dHNtNHU0ayJ9.mLzbdcCPq_-BeA8DlHu1KA";
+        initMap();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Mapbox 기본 3D 건물 + 층 스택 PoC</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css" rel="stylesheet" />
+    <style>
+        html,
+        body,
+        #map {
+            height: 100%;
+            margin: 0;
+        }
+
+        .ml-control {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+            background: rgba(255, 255, 255, .9);
+            border-radius: 12px;
+            padding: 8px 10px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, .12);
+            font: 14px/1.2 -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial;
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .ml-btn {
+            border: 0;
+            padding: 6px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <div class="ml-control">
+        <button id="reset" class="ml-btn">초기화</button>
+    </div>
+
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.js"></script>
+    <script>
+        // 1) 필수: 본인 토큰 입력
+        mapboxgl.accessToken = "pk.eyJ1IjoibGF6eWRldjEwMjQiLCJhIjoiY21mdW91NnNyMTVkZDJtcHd4dHNtNHU0ayJ9.mLzbdcCPq_-BeA8DlHu1KA";
+
+        // 2) 설정
+        const CONFIG = {
+            map: {
+                center: [126.95336, 37.34524],
+                zoom: 16,
+                style: "mapbox://styles/mapbox/streets-v12"
+            },
+            camera: {
+                clickMode: "around",                               // "around" | "above"
+                around: { zoom: 18, pitch: 60, bearing: 45, speed: 0.8, curve: 1.25 },
+                above: { zoom: 19.5, pitch: 0, bearing: 0, speed: 0.8 }
+            },
+            ui: {
+                floorSelectedOpacity: 0.95,
+                floorOthersOpacity: 0.05
+            },
+            buildingDefaults: {
+                floorThickness: 1,
+                floorGap: 5,
+                colorPalette: ["#ff0000", "#00ff00", "#0000ff", "#ff00ff", "#00ffff", "#ffaa00"]
+            },
+            defaultFloorCount: 3                                 // 클릭 시 기본 생성 층 수
+            ,
+            campus: {
+                geojsonUrl: "./campus.geojson",   // 외부 GeoJSON 파일 경로
+                idProp: "building_id",            // 건물 ID 속성명
+                nameProp: "name"                  // 건물 이름 속성명
+            }
+        };
+
+        // 3) 유틸
+        function autoFloorsArray(count, { floorThickness, floorGap, colorPalette }) {
+            const arr = [];
+            for (let i = 0; i < count; i++) {
+                const base = i * (floorThickness + floorGap);
+                const height = base + floorThickness;
+                const color = colorPalette[i % colorPalette.length];
+                arr.push({ level: i, name: `${i + 1}F`, base, height, color });
+            }
+            return arr;
+        }
+
+        function buildFloorsGeoJSON(coords, floorsSpec) {
+            const features = floorsSpec.map(f => ({
+                type: "Feature",
+                properties: { level: f.level, name: f.name ?? `${f.level}F`, base: f.base, height: f.height, color: f.color },
+                geometry: { type: "Polygon", coordinates: [coords] }
+            }));
+            return { type: "FeatureCollection", features };
+        }
+
+        function centroidOf(coords) {
+            let sx = 0, sy = 0, n = coords.length - 1;
+            for (let i = 0; i < n; i++) { sx += coords[i][0]; sy += coords[i][1]; }
+            return [sx / n, sy / n];
+        }
+
+        function ensureClosedPolygon(ring) {
+            if (!ring || ring.length < 3) return ring;
+            const first = ring[0], last = ring[ring.length - 1];
+            if (first[0] !== last[0] || first[1] !== last[1]) return [...ring, [...first]];
+            return ring;
+        }
+
+        // 4) 지도
+        const map = new mapboxgl.Map({
+            container: "map",
+            style: CONFIG.map.style,
+            center: CONFIG.map.center,
+            zoom: CONFIG.map.zoom,
+            pitch: 0,
+            bearing: 0
+        });
+        map.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), "top-right");
+
+        // 상태
+        const buildingState = {}; // bid -> { coords, floorsSpec, floorLayerIds, sourceId }
+        let activeBuildingId = null;
+        let activeLevel = null;
+
+        // 5) 레이어 구성
+        map.on("load", () => {
+            // 하늘
+            map.addLayer({
+                id: "sky",
+                type: "sky",
+                paint: {
+                    "sky-type": "atmosphere",
+                    "sky-atmosphere-sun": [0.0, 0.0],
+                    "sky-atmosphere-sun-intensity": 15
+                }
+            });
+
+            // ---- 캠퍼스 GeoJSON 소스/레이어 (속성 필터 기반 상호작용) ----
+            map.addSource("campus", { type: "geojson", data: CONFIG.campus.geojsonUrl });
+
+            map.addLayer({
+              id: "campus-3d",
+              type: "fill-extrusion",
+              source: "campus",
+              paint: {
+                "fill-extrusion-color": ["coalesce", ["get", "color"], "#aaaaaa"],
+                "fill-extrusion-base": ["coalesce", ["to-number", ["get", "min_height"]], 0],
+                "fill-extrusion-height": [
+                  "case",
+                  ["has", "height"], ["to-number", ["get", "height"]],
+                  ["has", "building:levels"], ["*", ["to-number", ["get", "building:levels"]], CONFIG.buildingDefaults.floorThickness + CONFIG.buildingDefaults.floorGap],
+                  10
+                ],
+                "fill-extrusion-opacity": 0.9
+              }
+            });
+
+            // 클릭 판정용 투명 fill
+            map.addLayer({
+              id: "campus-hit",
+              type: "fill",
+              source: "campus",
+              paint: { "fill-color": "#000000", "fill-opacity": 0.0 }
+            });
+
+            // 윤곽선(선택사항)
+            /* map.addLayer({
+              id: "campus-outline",
+              type: "line",
+              source: "campus",
+              paint: { "line-color": "#FFD000", "line-width": 2, "line-opacity": 0.5 }
+            }); */
+
+            map.on("mouseenter", "campus-hit", () => { map.getCanvas().style.cursor = "pointer"; });
+            map.on("mouseleave", "campus-hit", () => { map.getCanvas().style.cursor = ""; });
+
+            map.on("click", "campus-hit", (e) => {
+              e.originalEvent && (e.originalEvent.cancelBubble = true);
+              const f = e.features && e.features[0];
+              if (!f) return;
+
+              // 외곽 좌표(Polygon 또는 MultiPolygon 첫 외곽) 추출
+              let ring = null;
+              if (f.geometry.type === "Polygon") {
+                ring = f.geometry.coordinates[0];
+              } else if (f.geometry.type === "MultiPolygon") {
+                ring = f.geometry.coordinates[0][0];
+              }
+              if (!ring) return;
+              ring = ensureClosedPolygon(ring);
+
+              const bidRaw = f.properties?.[CONFIG.campus.idProp];
+              const bid = bidRaw ? String(bidRaw) : `feat-${f.id ?? Math.random().toString(36).slice(2)}`;
+
+              // 기존 같은 bid 제거
+              removeFloorsFor(bid);
+
+              // 층 수 자동 유추: building:levels가 있으면 사용, 없으면 기본값
+              const lvProp = f.properties?.["building:levels"];
+              const levels = Number.isFinite(+lvProp) ? Math.max(1, Math.min(20, +lvProp)) : CONFIG.defaultFloorCount;
+              const floorsSpec = autoFloorsArray(levels, CONFIG.buildingDefaults);
+
+              buildingState[bid] = {
+                coords: ring,
+                floorsSpec,
+                floorLayerIds: [],
+                sourceId: `${bid}-floors`
+              };
+
+              showFloorsFor(bid);
+
+              const c = centroidOf(ring);
+              (CONFIG.camera.clickMode === "above") ? flyAbove(c) : flyAround(c);
+            });
+
+            map.on("click", "campus-3d", (e) => {
+              e.originalEvent && (e.originalEvent.cancelBubble = true);
+              const f = e.features && e.features[0];
+              if (!f) return;
+              let ring = null;
+              if (f.geometry.type === "Polygon") {
+                ring = f.geometry.coordinates[0];
+              } else if (f.geometry.type === "MultiPolygon") {
+                ring = f.geometry.coordinates[0][0];
+              }
+              if (!ring) return;
+              ring = ensureClosedPolygon(ring);
+              const bidRaw = f.properties?.[CONFIG.campus.idProp];
+              const bid = bidRaw ? String(bidRaw) : `feat-${f.id ?? Math.random().toString(36).slice(2)}`;
+              removeFloorsFor(bid);
+              const lvProp = f.properties?.["building:levels"];
+              const levels = Number.isFinite(+lvProp) ? Math.max(1, Math.min(20, +lvProp)) : CONFIG.defaultFloorCount;
+              const floorsSpec = autoFloorsArray(levels, CONFIG.buildingDefaults);
+              buildingState[bid] = { coords: ring, floorsSpec, floorLayerIds: [], sourceId: `${bid}-floors` };
+              showFloorsFor(bid);
+              const c = centroidOf(ring);
+              (CONFIG.camera.clickMode === "above") ? flyAbove(c) : flyAround(c);
+            });
+
+            map.on("click", (e) => {
+                // 건물 클릭이 아닌 완전한 배경 클릭 시: 모든 층 제거 + 기본 3D 복귀
+                const floorLayers = Object.values(buildingState).flatMap(st => st.floorLayerIds);
+                const hit = map.queryRenderedFeatures(e.point, { layers: floorLayers });
+                if (hit.length === 0) {
+                    const baseHit = [
+                        ...map.queryRenderedFeatures(e.point, { layers: ["campus-3d"] }),
+                        ...map.queryRenderedFeatures(e.point, { layers: ["campus-hit"] })
+                    ];
+                    if (baseHit.length > 0) return;
+                    // 모든 건물 층 제거
+                    Object.keys(buildingState).forEach(removeFloorsFor);
+                    activeBuildingId = null;
+                    activeLevel = null;
+                    showCampusBase();
+                    enableCampusHit();
+                }
+            });
+
+            map.flyTo({ center: CONFIG.map.center, zoom: CONFIG.map.zoom, speed: 0.6 });
+        });
+
+        // 6) 동작
+        function showFloorsFor(bid) {
+            hideCampusBase();
+            disableCampusHit();
+            // 다른 사용자 스택은 유지(원하면 여기서 숨겨도 됨)
+            const st = buildingState[bid];
+            if (!st) return;
+            if (!map.getSource(st.sourceId)) {
+                map.addSource(st.sourceId, { type: "geojson", data: buildFloorsGeoJSON(st.coords, st.floorsSpec) });
+            }
+
+            st.floorsSpec.forEach(fl => {
+                const layerId = `${bid}-floor-${fl.level}`;
+                st.floorLayerIds.push(layerId);
+                map.addLayer({
+                    id: layerId,
+                    type: "fill-extrusion",
+                    source: st.sourceId,
+                    filter: ["==", ["get", "level"], fl.level],
+                    paint: {
+                        "fill-extrusion-color": ["get", "color"],
+                        "fill-extrusion-base": ["get", "base"],
+                        "fill-extrusion-height": ["get", "height"],
+                        "fill-extrusion-opacity": CONFIG.ui.floorSelectedOpacity
+                    }
+                });
+
+                map.on("mouseenter", layerId, () => map.getCanvas().style.cursor = "pointer");
+                map.on("mouseleave", layerId, () => map.getCanvas().style.cursor = "");
+
+                map.on("click", layerId, (e) => {
+                    e.originalEvent && (e.originalEvent.cancelBubble = true);
+                    activeBuildingId = bid;
+                    activeLevel = fl.level;
+                    setFloorOpacities(bid, fl.level);
+                    flyTopDown(centroidOf(st.coords));
+                });
+            });
+
+            activeBuildingId = bid;
+            activeLevel = null;
+        }
+
+        function setFloorOpacities(bid, selectedLevelOrNull) {
+            const st = buildingState[bid];
+            if (!st) return;
+            st.floorsSpec.forEach(fl => {
+                const layerId = `${bid}-floor-${fl.level}`;
+                const op = (selectedLevelOrNull === null)
+                    ? CONFIG.ui.floorSelectedOpacity
+                    : (fl.level === selectedLevelOrNull ? CONFIG.ui.floorSelectedOpacity : CONFIG.ui.floorOthersOpacity);
+                if (map.getLayer(layerId)) map.setPaintProperty(layerId, "fill-extrusion-opacity", op);
+            });
+        }
+
+        function flyAround(centerLngLat) {
+            const c = CONFIG.camera.around;
+            map.flyTo({ center: centerLngLat, zoom: c.zoom, pitch: c.pitch, bearing: c.bearing, speed: c.speed, curve: c.curve, essential: true });
+        }
+
+        function flyAbove(centerLngLat) {
+            const c = CONFIG.camera.above;
+            map.flyTo({ center: centerLngLat, zoom: c.zoom, pitch: c.pitch, bearing: c.bearing, speed: c.speed, essential: true });
+        }
+
+        function flyTopDown(centerLngLat) {
+            map.flyTo({ center: centerLngLat, zoom: Math.max(CONFIG.camera.above.zoom, 19), pitch: 0, bearing: 0, speed: 0.6 });
+        }
+
+        function hideCampusBase() {
+            if (map.getLayer("campus-3d")) map.setLayoutProperty("campus-3d", "visibility", "none");
+            if (map.getLayer("campus-outline")) map.setLayoutProperty("campus-outline", "visibility", "none");
+        }
+        function showCampusBase() {
+            if (map.getLayer("campus-3d")) map.setLayoutProperty("campus-3d", "visibility", "visible");
+            if (map.getLayer("campus-outline")) map.setLayoutProperty("campus-outline", "visibility", "visible");
+        }
+        function disableCampusHit() {
+            if (map.getLayer("campus-hit")) map.setLayoutProperty("campus-hit", "visibility", "none");
+        }
+        function enableCampusHit() {
+            if (map.getLayer("campus-hit")) map.setLayoutProperty("campus-hit", "visibility", "visible");
+        }
+
+        function removeFloorsFor(bid) {
+            const st = buildingState[bid];
+            if (!st) return;
+            st.floorLayerIds?.forEach(id => { if (map.getLayer(id)) map.removeLayer(id); });
+            if (st.sourceId && map.getSource(st.sourceId)) map.removeSource(st.sourceId);
+            delete buildingState[bid];
+        }
+
+        // 7) 초기화
+        document.getElementById("reset").addEventListener("click", () => {
+            Object.keys(buildingState).forEach(removeFloorsFor);
+            activeBuildingId = null;
+            activeLevel = null;
+            showCampusBase();
+            enableCampusHit();
+            map.flyTo({ center: CONFIG.map.center, zoom: CONFIG.map.zoom, pitch: 0, bearing: 0, speed: 0.6 });
+        });
+
+    </script>
+</body>
+</html>

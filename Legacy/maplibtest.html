@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Campus 2D→3D Floor PoC (MapLibre + OSM)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://unpkg.com/maplibre-gl@3.6.1/dist/maplibre-gl.css" rel="stylesheet" />
+    <style>
+        html,
+        body,
+        #map {
+            height: 100%;
+            margin: 0;
+        }
+
+        .ml-control {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+            background: rgba(255, 255, 255, .9);
+            border-radius: 12px;
+            padding: 8px 10px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, .12);
+            font: 14px/1.2 -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial;
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .ml-btn {
+            border: 0;
+            padding: 6px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <div class="ml-control">
+        <button id="reset" class="ml-btn">초기화</button>
+    </div>
+    <script src="https://unpkg.com/maplibre-gl@3.6.1/dist/maplibre-gl.js"></script>
+    <script>
+        // 중심과 테스트용 정사각형(3층) 좌표
+        const center = [126.95336, 37.34524];
+        const mainBuilding = [126.95284, 37.34703];
+        const d = 0.0002; // 정사각형 크기(대략 수십 m)
+        const square = [
+            [mainBuilding[0] - d, mainBuilding[1] - d],
+            [mainBuilding[0] + d, mainBuilding[1] - d],
+            [mainBuilding[0] + d, mainBuilding[1] + d],
+            [mainBuilding[0] - d, mainBuilding[1] + d],
+            [mainBuilding[0] - d, mainBuilding[1] - d]
+        ];
+
+        // 층 피쳐(바닥만 표현) — base/height로 간격 띄우기
+        const floorsGeoJSON = {
+            "type": "FeatureCollection",
+            "features": [
+                { "type": "Feature", "properties": { "level": 0, "name": "1F", "base": 0, "height": 4, "color": "#ff0000" }, "geometry": { "type": "Polygon", "coordinates": [square] } },
+                { "type": "Feature", "properties": { "level": 1, "name": "2F", "base": 5, "height": 9, "color": "#00ff00" }, "geometry": { "type": "Polygon", "coordinates": [square] } },
+                { "type": "Feature", "properties": { "level": 2, "name": "3F", "base": 10, "height": 14, "color": "#0000ff" }, "geometry": { "type": "Polygon", "coordinates": [square] } }
+            ]
+        };
+
+        // 단일 건물(클릭 전 노란색)
+        const buildingFootprint = {
+            "type": "FeatureCollection",
+            "features": [
+                { "type": "Feature", "properties": { "name": "Demo Building" }, "geometry": { "type": "Polygon", "coordinates": [square] } }
+            ]
+        };
+
+        // OSM 래스터 스타일(간단)
+        const simpleRasterStyle = {
+            "version": 8,
+            "sources": {
+                "osm": {
+                    "type": "raster",
+                    "tiles": ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
+                    "tileSize": 256,
+                    "attribution": "&copy; OpenStreetMap contributors"
+                }
+            },
+            "layers": [
+                { "id": "osm", "type": "raster", "source": "osm" }
+            ]
+        };
+
+        const map = new maplibregl.Map({
+            container: 'map',
+            style: simpleRasterStyle,
+            center,
+            zoom: 16,
+            pitch: 0,
+            bearing: 0,
+            hash: false,
+            attributionControl: true
+        });
+
+        map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
+
+        let floorsAdded = false;
+        let selectedLevel = null;
+
+        map.on('load', () => {
+            // 건물 발자국(노란색) — 클릭 전 상태
+            map.addSource('building-footprint', { type: 'geojson', data: buildingFootprint });
+            map.addLayer({
+                id: 'building-footprint-fill',
+                type: 'fill',
+                source: 'building-footprint',
+                paint: {
+                    'fill-color': '#FFD000',
+                    'fill-opacity': 0.65
+                }
+            });
+
+            // 클릭 가능 표시
+            map.on('mouseenter', 'building-footprint-fill', () => map.getCanvas().style.cursor = 'pointer');
+            map.on('mouseleave', 'building-footprint-fill', () => map.getCanvas().style.cursor = '');
+
+            // 건물 클릭 → 카메라 이동 + 층 스택 표시
+            map.on('click', 'building-footprint-fill', (e) => {
+            //   const target = e.lngLat || map.getcenter();
+              const target = mainBuilding; // 또는 buildingCenter를 쓰는 경우 buildingCenter
+              showFloors();
+              flyAround(target);
+            });
+
+            // 맵 바탕 클릭 → 선택 해제(층 보이되 모두 불투명)
+            map.on('click', (e) => {
+                // 바탕 클릭만 처리하고, floor layer 클릭은 아래에서 개별 처리
+                if (!floorsAdded) return;
+                const features = map.queryRenderedFeatures(e.point, { layers: ['floor-1F', 'floor-2F', 'floor-3F'] });
+                if (features.length === 0) {
+                    selectedLevel = null;
+                    setAllFloorsOpacity(0.95, 0.50); // 기본 진하게
+                }
+            });
+
+            // 초기 보기에서 대략적 위치로 이동
+            map.flyTo({ center, zoom: 16, speed: 0.6 });
+        });
+
+        function showFloors() {
+            if (floorsAdded) return;
+
+            // 발자국 숨김
+            map.setLayoutProperty('building-footprint-fill', 'visibility', 'none');
+
+            // 층 소스/레이어 추가
+            map.addSource('floors', { type: 'geojson', data: floorsGeoJSON });
+
+            // 층별 레이어(바닥만 쌓듯이 표현: fill-extrusion-base / height)
+            addFloorLayer('floor-1F', 0, '1F');
+            addFloorLayer('floor-2F', 1, '2F');
+            addFloorLayer('floor-3F', 2, '3F');
+
+            // 클릭 이벤트(층 선택)
+            ['floor-1F', 'floor-2F', 'floor-3F'].forEach((id, idx) => {
+                map.on('mouseenter', id, () => map.getCanvas().style.cursor = 'pointer');
+                map.on('mouseleave', id, () => map.getCanvas().style.cursor = '');
+
+                map.on('click', id, (e) => {
+                    const feat = e.features && e.features[0];
+                    if (!feat) return;
+                    selectedLevel = feat.properties.level | 0;
+                    focusSelectedFloor(selectedLevel);
+                });
+            });
+
+            floorsAdded = true;
+        }
+
+        function addFloorLayer(layerId, level, label) {
+            map.addLayer({
+                id: layerId,
+                type: 'fill-extrusion',
+                source: 'floors',
+                filter: ['==', ['get', 'level'], level],
+                paint: {
+                    'fill-extrusion-color': ['get', 'color'],
+                    'fill-extrusion-base': ['get', 'base'],
+                    'fill-extrusion-height': ['get', 'height'], // 바닥 "두께" 느낌
+                    'fill-extrusion-opacity': 0.95
+                }
+            });
+        }
+
+        function flyAround(targetLngLat) {
+            map.flyTo({
+                center: targetLngLat,
+                zoom: 18,
+                pitch: 60,
+                bearing: 45,
+                speed: 0.8,
+                curve: 1.25,
+                essential: true
+            });
+        }
+
+        function focusSelectedFloor(level) {
+            // 선택 층만 진하게, 나머지 반투명
+            setAllFloorsOpacity(0.05, 0.95, level);
+
+            // 수직(평면도 보기)
+            map.flyTo({
+                mainBuilding,
+                zoom: 19,
+                pitch: 0,
+                bearing: 0,
+                speed: 0.6
+            });
+        }
+
+        // othersOpacity: 선택 외 층의 불투명도, selectedOpacity: 선택 층의 불투명도
+        function setAllFloorsOpacity(othersOpacity = 0.25, selectedOpacity = 0.95, selected = null) {
+            const ids = [
+                { id: 'floor-1F', lvl: 0 },
+                { id: 'floor-2F', lvl: 1 },
+                { id: 'floor-3F', lvl: 2 }
+            ];
+            ids.forEach(({ id, lvl }) => {
+                const op = (selected === null) ? selectedOpacity : (lvl === selected ? selectedOpacity : othersOpacity);
+                if (map.getLayer(id)) map.setPaintProperty(id, 'fill-extrusion-opacity', op);
+            });
+        }
+
+        function flyAbove(targetLngLat) {
+            map.flyTo({
+                center: targetLngLat, // 건물 중심
+                zoom: 19.5,           // 필요시 18~21 사이로 조정
+                pitch: 0,             // 수직 내려보기
+                bearing: 0,
+                speed: 0.8,
+                essential: true
+            });
+        }
+
+        // 초기화 버튼: 발자국으로 복귀
+        document.getElementById('reset').addEventListener('click', () => {
+            if (floorsAdded) {
+                ['floor-1F', 'floor-2F', 'floor-3F'].forEach(id => { if (map.getLayer(id)) map.removeLayer(id); });
+                if (map.getSource('floors')) map.removeSource('floors');
+                floorsAdded = false;
+                selectedLevel = null;
+            }
+            if (map.getLayer('building-footprint-fill')) {
+                map.setLayoutProperty('building-footprint-fill', 'visibility', 'visible');
+            }
+            map.flyTo({ center, zoom: 16, pitch: 0, bearing: 0, speed: 0.6 });
+        });
+    </script>
+</body>
+
+</html>
