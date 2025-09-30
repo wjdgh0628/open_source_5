@@ -42,9 +42,10 @@ export function generateFloors(map, bid) {
                 "fill-extrusion-opacity": 1
             }
         });
+        
         //클릭시 실행할 코드 지정
         map.on("click", fid, e => {
-            handleFloorClick(map, e, bid, fid, fl);
+            handleFloorClick(map, e, bid, fid, fl.level);
         });
 
     });

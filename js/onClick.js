@@ -40,11 +40,11 @@ export function handleBuildingClick(map, e) {
 }
 
 // 층 클릭시 실행할 코드
-export function handleFloorClick(map, e, bid, fid, fl) {
+export function handleFloorClick(map, e, bid, fid, level) {
     e.originalEvent && (e.originalEvent.cancelBubble = true);
     currentState.activeFid = fid;
-    currentState.activeLevel = fl.level;
-    setFloorOpacities(map, bid, fl.level);
+    currentState.activeLevel = level;
+    setFloorOpacities(map, bid, level);
     flyCamera(map, CONFIG.camera.floor, currentState.pos, JSON.parse(currentState.buildProp?.["bearing"]));
     currentState.mode = 2;
 }
