@@ -5,14 +5,10 @@ export const CONFIG = {
         style: "mapbox://styles/mapbox/streets-v12"
     },
     camera: {
-        clickMode: "around", // "around" | "above"
-        floorClick: "above", // "around" | "above"
+        building: "around",
+        floor: "above",
         around: { zoom: 18, pitch: 60, bearing: -45, speed: 0.8, curve: 1.25 },
         above: { zoom: 19, pitch: 0, speed: 0.4 }
-    },
-    ui: {
-        floorSelectedOpacity: 1,
-        floorOthersOpacity: 0.0
     },
     buildingDefaults: {
         floorThickness: 1,
@@ -22,7 +18,9 @@ export const CONFIG = {
     },
     defaultFloorCount: 3,
     campus: {
-        geojsonUrl: "./campus.geojson",
+        geojsonUrl: "./json/buildings.geojson",
+        floorsUrl: "./json/floors.json",
+        roomsUrl: "./json/rooms.json",
         idProp: "@id",
         nameProp: "name"
     }
