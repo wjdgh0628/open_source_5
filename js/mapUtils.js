@@ -42,7 +42,7 @@ export function generateFloors(map, bid) {
                 "fill-extrusion-opacity": 1
             }
         });
-        
+
         //클릭시 실행할 코드 지정
         map.on("click", fid, e => {
             handleFloorClick(map, e, bid, fid, fl.level);
@@ -103,6 +103,17 @@ export function setFloorOpacities(map, bid, selected) {
             map.setPaintProperty(fid, "fill-extrusion-opacity", op);
         currentState.activeBid = bid;
     });
+}
+
+export async function searchRoom() {
+    const res = await fetch(CONFIG.campus.roomsUrl);
+    const room = await res.json()?.main?.floor_1?.m101;
+
+
+    // 예: 방 이름으로 찾기
+    console.log(room?.bid);
+    console.log(room?.floor);
+    console.log(room?.center);
 }
 
 //카메라 이동 함수

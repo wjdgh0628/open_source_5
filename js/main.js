@@ -1,5 +1,5 @@
 import { CONFIG } from './config.js';
-import {currentState, generateFloors} from './mapUtils.js';
+import {currentState, searchRoom} from './mapUtils.js';
 import {handleBuildingClick, handleBackgroundClick} from './onClick.js';
 
 export function initMap() {
@@ -44,7 +44,8 @@ export function initMap() {
             }
         });
         //건물, 배경 클릭시 실행할 코드 지정
-        map.on("click", "campus-3d", e => handleBuildingClick(map, e));
+        // map.on("click", "campus-3d", e => handleBuildingClick(map, e));
+        map.on("click", "campus-3d", e => searchRoom());
         map.on("click", e => handleBackgroundClick(map, e));
     });
 
