@@ -3,6 +3,7 @@ import {
     currentState, flyCamera, hideCampusBase, showCampusBase, generateFloors, removeFloorsFor, setFloorOpacities, autoFloorsArray
 } from './mapUtils.js';
 
+//건물 클릭시 실행할 코드
 export function handleBuildingClick(map, e) {
     //모르는 코드
     e.originalEvent && (e.originalEvent.cancelBubble = true);
@@ -26,16 +27,29 @@ export function handleBuildingClick(map, e) {
     //빌딩스테이드에 건물 정보 추가
     currentState[bid] = { coords: ring, floorsSpec, floorLayerIds: [], sourceId: `${bid}-floors` };
 
+    //건물 숨기고 층 생성하고 카메라 이동
     hideCampusBase(map);
     generateFloors(map, bid);
     flyCamera(map, CONFIG.camera.building, JSON.parse(f.properties?.["center"]));
 
+    //cs에 현재상태 저장
     currentState.activeBid = bid;
     currentState.buildProp = f.properties;
     currentState.pos = JSON.parse(f.properties?.["center"]);
     currentState.mode = 1;
 }
 
+// 층 클릭시 실행할 코드
+export function handleFloorClick(map, e, bid, fid, fl) {
+    e.originalEvent && (e.originalEvent.cancelBubble = true);
+    currentState.activeFid = fid;
+    currentState.activeLevel = fl.level;
+    setFloorOpacities(map, bid, fl.level);
+    flyCamera(map, CONFIG.camera.floor, currentState.pos, JSON.parse(currentState.buildProp?.["bearing"]));
+    currentState.mode = 2;
+}
+
+//배경 클릭시 실행할 코드
 export function handleBackgroundClick(map, e) {
     const floorLayers = Object.entries(currentState)
         .filter(([k, v]) => v && v.floorLayerIds)
@@ -57,13 +71,4 @@ export function handleBackgroundClick(map, e) {
             currentState.mode = 0;
         }
     }
-}
-
-export function handleFloorClick(map, e, bid, fid, fl) {
-    e.originalEvent && (e.originalEvent.cancelBubble = true);
-    currentState.activeFid = fid;
-    currentState.activeLevel = fl.level;
-    setFloorOpacities(map, bid, fl.level);
-    flyCamera(map, CONFIG.camera.floor, currentState.pos, JSON.parse(currentState.buildProp?.["bearing"]));
-    currentState.mode = 2;
 }

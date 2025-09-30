@@ -10,6 +10,7 @@ currentState.activeBid = null;
 currentState.activeFid = null;
 currentState.activeLevel = null;
 
+//층 생성 총괄
 export function generateFloors(map, bid) {
     //빌딩 정보 가져오기
     const st = currentState[bid];
@@ -51,6 +52,7 @@ export function generateFloors(map, bid) {
     currentState.activeLevel = null;
 }
 
+// 층 배열(높이, 색상 등 정보 포함) 자동생성
 export function autoFloorsArray(fcount, bcount, defs) {
     const { floorThickness, floorGap, colorPalette, basementPalette } = defs;
     
@@ -79,6 +81,7 @@ export function autoFloorsArray(fcount, bcount, defs) {
     return basement.concat(floors);
 }
 
+//아마 폴리곤 바탕으로 층 모양 만드는 코드
 export const buildFloorsGeoJSON = (coords, floors) => ({
     type: "FeatureCollection",
     features: floors.map(f => ({
@@ -101,12 +104,14 @@ export function setFloorOpacities(map, bid, selected) {
     });
 }
 
+//카메라 이동 함수
 export function flyCamera(map, mode, center, bearing = null){
     if(bearing == null)
         bearing = CONFIG.camera[mode].bearing;
     map.flyTo({ center, ...CONFIG.camera[mode], bearing: bearing, ssential: true });
 }
 
+// 모드 전환할때 각 요소 없애거나 나타나게 하는 함수들
 export function removeFloorsFor(map, bid) {
     const st = currentState[bid];
     if (!st || !Array.isArray(st.floorLayerIds)) return;
