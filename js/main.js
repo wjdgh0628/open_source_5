@@ -46,7 +46,7 @@ export function initMap() {
         //건물, 배경 클릭시 실행할 코드 지정
         // map.on("click", "campus-3d", e => handleBuildingClick(map, e));
         map.on("click", "campus-3d", e => searchRoom(map));
-        map.on("click", e => handleBackgroundClick(map, e));
+        // map.on("click", e => handleBackgroundClick(map, e));
     });
 
     currentState.mode = 0;
