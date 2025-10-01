@@ -56,7 +56,7 @@ export function generateFloors(map, bid) {
 // 층 배열(높이, 색상 등 정보 포함) 자동생성
 export function autoFloorsArray(fcount, bcount, defs) {
     const { floorThickness, floorGap, colorPalette, basementPalette } = defs;
-    
+
     let basement = Array.from({ length: bcount }, (_, i) => {
         let bi = bcount - i - 1;
         const base = i * (floorThickness + floorGap);
@@ -105,22 +105,45 @@ export function setFloorOpacities(map, bid, selected) {
     });
 }
 
-export async function searchRoom() {
+export async function searchRoom(map) {
     const res = await fetch(CONFIG.campus.roomsUrl);
-    const room = await res.json()?.main?.floor_1?.m101;
+    const data = await res.json();
+    const room = data?.main?.floor_1?.m101;
 
 
     // 예: 방 이름으로 찾기
-    console.log(room?.bid);
-    console.log(room?.floor);
-    console.log(room?.center);
+    let bid = room?.bid;
+    let floor = room?.floor;
+    let center = room?.center;
+    let buildingCenter = null;
+
+    // buildings.geojson 파일을 불러온다고 가정
+    fetch(CONFIG.campus.geojsonUrl)
+        .then(response => response.json())
+        .then(data => {x
+            const targetId = bid; // 원하는 @id 값
+            const feature = data.features.find(f => f.properties["@id"] === targetId);
+
+            if (feature) {
+                console.log("Center:", feature.properties.center);
+                buildingCenter = feature.properties.center;
+            } else {
+                console.log("해당 ID를 가진 객체가 없습니다.");
+            }
+        })
+        .catch(err => console.error("파일 불러오기 실패:", err));
+
+    generateFloors(map, bid);
+    setFloorOpacities(map, bid, floor)
+    flyCamera(map, CONFIG.camera.floor, JSON.parse(buildingCenter));
 }
 
+
 //카메라 이동 함수
-export function flyCamera(map, mode, center, bearing = null){
-    if(bearing == null)
+export function flyCamera(map, mode, center, bearing = null) {
+    if (bearing == null)
         bearing = CONFIG.camera[mode].bearing;
-    map.flyTo({ center, ...CONFIG.camera[mode], bearing: bearing, ssential: true });
+    map.flyTo({ center, ...CONFIG.camera[mode], bearing: bearing, essential: true });
 }
 
 // 모드 전환할때 각 요소 없애거나 나타나게 하는 함수들

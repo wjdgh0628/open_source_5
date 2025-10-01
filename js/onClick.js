@@ -24,7 +24,7 @@ export function handleBuildingClick(map, e) {
     const bmProp = f.properties?.["building:basement"];
     const floorsSpec = autoFloorsArray(lvProp, bmProp, CONFIG.buildingDefaults);
 
-    //빌딩스테이드에 건물 정보 추가
+    //cs에 건물 정보 추가
     currentState[bid] = { coords: ring, floorsSpec, floorLayerIds: [], sourceId: `${bid}-floors` };
 
     //건물 숨기고 층 생성하고 카메라 이동
