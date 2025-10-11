@@ -47,6 +47,6 @@ export function initMap() {
         map.on("click", "campus-3d", e => handleBuildingClick(map, e));
         map.on("click", e => handleBackgroundClick(map, e));
     });
-
     currentState.mode = 0;
+    return map;
 }
