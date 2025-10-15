@@ -11,9 +11,9 @@ export async function showBuildingFloors(map, bid) {
     
     // 층 배열 생성 (지하층/지상층 정보 활용)
     const info = await searchBuildingByBid(bid);
-    let ring = info["ring"];
-    const lvProp = info["levels"];
-    const bmProp = info["basement"];
+    let ring = info.ring;
+    const lvProp = info.levels;
+    const bmProp = info.basement;
     const floorsSpec = autoFloorsArray(lvProp, bmProp, CONFIG.buildingDefaults);
 
     // currentState에 현재 건물 정보 저장
@@ -22,17 +22,14 @@ export async function showBuildingFloors(map, bid) {
     // 건물 숨김, 층 생성, 카메라 이동
     hideCampusBase(map);
     generateFloors(map, bid);
-    flyCamera(map, CONFIG.camera.building, info["center"]);
+    flyCamera(map, CONFIG.camera.building, info.center);
 
     // 상태 변수 업데이트
     currentState.activeBid = bid;
-    currentState.buildProp = info["properties"];
-    currentState.pos = info["center"];
+    currentState.buildProp = info.properties;
+    currentState.pos = info.center;
     currentState.mode = 1; // 건물 층 보기 모드
-    console.log(info?.["bid"]);
-    console.log(info["bid"]);
     console.log(info.bid);
-    console.log(info);
 }
 
 //공통 feature 추출 함수
