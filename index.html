@@ -30,9 +30,9 @@
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.js"></script>
 
     <script type="module">
-        import { initMap } from '/js/main.js'; 
-        import { CONFIG } from '/js/config.js';  
-        import { handleBuildingListClick } from '/js/onclick.js';
+        import { initMap } from './js/main.js'; 
+        import { CONFIG } from './js/config.js';  
+        import { handleBuildingListClick } from './js/onclick.js';
 
         mapboxgl.accessToken = "pk.eyJ1IjoibGF6eWRldjEwMjQiLCJhIjoiY21mdW91NnNyMTVkZDJtcHd4dHNtNHU0ayJ9.mLzbdcCPq_-BeA8DlHu1KA";
 
@@ -65,7 +65,7 @@
                 listItem.classList.add('building-list-item');
                 listItem.addEventListener('click', () => {
                     console.log(`[${name}] 클릭됨.`);
-                    handleBuildingListClick(mapInstance, feature);
+                    handleBuildingListClick(mapInstance, feature.properties?.["@id"]);
                 });
                 
                 ul.appendChild(listItem);
