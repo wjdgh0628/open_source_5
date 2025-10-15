@@ -165,7 +165,7 @@ export async function searchBuildingByBid(bid)
         basement: bmProp,
         center: center,
         properties: properties
-    }
+    };
 }
 
 

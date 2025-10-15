@@ -30,62 +30,9 @@
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.js"></script>
 
     <script type="module">
-        import { initMap } from './js/main.js'; 
-        import { CONFIG } from './js/config.js';  
-        import { handleBuildingListClick } from './js/onclick.js';
-
+        import { start } from './js/main.js'; 
         mapboxgl.accessToken = "pk.eyJ1IjoibGF6eWRldjEwMjQiLCJhIjoiY21mdW91NnNyMTVkZDJtcHd4dHNtNHU0ayJ9.mLzbdcCPq_-BeA8DlHu1KA";
-
-        const map = initMap(); 
-
-        fetch(CONFIG.campus.geojsonUrl)
-            .then(res => res.json())
-            .then(geojsonData => {
-                generateBuildingList(map, geojsonData);
-            })
-            .catch(err => console.error("GeoJSON 불러오기 오류:", err));
-
-        //건물 리스트 생성 함수
-        function generateBuildingList(mapInstance, geojsonData) {
-            const listContent = document.getElementById('building-list-content');
-            listContent.innerHTML = ''; 
-            
-            const ul = document.createElement('ul');
-            ul.classList.add('building-list'); 
-            
-            const nameKey = CONFIG.campus.nameProp; 
-            
-            // GeoJSON의 각 건물 feature 반복
-            geojsonData.features.forEach(feature => {
-                const name = feature.properties?.[nameKey];
-                if (!name) return; 
-
-                const listItem = document.createElement('li');
-                listItem.textContent = name;
-                listItem.classList.add('building-list-item');
-                listItem.addEventListener('click', () => {
-                    console.log(`[${name}] 클릭됨.`);
-                    handleBuildingListClick(mapInstance, feature.properties?.["@id"]);
-                });
-                
-                ul.appendChild(listItem);
-            });
-            listContent.appendChild(ul);
-        }
-
-        //사이드바 토글 기능
-        const sidebar = document.getElementById('sidebar');
-        const toggleBtn = document.getElementById('sidebar-toggle-btn');
-        const icon = toggleBtn.querySelector('i');
-
-        toggleBtn.addEventListener('click', () => {
-        sidebar.classList.toggle('collapsed');
-        if (sidebar.classList.contains('collapsed')) {
-            icon.classList.replace('fa-chevron-left', 'fa-chevron-right');
-        } else {
-            icon.classList.replace('fa-chevron-right', 'fa-chevron-left');
-        }
-        });
+        start(); 
     </script>
 </body>
 

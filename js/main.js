@@ -1,6 +1,6 @@
 import { CONFIG } from './config.js';
 import {currentState, generateFloors} from './mapUtils.js';
-import {handleBuildingClick, handleBackgroundClick} from './onClick.js';
+import {handleBuildingClick, handleBackgroundClick, handleBuildingListClick} from './onClick.js';
 
 export function initMap() {
     // map 객체(맵박스) 생성
@@ -49,4 +49,56 @@ export function initMap() {
     });
     currentState.mode = 0;
     return map;
+}
+export function start()
+{
+        const map = initMap();
+        fetch(CONFIG.campus.geojsonUrl)
+            .then(res => res.json())
+            .then(geojsonData => {
+                generateBuildingList(map, geojsonData);
+            })
+            .catch(err => console.error("GeoJSON 불러오기 오류:", err));
+
+        //건물 리스트 생성 함수
+        function generateBuildingList(mapInstance, geojsonData) {
+            const listContent = document.getElementById('building-list-content');
+            listContent.innerHTML = ''; 
+            
+            const ul = document.createElement('ul');
+            ul.classList.add('building-list'); 
+            
+            const nameKey = CONFIG.campus.nameProp; 
+            
+            // GeoJSON의 각 건물 feature 반복
+            geojsonData.features.forEach(feature => {
+                const name = feature.properties?.[nameKey];
+                if (!name) return; 
+
+                const listItem = document.createElement('li');
+                listItem.textContent = name;
+                listItem.classList.add('building-list-item');
+                listItem.addEventListener('click', () => {
+                    console.log(`[${name}] 클릭됨.`);
+                    handleBuildingListClick(mapInstance, feature.properties?.["@id"]);
+                });
+                
+                ul.appendChild(listItem);
+            });
+            listContent.appendChild(ul);
+        }
+
+        //사이드바 토글 기능
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('sidebar-toggle-btn');
+        const icon = toggleBtn.querySelector('i');
+
+        toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('collapsed');
+        if (sidebar.classList.contains('collapsed')) {
+            icon.classList.replace('fa-chevron-left', 'fa-chevron-right');
+        } else {
+            icon.classList.replace('fa-chevron-right', 'fa-chevron-left');
+        }
+        });
 }
