@@ -101,4 +101,19 @@ export function start()
             icon.classList.replace('fa-chevron-right', 'fa-chevron-left');
         }
         });
+
+        const modal = document.getElementById('modal-overlay');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+
+        // 'X' 버튼 클릭 시 모달 닫기
+        modalCloseBtn.addEventListener('click', () => {
+            modal.classList.add('hidden');
+        });
+
+        // 모달 바깥의 어두운 배경 클릭 시 모달 닫기
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+            }
+        });
 }

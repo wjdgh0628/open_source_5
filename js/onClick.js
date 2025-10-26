@@ -63,11 +63,35 @@ export function handleBuildingListClick(map, bid) {
 // 층 클릭시 실행할 코드
 export function handleFloorClick(map, e, bid, fid, level) {
     e.originalEvent && (e.originalEvent.cancelBubble = true);
-    currentState.activeFid = fid;
-    currentState.activeLevel = level;
-    setFloorOpacities(map, bid, level);
-    flyCamera(map, CONFIG.camera.floor, currentState.pos, JSON.parse(currentState.buildProp?.["bearing"]));
-    currentState.mode = 2;
+    if (currentState.activeFid === fid) {
+        // 이미 활성화된 층을 다시 클릭한 경우 (두 번째 클릭)
+        console.log(`[${fid}] 층을 다시 클릭했습니다. 모달을 엽니다.`);
+        
+        // 1. 모달 요소들을 가져옵니다.
+        const modal = document.getElementById('modal-overlay');
+        const modalInfo = document.getElementById('modal-floor-info');
+
+        // 2. 모달에 표시할 내용을 업데이트합니다. (예시)
+        // TODO: 나중에 이 부분을 실제 층 정보로 채워야 합니다.
+        // rooms.json 데이터를 불러와서 채울 수 있습니다.
+        modalInfo.innerHTML = `
+            <p><strong>건물 ID:</strong> ${bid}</p>
+            <p><strong>층 ID:</strong> ${fid}</p>
+            <p><strong>층 레벨:</strong> ${level}</p>
+            <p>여기에 <strong>${fid}</strong>의 세부 강의실 정보나 사진 등을 표시할 수 있습니다.</p>
+        `;
+
+        // 3. 모달을 보여줍니다.
+        modal.classList.remove('hidden');
+
+    } else {
+        // 다른 층을 클릭했거나, 층을 처음 클릭한 경우 (첫 번째 클릭)
+        currentState.activeFid = fid;
+        currentState.activeLevel = level;
+        setFloorOpacities(map, bid, level);
+        flyCamera(map, CONFIG.camera.floor, currentState.pos, JSON.parse(currentState.buildProp?.["bearing"]));
+        currentState.mode = 2;
+    }
 }
 
 //배경 클릭시 실행할 코드
