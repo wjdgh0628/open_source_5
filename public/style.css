@@ -35,16 +35,21 @@ html, body {
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
   z-index: 10;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: scroll;
   transition: transform 0.3s ease, width 0.3s ease;
   transform: translateX(0);
+  -ms-overflow-style: none;
+}
+
+#sidebar::-webkit-scrollbar {
+  display: none;
 }
 
 /* 접힌 상태 */
 #sidebar.collapsed {
-  width: 50px;
-  min-width: 50px;
-  max-width: 50px;
+  width: 70px;
+  min-width: 70px;
+  max-width: 70px;
   transform: none;
 }
 
@@ -96,8 +101,8 @@ html, body {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 13px;
+  right: 17px;
   z-index: 20;
 }
 
