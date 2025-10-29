@@ -4,9 +4,6 @@ import {flyCamera, hideCampusBase, showCampusBase, generateFloors, autoFloorsArr
 
 //빌딩 층 보여주는 함수 >> 건물클릭, 리스트 클릭시 이 함수를 호출
 export async function showBuildingFloors(map, bid) {
-
-    // 이전에 활성화된 모든 건물 층 모델들 삭제
-    removeAllFloors();
     
     // 층 배열 생성 (지하층/지상층 정보 활용)
     const info = await searchBuildingByBid(bid);
@@ -49,7 +46,7 @@ export function handleFloorClick(map, e, bid, fid) {
 
 //배경 클릭시 실행할 코드
 export function handleBackgroundClick(map, e) {
-    removeAllFloors();
+    removeAllFloors(map);
     showCampusBase(map);
     console.log("배경 클릭됨");
 }

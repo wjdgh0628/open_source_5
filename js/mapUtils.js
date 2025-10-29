@@ -82,7 +82,7 @@ export function flyCamera(map, mode, center, bearing = null){
         bearing = CONFIG.camera[mode].bearing;
     map.flyTo({ center, ...CONFIG.camera[mode], bearing: bearing, ssential: true });
 }
-
+//bid로 건물 정보 검색
 export async function searchBuildingByBid(bid)
 {
     /* const res = await fetch(CONFIG.campus.roomsUrl);
@@ -108,13 +108,11 @@ export async function searchBuildingByBid(bid)
     let ring = f.geometry.coordinates[0];
     if (!ring) return;
 
-    // 층 배열 생성 (지하층/지상층 정보 활용)
     const lvProp = f.properties?.["building:levels"];
     const bmProp = f.properties?.["building:basement"];
     // const center = JSON.parse(f.properties?.["center"]);
     const center = f.properties?.["center"];
     const properties = f.properties;
-
 
     return {
         bid: bid,
@@ -122,17 +120,25 @@ export async function searchBuildingByBid(bid)
         levels: lvProp,
         basement: bmProp,
         center: center,
-        properties: properties
+        properties: properties,
     };
 }
 
 // 모드 전환할때 각 요소 없애거나 나타나게 하는 함수들
-export function removeFloorsFor(map, bid) {
-    const st = searchBuildingByBid(bid);
-    if (!st || !Array.isArray(st.floorLayerIds)) return;
-    st.floorLayerIds.forEach(id => map.getLayer(id) && map.removeLayer(id));
+export async function removeFloorsFor(map, bid) {
+    const st = await searchBuildingByBid(bid);
+
+    //fid 배열 만드는 임시 코드
+    const fidList = [];
+    for(let i = 0; i < st.levels + st.basement; i++)
+    {
+        fidList.push(`${bid}-${i}`);
+    }
+    if (!st || !Array.isArray(fidList)) return;
+    fidList.forEach(id => map.getLayer(id) && map.removeLayer(id));
     st.sourceId && map.getSource(st.sourceId) && map.removeSource(st.sourceId);
 }
+
 export const removeAllFloors = map =>
     CONFIG.bidList.forEach(bid => removeFloorsFor(map, bid));
 export const hideCampusBase = map =>
