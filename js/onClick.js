@@ -1,74 +1,55 @@
 import { CONFIG } from './config.js';
-import {
-    currentState, flyCamera, hideCampusBase, showCampusBase, generateFloors, removeFloorsFor, setFloorOpacities, autoFloorsArray
+import {flyCamera, hideCampusBase, showCampusBase, generateFloors, autoFloorsArray, searchBuildingByBid, removeAllFloors
 } from './mapUtils.js';
 
-//건물 클릭시 실행할 코드
-export function handleBuildingClick(map, e) {
-    //모르는 코드
-    e.originalEvent && (e.originalEvent.cancelBubble = true);
-    // 클릭한 건물 geojson 정보 가져오기
-    const f = e.features?.[0];
-    if (!f) return;
-    // 클릭한 건물 폴리곤 가져오기
-    let ring = f.geometry.coordinates[0];
-    if (!ring) return;
+//빌딩 층 보여주는 함수 >> 건물클릭, 리스트 클릭시 이 함수를 호출
+export async function showBuildingFloors(map, bid) {
 
-    //bid 가져오기
-    const bid = f.properties?.[CONFIG.campus.idProp];
-    // 아마 건물들 3d모델들 삭제하는 코드
-    Object.keys(currentState).forEach(b => removeFloorsFor(map, b));
+    // 이전에 활성화된 모든 건물 층 모델들 삭제
+    removeAllFloors();
     
-    // 층 배열 만들기
-    const lvProp = f.properties?.["building:levels"];
-    const bmProp = f.properties?.["building:basement"];
+    // 층 배열 생성 (지하층/지상층 정보 활용)
+    const info = await searchBuildingByBid(bid);
+    const lvProp = info.levels;
+    const bmProp = info.basement;
     const floorsSpec = autoFloorsArray(lvProp, bmProp, CONFIG.buildingDefaults);
 
-    //빌딩스테이드에 건물 정보 추가
-    currentState[bid] = { coords: ring, floorsSpec, floorLayerIds: [], sourceId: `${bid}-floors` };
-
-    //건물 숨기고 층 생성하고 카메라 이동
+    // 건물 숨김, 층 생성, 카메라 이동
     hideCampusBase(map);
-    generateFloors(map, bid);
-    flyCamera(map, CONFIG.camera.building, JSON.parse(f.properties?.["center"]));
+    generateFloors(map, info, floorsSpec);
+    flyCamera(map, CONFIG.camera.building, info.center);
+}
 
-    //cs에 현재상태 저장
-    currentState.activeBid = bid;
-    currentState.buildProp = f.properties;
-    currentState.pos = JSON.parse(f.properties?.["center"]);
-    currentState.mode = 1;
+//건물 클릭 시 실행
+export function handleBuildingClick(map, e) {
+    e.originalEvent && (e.originalEvent.cancelBubble = true);
+    const f = e?.features ? e.features[0] : e;
+    // 지도 클릭 이벤트일 경우 0번 feature , 리스트 클릭일 경우 이미 feature임
+    
+    if (!f) return;
+    // 건물 폴리곤 좌표와 ID 가져오기
+    let ring = f.geometry.coordinates[0];
+    if (!ring) return;
+    
+    const bid = f.properties?.[CONFIG.campus.idProp];
+    
+    console.log("건물 클릭됨: ", bid);
+    showBuildingFloors(map, bid);
+}
+
+//리스트 클릭 시 실행
+export function handleBuildingListClick(map, bid) {
+    showBuildingFloors(map, bid);
 }
 
 // 층 클릭시 실행할 코드
-export function handleFloorClick(map, e, bid, fid, level) {
-    e.originalEvent && (e.originalEvent.cancelBubble = true);
-    currentState.activeFid = fid;
-    currentState.activeLevel = level;
-    setFloorOpacities(map, bid, level);
-    flyCamera(map, CONFIG.camera.floor, currentState.pos, JSON.parse(currentState.buildProp?.["bearing"]));
-    currentState.mode = 2;
+export function handleFloorClick(map, e, bid, fid) {
+    console.log("층 클릭됨: ", bid, fid);
 }
 
 //배경 클릭시 실행할 코드
 export function handleBackgroundClick(map, e) {
-    const floorLayers = Object.entries(currentState)
-        .filter(([k, v]) => v && v.floorLayerIds)
-        .flatMap(([, st]) => st.floorLayerIds);
-    const hit = map.queryRenderedFeatures(e.point, { layers: floorLayers });
-    if (hit.length === 0) {
-        const baseHit = [
-            ...map.queryRenderedFeatures(e.point, { layers: ["campus-3d"] })
-        ];
-        if (baseHit.length > 0) return;
-        if (currentState.mode == 2) {
-            flyCamera(map, CONFIG.camera.building, currentState.pos);
-            setFloorOpacities(map, currentState.activeBid, null)
-            currentState.mode = 1;
-        }
-        else {
-            Object.keys(currentState).forEach(bid => removeFloorsFor(map, bid));
-            showCampusBase(map);
-            currentState.mode = 0;
-        }
-    }
+    removeAllFloors();
+    showCampusBase(map);
+    console.log("배경 클릭됨");
 }

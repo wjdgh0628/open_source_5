@@ -12,7 +12,7 @@ export const CONFIG = {
     },
     buildingDefaults: {
         floorThickness: 1,
-        floorGap: 5,
+        floorGap: 7,
         colorPalette: ["#ff0000", "#ff4400", "#ff8800", "#ffcc00", "#ffff00", "#ccff00", "#88ff00", "#44ff00", "#00ff00", "#00ff44", "#00ff88", "#00ffcc", "#00ffff", "#00ccff", "#0088ff", "#0044ff", "#0000ff"],
         basementPalette: ["#4400ff", "#8800ff", "#cc00ff", "#ff00ff"]
     },
@@ -23,5 +23,20 @@ export const CONFIG = {
         roomsUrl: "./json/rooms.json",
         idProp: "@id",
         nameProp: "name"
-    }
+    },
+    bidList: [
+        "main_1",
+        "main_2",
+        "grad_1",
+        "grad_2",
+        "design",
+        "gemi",
+        "music",
+        "rodem",
+        "visionCentre",
+        "stem",
+        "council",
+        "theology",
+        "vision"
+    ]
 };
