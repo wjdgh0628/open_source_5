@@ -60,9 +60,11 @@ export function handleBuildingListClick(map, bid) {
     showBuildingFloors(map, bid);
 }
 
-// 층 클릭시 실행할 코드
+// 층 클릭시 실행할 코드 (수정됨)
 export function handleFloorClick(map, e, bid, fid, level) {
     e.originalEvent && (e.originalEvent.cancelBubble = true);
+
+    // 현재 클릭된 층(fid)이 이미 활성화된 층(currentState.activeFid)인지 확인
     if (currentState.activeFid === fid) {
         // 이미 활성화된 층을 다시 클릭한 경우 (두 번째 클릭)
         console.log(`[${fid}] 층을 다시 클릭했습니다. 모달을 엽니다.`);
@@ -70,18 +72,38 @@ export function handleFloorClick(map, e, bid, fid, level) {
         // 1. 모달 요소들을 가져옵니다.
         const modal = document.getElementById('modal-overlay');
         const modalInfo = document.getElementById('modal-floor-info');
+        
+        // --- ▼▼▼ 수정된 부분 시작 ▼▼▼ ---
 
-        // 2. 모달에 표시할 내용을 업데이트합니다. (예시)
-        // TODO: 나중에 이 부분을 실제 층 정보로 채워야 합니다.
-        // rooms.json 데이터를 불러와서 채울 수 있습니다.
-        modalInfo.innerHTML = `
-            <p><strong>건물 ID:</strong> ${bid}</p>
-            <p><strong>층 ID:</strong> ${fid}</p>
-            <p><strong>층 레벨:</strong> ${level}</p>
-            <p>여기에 <strong>${fid}</strong>의 세부 강의실 정보나 사진 등을 표시할 수 있습니다.</p>
+        // 2. 이미지 경로를 설정합니다.
+        let imgPath = '';
+        
+        // 이공관(stem) 4층(level 3)에 대한 특별 케이스
+        if (bid === 'stem' && level === 3) {
+            imgPath = './img/IT_4th_floor.png';
+        } else {
+            // 그 외의 경우, 기본 규칙을 따릅니다. (예: main_1_0.png)
+            imgPath = `./img/${bid}_${level}.png`;
+        }
+
+        // 3. 모달에 표시할 내용을 업데이트합니다.
+        modalInfo.innerHTML = 
+            //<p><strong>건물 ID:</strong> ${bid}</p>
+            //<p><strong>층 ID:</strong> ${fid}</p>
+            //<p><strong>층 레벨:</strong> ${level}</p>
+            `
+            <img 
+                src="${imgPath}" 
+                alt="${bid} ${level}층 평면도" 
+                onerror="this.style.display='none'; this.nextSibling.style.display='block';" 
+            />
+            <p style="display:none; color: #888; text-align: center;">
+                (평면도 이미지를 찾을 수 없습니다.)
+            </p>
         `;
+        // --- ▲▲▲ 수정된 부분 끝 ▲▲▲ ---
 
-        // 3. 모달을 보여줍니다.
+        // 4. 모달을 보여줍니다.
         modal.classList.remove('hidden');
 
     } else {
@@ -108,6 +130,11 @@ export function handleBackgroundClick(map, e) {
         if (currentState.mode == 2) {
             flyCamera(map, CONFIG.camera.building, currentState.pos);
             setFloorOpacities(map, currentState.activeBid, null)
+            
+            // 활성화된 층 정보를 리셋합니다.
+            currentState.activeFid = null;
+            currentState.activeLevel = null;
+            
             currentState.mode = 1;
         }
         else {

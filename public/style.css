@@ -169,3 +169,11 @@ html, body {
   margin-bottom: 16px;
   color: #333;
 }
+
+#modal-floor-info img {
+  width: 100%; /* 모달 너비에 맞춤 */
+  max-height: 60vh; /* 이미지가 너무 길 경우 최대 높이 제한 */
+  object-fit: contain; /* 이미지 비율 유지 */
+  border: 1px solid #eee;
+  margin-top: 10px;
+}
