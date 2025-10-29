@@ -6,6 +6,7 @@ html, body {
   overflow: hidden;
 }
 
+/*=================================지도 스타일=================================*/
 /* 지도 스타일 */
 #map {
   position: fixed;
@@ -23,6 +24,7 @@ html, body {
   z-index: 100;
 }
 
+/*=================================사이드바 스타일=================================*/
 /* 사이드바 스타일 */
 #sidebar {
   --sidebar-width: clamp(250px, 20vw, 350px);
@@ -111,4 +113,59 @@ html, body {
   opacity: 1;
   pointer-events: auto;
   visibility: visible;
+}
+
+/*=================================모달 스타일=================================*/
+/* 기본 모달 스타일 */
+.modal {
+    display: none; /* 초기에는 숨김 */
+    position: fixed;
+    z-index: 100; /* 지도(Mapbox)보다 위에 표시되도록 높게 설정 */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    overflow-y: scroll;
+    -ms-overflow-style: none;
+    background-color: rgba(121, 121, 121, 0.618); /* 반투명 검은색 배경 */
+    opacity: 0; /* 초기 투명도: 완전히 투명 */
+    visibility: hidden; /* 초기 가시성: 마우스 이벤트 방지 */
+    /* 투명도와 가시성에 트랜지션 효과 적용*/
+    transition: opacity 0.5s ease-in-out, visibility 0.5s;
+} 
+.modal::-webkit-scrollbar {
+  display: none;
+}
+
+.modal.is-visible {
+    display: block; /* is-visible 클래스가 추가되면 표시 */
+    opacity: 1; /* 최종 투명도: 완전히 불투명 */
+    visibility: visible; /* 가시성: 보이도록 설정 */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 10% auto; /* 화면 중앙에 위치 */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* 내용 영역의 너비 */
+    max-width: 800px; /* 최대 너비 */
+    position: relative;
+    border-radius: 8px;
+}
+
+.modal-content img {
+    max-width: 80%; /* 이미지가 내용 영역을 벗어나지 않도록 설정 */
+    height: auto;
+    display: block;
+    margin: 10px auto;
+}
+
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
 }

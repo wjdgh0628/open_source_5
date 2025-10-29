@@ -1,6 +1,7 @@
 import { CONFIG } from './config.js';
 import {
-    currentState, flyCamera, hideCampusBase, showCampusBase, generateFloors, removeFloorsFor, setFloorOpacities, autoFloorsArray, searchBuildingByBid
+    currentState, flyCamera, hideCampusBase, showCampusBase, generateFloors, 
+    removeFloorsFor, setFloorOpacities, autoFloorsArray, searchBuildingByBid, showFloorplanModal
 } from './mapUtils.js';
 
 //빌딩 층 보여주는 함수 >> 건물클릭, 리스트 클릭시 이 함수를 호출
@@ -60,14 +61,23 @@ export function handleBuildingListClick(map, bid) {
     showBuildingFloors(map, bid);
 }
 
-// 층 클릭시 실행할 코드
+// 층 클릭시 실행할 코드        //카메라 이동 대신 모달 팝업으로 수정 
 export function handleFloorClick(map, e, bid, fid, level) {
     e.originalEvent && (e.originalEvent.cancelBubble = true);
     currentState.activeFid = fid;
     currentState.activeLevel = level;
+
+    const imageFileName = `${bid}_${level}.png`;
+    const imagePath = `/floorplans/${imageFileName}`;
+
     setFloorOpacities(map, bid, level);
     flyCamera(map, CONFIG.camera.floor, currentState.pos, JSON.parse(currentState.buildProp?.["bearing"]));
     currentState.mode = 2;
+
+    const animationDurationMs = 1200; 
+    setTimeout(() => {
+        showFloorplanModal(imagePath, bid, level); 
+    }, animationDurationMs);
 }
 
 //배경 클릭시 실행할 코드

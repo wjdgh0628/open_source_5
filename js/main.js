@@ -100,5 +100,5 @@ export function start()
         } else {
             icon.classList.replace('fa-chevron-right', 'fa-chevron-left');
         }
-        });
+    });
 }

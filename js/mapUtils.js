@@ -167,3 +167,39 @@ export async function searchBuildingByBid(bid)
         properties: properties
     };
 }
+
+//평면도 모달 팝업 함수
+const modal = document.getElementById('floorplan-modal');
+export function showFloorplanModal(imagePath, bid, level) {
+    //엘리먼트 가져오기
+    const modalImage = document.getElementById('modal-floorplan-image');
+    const modalTitle = document.getElementById('modal-title');
+
+    if (!modal || !modalImage || !modalTitle) {
+        console.error("Floorplan modal or its elements not found in the DOM.");
+        alert(`평면도 이미지: ${imagePath}\n(건물: ${bid}, 층: ${level})`);
+        return;
+    }
+
+    //모달 내용 업데이트
+    modalTitle.textContent = `${bid} 건물 ${level}층 평면도`;
+    modalImage.src = imagePath;
+    modalImage.alt = `${bid} ${level}층`;
+
+    modal.classList.add('is-visible');
+}
+//평면도 모달 닫는 함수
+export function hideFloorplanModal() {
+    if (modal) {
+        modal.classList.remove('is-visible');
+    }
+}
+//모달 닫기 이벤트리스너
+document.addEventListener('DOMContentLoaded', () => {
+    if (!modal) return;
+    
+    const closeButton = modal.querySelector('.close-button');
+    if (closeButton) {
+        closeButton.addEventListener('click', hideFloorplanModal);
+    }
+});
