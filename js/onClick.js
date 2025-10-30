@@ -1,5 +1,5 @@
 import { CONFIG } from './config.js';
-import { showCampusBase, removeAllFloors, flyCamera, hideCampusBase, generateFloors, searchBuildingByBid } from './mapUtils.js';
+import { showCampusBase, removeAllFloors, flyCamera, hideCampusBase, generateFloors, searchBasicInfoByBid, searchFloorInfoByBid } from './mapUtils.js';
 
 //건물 클릭 시 실행
 export async function handleBuildingClick(map, e) {
@@ -9,30 +9,31 @@ export async function handleBuildingClick(map, e) {
     console.log("건물 클릭됨: ", properties?.[CONFIG.campus.idProp]);
 
     // 층 배열 생성 (지하층/지상층 정보 활용)
-    const info = await searchBuildingByBid(bid);
+    const basic = await searchBasicInfoByBid(bid);
+    const floor = await searchFloorInfoByBid(bid);
 
     // 건물 숨김, 층 생성, 카메라 이동
     await removeAllFloors(map);
     hideCampusBase(map);
-    generateFloors(map, info);
-    flyCamera(map, CONFIG.camera.building, info.center, info.bearing);
+    generateFloors(map, floor);
+    flyCamera(map, CONFIG.camera.building, basic.center, basic.bearing);
 }
 
 //리스트 클릭 시 실행
 export async function handleBuildingListClick(map, bid) {
-    const info = await searchBuildingByBid(bid);
-    console.log(`리스트에서 [${info.name}] 클릭됨.`);
+    const basic = await searchBasicInfoByBid(bid);
+    const floor = await searchFloorInfoByBid(bid);
+    console.log(`리스트에서 [${basic.name}] 클릭됨.`);
 
     // 건물 숨김, 층 생성, 카메라 이동
     await removeAllFloors(map);
     hideCampusBase(map);
-    generateFloors(map, info);
-    flyCamera(map, CONFIG.camera.building, info.center, info.bearing);
+    generateFloors(map, floor);
+    flyCamera(map, CONFIG.camera.building, basic.center, basic.bearing);
 }
 
 // 층 클릭시 실행할 코드 (수정됨)
-export function handleFloorClick(map, e, bid, fid, level) {
-    e.originalEvent && (e.originalEvent.cancelBubble = true);
+export function handleFloorClick(bid, fid, level) {
 
     console.log(`[${fid}] 층을 클릭했습니다. 모달을 엽니다.`);
 
@@ -48,6 +49,7 @@ export function handleFloorClick(map, e, bid, fid, level) {
 
     //기본 규칙을 따릅니다. (예: main_0.png)
     imgPath = `./img/${bid}_${level}.png`;
+    console.log(imgPath);
 
     // 3. 모달에 표시할 내용을 업데이트합니다.
     modalInfo.innerHTML =
