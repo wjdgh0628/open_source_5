@@ -14,16 +14,36 @@
     <div id="map"></div>
     <div class="ml-control"></div>
 
-    <div id="sidebar" class="collapsed"> 
+    <div id="sidebar"> 
         <div id="sidebar-header">
-            <h3>건물 리스트</h3>
-            <button id="sidebar-toggle-btn" title="사이드바 토글">
-                <i class="fas fa-chevron-right"></i> </button>
+            <img src="img/logo.png" alt="한세대학교 로고" id="sidebar-logo">
         </div>
         
-        <div id="building-list-content">
-            <p>리스트 항목...</p>
-            <p>리스트 항목...</p>
+        <div id="building-list-container">
+            <div id="favorites-section">
+                <h3><i class="fas fa-star"></i> 즐겨찾기</h3>
+                <ul id="favorites-list" class="building-list">
+                    </ul>
+            </div>
+
+            <div id="all-buildings-section">
+                <h3 id="all-buildings-title">건물 명칭</h3>
+                <ul id="all-buildings-list" class="building-list">
+                    </ul>
+            </div>
+        </div>
+
+        <div id="sidebar-collapsed-text"></div>
+        <button id="sidebar-toggle-btn" title="사이드바 토글">&lt;</button>
+    </div>
+
+    <div id="modal-overlay" class="hidden">
+        <div id="modal-content">
+            <button id="modal-close-btn" title="닫기">&times;</button>
+            <h2>층 정보</h2>
+            <div id="modal-floor-info">
+                <p>층 세부 정보가 여기에 표시됩니다.</p>
+            </div>
         </div>
     </div>
 
