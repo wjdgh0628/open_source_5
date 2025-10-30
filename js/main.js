@@ -46,7 +46,8 @@ export function initMap() {
         });
         //건물, 배경 클릭시 실행할 코드 지정
         setHandler(map, "campus-3d", e => handleBuildingClick(map, e));
-        setHandler(map, "landuse", e => handleBackgroundClick(map, e));
+        map.on('click', (e) => handleBackgroundClick(map, e));
+        // map.on('click', (e) =>{console.log(map.queryRenderedFeatures(e.point))});
     });
     return map;
 }
@@ -78,7 +79,6 @@ export function start() {
             listItem.textContent = name;
             listItem.classList.add('building-list-item');
             listItem.addEventListener('click', () => {
-                console.log(`[${name}] 클릭됨.`);
                 handleBuildingListClick(mapInstance, feature.properties?.["@id"]);
             });
 
