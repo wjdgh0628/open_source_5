@@ -99,6 +99,7 @@ export function flyCamera(map, mode, center, bearing = null) {
         bearing = CONFIG.camera[mode].bearing;
     map.flyTo({ center, ...CONFIG.camera[mode], bearing: bearing, ssential: true });
 }
+//geojson bid로 fetch
 async function fetchBuildingByBid(bid) {
     let f = null;
     await fetch(CONFIG.campus.geojsonUrl)
@@ -117,7 +118,7 @@ async function fetchBuildingByBid(bid) {
         .catch(err => { console.error("파일 불러오기 실패:", err); f = false; });
     return f;
 }
-//bid로 건물 정보 검색
+//bid로 건물 기본정보 검색
 export async function searchBasicInfoByBid(bid) {
     const f = await fetchBuildingByBid(bid);
     if (!f) return;
@@ -131,6 +132,7 @@ export async function searchBasicInfoByBid(bid) {
         bearing: f.properties?.["bearing"]
     };
 }
+//bid로 건물 층 정보 검색
 export async function searchFloorInfoByBid(bid) {
     const f = await fetchBuildingByBid(bid);
     if (!f) return;
@@ -161,4 +163,30 @@ export function setHandler(map, id, callback) {
         if (isTop) { callback(topFeature); }
     }
     map.on('click', id, (e) => handler(e));
+}
+
+//평면도 모달 팝업 함수
+export function showFloorplanModal(imagePath, bid, level, modal) {
+    //엘리먼트 가져오기
+    const modalImage = document.getElementById('modal-floorplan-image');
+    const modalTitle = document.getElementById('modal-title');
+
+    if (!modal || !modalImage || !modalTitle) {
+        console.error("Floorplan modal or its elements not found in the DOM.");
+        alert(`평면도 이미지: ${imagePath}\n(건물: ${bid}, 층: ${level})`);
+        return;
+    }
+
+    //모달 내용 업데이트
+    modalTitle.textContent = `${bid} 건물 ${level}층 평면도`;
+    modalImage.src = imagePath;
+    modalImage.alt = `${bid} ${level}층`;
+
+    modal.classList.add('is-visible');
+}
+//평면도 모달 닫는 함수
+export function hideFloorplanModal(modal) {
+    if (modal) {
+        modal.classList.remove('is-visible');
+    }
 }

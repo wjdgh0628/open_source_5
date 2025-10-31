@@ -1,5 +1,5 @@
 import { CONFIG } from './config.js';
-import { setHandler } from './mapUtils.js';
+import { setHandler, hideFloorplanModal } from './mapUtils.js';
 import { handleBuildingClick, handleBackgroundClick } from './onClick.js';
 import { rerenderLists, toggleSidebar } from './sideBar.js';
 /*global mapboxgl*/ //mapboxgl 비선언 오류 숨기기
@@ -50,13 +50,14 @@ export function initMap() {
 export function start() {
     const map = initMap();
 
-    rerenderLists(map); // (수정) generateBuildingList 대신 새로고침 함수 호출
+    rerenderLists(map); //generateBuildingList 대신 새로고침 함수 호출
 
-    // --- 사이드바 토글 로직 (이전과 동일) ---
+    // --- 사이드바 토글 로직
     toggleSidebar();
 
-    // --- 모달 닫기 로직 (이전과 동일) ---
-    const modal = document.getElementById('modal-overlay');
+    // --- 모달 닫기 로직 ---
+    //==============================================widgh
+    /* const modal = document.getElementById('modal-overlay');
     const modalCloseBtn = document.getElementById('modal-close-btn');
     modalCloseBtn.addEventListener('click', () => {
         modal.classList.add('hidden');
@@ -64,6 +65,18 @@ export function start() {
     modal.addEventListener('click', (e) => {
         if (e.target === modal) {
             modal.classList.add('hidden');
+        }
+    }); */
+
+    //==============================================yujin
+    const modal = document.getElementById('floorplan-modal');
+    //모달 닫기 이벤트리스너
+    document.addEventListener('DOMContentLoaded', () => {
+        if (!modal) return;
+
+        const closeButton = modal.querySelector('.close-button');
+        if (closeButton) {
+            closeButton.addEventListener('click', hideFloorplanModal(modal));
         }
     });
 }

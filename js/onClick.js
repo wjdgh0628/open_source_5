@@ -1,5 +1,7 @@
 import { CONFIG } from './config.js';
-import { showCampusBase, removeAllFloors, flyCamera, hideCampusBase, generateFloors, searchBasicInfoByBid, searchFloorInfoByBid } from './mapUtils.js';
+import { showCampusBase, hideCampusBase, generateFloors, removeAllFloors,
+    flyCamera, searchBasicInfoByBid, searchFloorInfoByBid, showFloorplanModal
+} from './mapUtils.js';
 
 //건물 클릭 시 실행
 export async function handleBuildingClick(map, e) {
@@ -18,7 +20,6 @@ export async function handleBuildingClick(map, e) {
     generateFloors(map, floor);
     flyCamera(map, CONFIG.camera.building, basic.center, basic.bearing);
 }
-
 //리스트 클릭 시 실행
 export async function handleBuildingListClick(map, bid) {
     const basic = await searchBasicInfoByBid(bid);
@@ -31,10 +32,33 @@ export async function handleBuildingListClick(map, bid) {
     generateFloors(map, floor);
     flyCamera(map, CONFIG.camera.building, basic.center, basic.bearing);
 }
-
 // 층 클릭시 실행할 코드 (수정됨)
 export function handleFloorClick(bid, fid, level) {
+    
+    const imageFileName = `${bid}_${level}.png`;
+    const imagePath = `/floorplans/${imageFileName}`;
+    
+    const animationDurationMs = 1200; 
+    setTimeout(() => {
+        showFloorplanModal(imagePath, bid, level); 
+    }, animationDurationMs);
+}
+//배경 클릭시 실행할 코드
+export function handleBackgroundClick(map, e) {
+    const features = map.queryRenderedFeatures(e.point);
+    const topFeature = features[0];
+    let isBackground = false;
 
+    if (features.length == 0) isBackground = true;
+    else CONFIG.bgIdList.forEach(v => { if (topFeature.layer.id.includes(v)) isBackground = true });
+
+    if (isBackground) {
+        removeAllFloors(map);
+        showCampusBase(map);
+        console.log("배경 클릭됨");
+    }
+}
+export function handleFloorClickLegacy(bid, fid, level) {
     console.log(`[${fid}] 층을 클릭했습니다. 모달을 엽니다.`);
 
     // 1. 모달 요소들을 가져옵니다.
@@ -45,7 +69,6 @@ export function handleFloorClick(bid, fid, level) {
 
     // 2. 이미지 경로를 설정합니다.
     let imgPath = '';
-
 
     //기본 규칙을 따릅니다. (예: main_0.png)
     imgPath = `./img/${bid}_${level}.png`;
@@ -70,20 +93,4 @@ export function handleFloorClick(bid, fid, level) {
 
     // 4. 모달을 보여줍니다.
     modal.classList.remove('hidden');
-}
-
-//배경 클릭시 실행할 코드
-export function handleBackgroundClick(map, e) {
-    const features = map.queryRenderedFeatures(e.point);
-    const topFeature = features[0];
-    let isBackground = false;
-
-    if (features.length == 0) isBackground = true;
-    else CONFIG.bgIdList.forEach(v => { if (topFeature.layer.id.includes(v)) isBackground = true });
-
-    if (isBackground) {
-        removeAllFloors(map);
-        showCampusBase(map);
-        console.log("배경 클릭됨");
-    }
 }

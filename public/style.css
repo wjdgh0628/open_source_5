@@ -6,6 +6,7 @@ html, body {
  overflow: hidden;
 }
 
+/*=================================지도 스타일=================================*/
 /* 지도 스타일 */
 #map {
  position: fixed;
@@ -23,31 +24,35 @@ html, body {
  z-index: 100;
 }
 
-/* ===== ▼▼▼ 사이드바 로직 수정 (원래대로) ▼▼▼ ===== */
-
-/* 사이드바 스타일 (기본: 펼쳐진 상태) */
+/*=================================사이드바 스타일=================================*/
+/* 사이드바 스타일 */
 #sidebar {
- --sidebar-width: clamp(250px, 20vw, 350px);
- position: fixed;
- top: 0;
- left: 0;
- width: var(--sidebar-width);
- height: 100%;
- background-color: #ffffff; 
- box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
- z-index: 10;
- display: flex; 
-  flex-direction: column;
- transition: transform 0.3s ease, width 0.3s ease;
- transform: translateX(0);
+  --sidebar-width: clamp(250px, 20vw, 350px);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100%;
+  background-color: #f8f8f8;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  transition: transform 0.3s ease, width 0.3s ease;
+  transform: translateX(0);
+  -ms-overflow-style: none;
+}
+
+#sidebar::-webkit-scrollbar {
+  display: none;
 }
 
 /* (수정) "접힌" 상태 (얇은 바) */
 #sidebar.collapsed {
- width: 50px;
- min-width: 50px;
- max-width: 50px;
- transform: none;
+  width: 70px;
+  min-width: 70px;
+  max-width: 70px;
+  transform: none;
 }
 
 /* 헤더 (로고) */
@@ -139,7 +144,10 @@ html, body {
   
   box-shadow: 2px 0 5px rgba(0,0,0,0.1);
   transition: all 0.3s ease;
-  z-index: 5;
+  position: absolute;
+  top: 13px;
+  right: 17px;
+  z-index: 20;
 }
 
 /* (수정) 접힌 상태일 때 버튼 위치 */
@@ -174,112 +182,58 @@ html, body {
   opacity: 1;
   visibility: visible;
 }
-/* ===== ▲▲▲ 사이드바 로직 전체 수정 끝 ▲▲▲ ===== */
 
-
-/* ... [모달, 리스트 아이템, 즐겨찾기 버튼 스타일은 동일] ... */
-
-/* 모달 배경 (어둡게) */
-#modal-overlay {
- position: fixed;
- top: 0;
- left: 0;
- width: 100%;
- height: 100%;
- background-color: rgba(0, 0, 0, 0.6);
- display: flex;
- justify-content: center;
- align-items: center;
- z-index: 1000;
- opacity: 1;
- visibility: visible;
- transition: opacity 0.3s ease, visibility 0.3s ease;
+/*=================================모달 스타일=================================*/
+/* 기본 모달 스타일 */
+.modal {
+    display: none; /* 초기에는 숨김 */
+    position: fixed;
+    z-index: 100; /* 지도(Mapbox)보다 위에 표시되도록 높게 설정 */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    overflow-y: scroll;
+    -ms-overflow-style: none;
+    background-color: rgba(121, 121, 121, 0.618); /* 반투명 검은색 배경 */
+    opacity: 0; /* 초기 투명도: 완전히 투명 */
+    visibility: hidden; /* 초기 가시성: 마우스 이벤트 방지 */
+    /* 투명도와 가시성에 트랜지션 효과 적용*/
+    transition: opacity 0.5s ease-in-out, visibility 0.5s;
+} 
+.modal::-webkit-scrollbar {
+  display: none;
 }
 
-/* 모달이 숨겨진 상태 */
-#modal-overlay.hidden {
- opacity: 0;
- visibility: hidden;
- pointer-events: none;
+.modal.is-visible {
+    display: block; /* is-visible 클래스가 추가되면 표시 */
+    opacity: 1; /* 최종 투명도: 완전히 불투명 */
+    visibility: visible; /* 가시성: 보이도록 설정 */
 }
 
-/* 모달 내용물 흰색 박스 */
-#modal-content {
- background-color: #ffffff;
- padding: 24px;
- border-radius: 8px;
- box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
- min-width: 300px;
- max-width: 600px;
- width: 80%;
- position: relative;
- box-sizing: border-box; 
+.modal-content {
+    background-color: #fefefe;
+    margin: 10% auto; /* 화면 중앙에 위치 */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* 내용 영역의 너비 */
+    max-width: 800px; /* 최대 너비 */
+    position: relative;
+    border-radius: 8px;
 }
 
-/* 모달 닫기 버튼 (X) */
-#modal-close-btn {
- position: absolute;
- top: 10px;
- right: 15px;
- background: none;
- border: none;
- font-size: 28px;
- line-height: 1;
- color: #aaa;
- cursor: pointer;
- padding: 0;
+.modal-content img {
+    max-width: 80%; /* 이미지가 내용 영역을 벗어나지 않도록 설정 */
+    height: auto;
+    display: block;
+    margin: 10px auto;
 }
 
-#modal-close-btn:hover {
- color: #333;
-}
-
-#modal-content h2 {
- margin-top: 0;
- margin-bottom: 16px;
- color: #333;
-}
-
-#modal-floor-info img {
- width: 100%;
- max-height: 60vh;
- object-fit: contain;
- border: 1px solid #eee;
- margin-top: 10px;
-}
-
-/* 사이드바 리스트 아이템 스타일 */
-.building-list-item {
-  display: flex;
-  align-items: center;
-  padding: 8px 4px;
-  border-bottom: 1px solid #ddd;
-}
-
-.building-list-item span {
-  flex-grow: 1;
-  cursor: pointer;
-}
-
-.building-list-item span:hover {
-  color: #007bff;
-}
-
-/* 즐겨찾기 버튼 스타일 */
-.favorite-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1.2rem;
-  padding: 0 8px 0 4px;
-  color: #ccc;
-  transition: color 0.2s ease, transform 0.2s ease;
-}
-
-.favorite-btn:hover {
-  transform: scale(1.2);
-}
-
-.favorite-btn.favorited {
-  color: #f0c300;
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
 }

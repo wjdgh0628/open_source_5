@@ -30,17 +30,16 @@ function toggleFavorite(bid) {
 export function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const toggleBtn = document.getElementById('sidebar-toggle-btn');
+    const icon = toggleBtn.querySelector('i');
 
     toggleBtn.addEventListener('click', () => {
         sidebar.classList.toggle('collapsed');
-
         if (sidebar.classList.contains('collapsed')) {
-            toggleBtn.textContent = '>';
+            icon.classList.replace('fa-chevron-left', 'fa-chevron-right');
         } else {
-            toggleBtn.textContent = '<';
+            icon.classList.replace('fa-chevron-right', 'fa-chevron-left');
         }
     });
-
     if (sidebar.classList.contains('collapsed')) {
         toggleBtn.textContent = '>';
     } else {
