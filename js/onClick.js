@@ -61,7 +61,7 @@ export function handleBuildingListClick(map, bid) {
     showBuildingFloors(map, bid);
 }
 
-// 층 클릭시 실행할 코드        //카메라 이동 대신 모달 팝업으로 수정 
+// 층 클릭시 실행할 코드   
 export function handleFloorClick(map, e, bid, fid, level) {
     e.originalEvent && (e.originalEvent.cancelBubble = true);
     currentState.activeFid = fid;
