@@ -164,7 +164,7 @@ export function setHandler(map, id, callback) {
     }
     map.on('click', id, (e) => handler(e));
 }
-
+/* 
 //평면도 모달 팝업 함수
 export function showFloorplanModal(imagePath, bid, level, modal) {
     //엘리먼트 가져오기
@@ -189,4 +189,4 @@ export function hideFloorplanModal(modal) {
     if (modal) {
         modal.classList.remove('is-visible');
     }
-}
+} */

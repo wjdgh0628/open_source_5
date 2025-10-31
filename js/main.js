@@ -1,5 +1,5 @@
 import { CONFIG } from './config.js';
-import { setHandler, hideFloorplanModal } from './mapUtils.js';
+import { setHandler } from './mapUtils.js';
 import { handleBuildingClick, handleBackgroundClick } from './onClick.js';
 import { rerenderLists, toggleSidebar } from './sideBar.js';
 /*global mapboxgl*/ //mapboxgl 비선언 오류 숨기기
@@ -57,7 +57,7 @@ export function start() {
 
     // --- 모달 닫기 로직 ---
     //==============================================widgh
-    /* const modal = document.getElementById('modal-overlay');
+    const modal = document.getElementById('modal-overlay');
     const modalCloseBtn = document.getElementById('modal-close-btn');
     modalCloseBtn.addEventListener('click', () => {
         modal.classList.add('hidden');
@@ -66,9 +66,9 @@ export function start() {
         if (e.target === modal) {
             modal.classList.add('hidden');
         }
-    }); */
+    });
 
-    //==============================================yujin
+    /* //==============================================yujin
     const modal = document.getElementById('floorplan-modal');
     //모달 닫기 이벤트리스너
     document.addEventListener('DOMContentLoaded', () => {
@@ -78,5 +78,5 @@ export function start() {
         if (closeButton) {
             closeButton.addEventListener('click', hideFloorplanModal(modal));
         }
-    });
+    }); */
 }
