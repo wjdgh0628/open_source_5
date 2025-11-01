@@ -3,7 +3,7 @@ import { setHandler } from './mapUtils.js';
 import { handleBuildingClick, handleBackgroundClick } from './onClick.js';
 import { rerenderLists, toggleSidebar } from './sideBar.js';
 /*global mapboxgl*/ //mapboxgl 비선언 오류 숨기기
-
+//브랜치 커밋 구분을 위한 주석
 export function initMap() {
     // ... (initMap 함수 내용은 동일) ...
     const map = new mapboxgl.Map({
