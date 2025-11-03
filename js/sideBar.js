@@ -4,49 +4,31 @@ import { searchBasicInfoByBid } from './mapUtils.js';
 
 // 목록 새로고침 함수
 export function rerenderLists(map) {
-    if (!map) return; // 데이터가 없으면 실행 중지
+    if (!map) return; 
     const favorites = loadFavorites();
-    // 저장된 GeoJSON 데이터와 map 객체를 사용해 리스트 재생성
     generateBuildingList(map, favorites);
 }
-// 1. 로컬 스토리지에서 즐겨찾기 목록 저장/불러오기
+// 1. 로컬 스토리지 관련 함수
 function saveFavorites(favsArray) { localStorage.setItem('campusFavorites', JSON.stringify(favsArray)); }
 function loadFavorites() {
     const favsJSON = localStorage.getItem('campusFavorites');
     return favsJSON ? JSON.parse(favsJSON) : [];
 }
 
-// 즐겨찾기 토글 함수(DOM을 직접 조작하는 대신, 저장 후 새로고침 호출)
+// 2. 즐겨찾기 토글 함수
 function toggleFavorite(bid) {
     let favorites = loadFavorites();
     const index = favorites.indexOf(bid);
 
-    if (index > -1) { favorites.splice(index, 1); }// 이미 즐겨찾기 됨 -> 삭제
-    else { favorites.push(bid); }// 새 즐겨찾기 -> 추가
+    if (index > -1) { favorites.splice(index, 1); }
+    else { favorites.push(bid); }
 
-    saveFavorites(favorites); // 1. 로컬스토리지에 저장
+    saveFavorites(favorites); 
 }
 
-export function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const toggleBtn = document.getElementById('sidebar-toggle-btn');
-
-    toggleBtn.addEventListener('click', () => {
-        sidebar.classList.toggle('collapsed');
-
-        if (sidebar.classList.contains('collapsed')) {
-            toggleBtn.textContent = '>';
-        } else {
-            toggleBtn.textContent = '<';
-        }
-    });
-
-    if (sidebar.classList.contains('collapsed')) {
-        toggleBtn.textContent = '>';
-    } else {
-        toggleBtn.textContent = '<';
-    }
-}
+// ===== ▼▼▼ (삭제) toggleSidebar 함수 전체 삭제 ▼▼▼ =====
+// (새 UI는 이 함수를 사용하지 않습니다)
+// ===== ▲▲▲ 함수 삭제 끝 ▲▲▲ =====
 
 async function generateBuildingList(map, favorites) {
 
@@ -65,7 +47,7 @@ async function generateBuildingList(map, favorites) {
         const isFavorited = favorites.includes(bid);
 
         const listItem = document.createElement('li');
-        listItem.classList.add('building-list-item');
+        listItem.classList.add('building-list-item'); 
 
         const favButton = document.createElement('button');
         favButton.classList.add('favorite-btn');
@@ -76,10 +58,9 @@ async function generateBuildingList(map, favorites) {
             favButton.textContent = '☆';
         }
 
-        // (수정) 클릭 시 DOM 조작 대신 toggleFavorite(bid)만 호출
         favButton.addEventListener('click', (e) => {
             e.stopPropagation();
-            toggleFavorite(bid); // buttonElement를 넘길 필요 없음
+            toggleFavorite(bid); 
             rerenderLists(map);
         });
 
@@ -96,7 +77,6 @@ async function generateBuildingList(map, favorites) {
         if (isFavorited) {
             favList.appendChild(listItem);
         } else {
-            // geojson 순서대로 추가되므로 순서가 보장됨
             allList.appendChild(listItem);
         }
     };
