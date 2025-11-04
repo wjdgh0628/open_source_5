@@ -4,18 +4,19 @@ import { searchBasicInfoByBid } from './mapUtils.js';
 
 // 목록 새로고침 함수
 export function rerenderLists(map) {
-    if (!map) return; 
+    if (!map) return;  // 데이터가 없으면 실행 중지
     const favorites = loadFavorites();
+    // 저장된 GeoJSON 데이터와 map 객체를 사용해 리스트 재생성
     generateBuildingList(map, favorites);
 }
-// 1. 로컬 스토리지 관련 함수
+// 로컬 스토리지에서 즐겨찾기 목록 저장/불러오기
 function saveFavorites(favsArray) { localStorage.setItem('campusFavorites', JSON.stringify(favsArray)); }
 function loadFavorites() {
     const favsJSON = localStorage.getItem('campusFavorites');
     return favsJSON ? JSON.parse(favsJSON) : [];
 }
 
-// 2. 즐겨찾기 토글 함수
+// 즐겨찾기 토글 함수
 function toggleFavorite(bid) {
     let favorites = loadFavorites();
     const index = favorites.indexOf(bid);
@@ -26,19 +27,13 @@ function toggleFavorite(bid) {
     saveFavorites(favorites); 
 }
 
-// ===== ▼▼▼ (삭제) toggleSidebar 함수 전체 삭제 ▼▼▼ =====
-// (새 UI는 이 함수를 사용하지 않습니다)
-// ===== ▲▲▲ 함수 삭제 끝 ▲▲▲ =====
-
 async function generateBuildingList(map, favorites) {
 
     const favList = document.getElementById('favorites-list');
     const allList = document.getElementById('all-buildings-list');
     favList.innerHTML = '';
     allList.innerHTML = '';
-
-    const nameKey = CONFIG.campus.nameProp;
-    const idKey = CONFIG.campus.idProp;
+    
     for (const bid of CONFIG.bidList) {
         const info = await searchBasicInfoByBid(bid);
         const name = info.name;
@@ -80,4 +75,31 @@ async function generateBuildingList(map, favorites) {
             allList.appendChild(listItem);
         }
     };
+}
+
+export const showMenu = (toggleId, navbarId, bodyId) => {
+    const toggle = document.getElementById(toggleId),
+    navbar = document.getElementById(navbarId),
+    bodypadding = document.getElementById(bodyId)
+
+    if( toggle && navbar ) {
+        toggle.addEventListener('click', ()=>{
+            navbar.classList.toggle('expander');
+            bodypadding.classList.toggle('body-pd')
+        })
+    }
+}
+
+
+export function setupCollapseMenu(linkCollapse) {
+    var i
+    for(i=0;i<linkCollapse.length;i++) {
+        linkCollapse[i].addEventListener('click', function(){
+            const collapseMenu = this.nextElementSibling
+            collapseMenu.classList.toggle('showCollapse')
+
+            const rotate = collapseMenu.previousElementSibling
+            rotate.classList.toggle('rotate')
+        });
+    }
 }
