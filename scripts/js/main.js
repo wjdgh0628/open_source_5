@@ -2,7 +2,7 @@ import { CONFIG } from './config.js';
 import { setHandler } from './mapUtils.js';
 import { handleBuildingClick, handleBackgroundClick } from './onClick.js';
 import { rerenderLists, toggleSidebar } from './sideBar.js';
-/*global mapboxgl*/ //mapboxgl 비선언 오류 숨기기
+/*global mapboxgl*/ //eslint mapboxgl 비선언 오류 숨기기
 
 export function initMap() {
     // ... (initMap 함수 내용은 동일) ...
@@ -23,7 +23,7 @@ export function initMap() {
         });
         map.addSource("campus", { type: "geojson", data: CONFIG.campus.geojsonUrl });
         map.addLayer({
-            id: "campus-3d",
+            id: CONFIG.idRules.buildings,
             type: "fill-extrusion",
             source: "campus",
             paint: {
@@ -40,7 +40,7 @@ export function initMap() {
             }
         });
         //건물, 배경 클릭시 실행할 코드 지정
-        setHandler(map, "campus-3d", e => handleBuildingClick(map, e));
+        setHandler(map, CONFIG.idRules.buildings, e => handleBuildingClick(map, e));
         map.on('click', (e) => handleBackgroundClick(map, e));
         // map.on('click', (e) =>{console.log(map.queryRenderedFeatures(e.point))});
     });

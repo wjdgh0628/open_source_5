@@ -1,103 +1,13 @@
 import { CONFIG } from './config.js';
 import { handleFloorClick } from './onClick.js';
 
-//층 생성하는 함수
-export function generateFloors(map, info) {
-    const bid = info.bid;
-    const { floorThickness, floorGap, colorPalette, basementPalette } = CONFIG.buildingDefaults;
-
-    //geojson에 저장된 층수랑 층 배열 길이가 같은지 검사
-    if (info.bmLevel + info.flLevel != info.flList.length) {
-        console.log(`층수 오류 | 지상:${info.bmLevel} + 지하:${info.flLevel}, 배열 길이${info.flList.length}`);
-        return;
-    }
-
-    //
-    let floorsSpec = []
-    info.flList.forEach((flVarNum, i) => {
-        let fi = i - info.bmLevel;
-        let bi = i + (4 - info.bmLevel);
-        const colorJump = parseInt(colorPalette.length / info.flLevel)
-        const base = i * (floorThickness + floorGap);
-        floorsSpec.push({
-            type: "Feature",
-            properties: {
-                level: i,
-                name: `${i + 1}F`,
-                base,
-                height: base + floorThickness,
-                color: i >= info.bmLevel ? colorPalette[fi * colorJump] : basementPalette[bi]
-            },
-            geometry: { type: "Polygon", coordinates: [info.flVars[flVarNum]] }
-        })
-    })
-
-    //층 모양(폴리곤이랑 높이 등) source로 저장
-    let sourceId = `${bid}-floors`;
-    if (!map.getSource(sourceId)) {
-        map.addSource(sourceId, {
-            type: "geojson",
-            data: ({
-                type: "FeatureCollection",
-                features: floorsSpec
-            })
-        });
-    }
-
-    //floorsSpec 각 항목마다 반복
-    floorsSpec.forEach(flspec => {
-        const properties = flspec.properties;
-        const fid = `${bid}-${properties.level}`;
-        //층 하나씩 생성
-        map.addLayer({
-            id: fid,
-            type: "fill-extrusion",
-            source: sourceId,
-            filter: ["==", ["get", "level"], properties.level],
-            paint: {
-                "fill-extrusion-color": ["get", "color"],
-                "fill-extrusion-base": ["get", "base"],
-                "fill-extrusion-height": ["get", "height"],
-                "fill-extrusion-opacity": 1
-            }
-        });
-
-        //클릭시 실행할 코드 지정
-        setHandler(map, fid, e => handleFloorClick(bid, fid, properties.level));
-    });
-}
-
-// 건물별 층 제거 함수
-export async function removeFloorsFor(map, bid) {
-    const info = await searchFloorInfoByBid(bid);
-
-    //fid 배열 만드는 임시 코드
-    const fidList = [];
-    for (let i = 0; i < info.flLevel + info.bmLevel; i++) {
-        fidList.push(`${bid}-${i}`);
-    }
-    if (!info || !Array.isArray(fidList)) return;
-    fidList.forEach(id => map.getLayer(id) && map.removeLayer(id));
-}
-//전체 건물들 층 제거
-export async function removeAllFloors(map) {
-    for (const bid of CONFIG.bidList) {
-        await removeFloorsFor(map, bid);
-    }
-}
-
-//건물 모델 보이기/숨기기
-export const hideCampusBase = map =>
-    map.getLayer("campus-3d") && map.setLayoutProperty("campus-3d", "visibility", "none");
-export const showCampusBase = map =>
-    map.getLayer("campus-3d") && map.setLayoutProperty("campus-3d", "visibility", "visible");
-
 //카메라 이동 함수
 export function flyCamera(map, mode, center, bearing = null) {
     if (bearing == null)
         bearing = CONFIG.camera[mode].bearing;
     map.flyTo({ center, ...CONFIG.camera[mode], bearing: bearing, ssential: true });
 }
+
 //geojson bid로 fetch
 async function fetchBuildingByBid(bid) {
     let f = null;
@@ -141,6 +51,7 @@ export async function searchFloorInfoByBid(bid) {
         bid: bid,
         flLevel: floors?.["flLevel"],
         bmLevel: floors?.["bmLevel"],
+        totLevel: floors?.["flLevel"] + floors?.["bmLevel"],
         flList: floors?.["flList"],
         flVars: floors?.["flVars"]
     };
@@ -162,4 +73,114 @@ export function setHandler(map, id, callback) {
         if (isTop) { callback(topFeature); }
     }
     map.on('click', id, (e) => handler(e));
+}
+
+//건물, 층 모델 보이기/숨기기
+export function hideCampusBase(map) {
+    map.getLayer(CONFIG.idRules.buildings) && map.setLayoutProperty(CONFIG.idRules.buildings, "visibility", "none");
+}
+export function showCampusBase(map) {
+    map.getLayer(CONFIG.idRules.buildings) && map.setLayoutProperty(CONFIG.idRules.buildings, "visibility", "visible");
+}
+function hideFloor(map, fid) {
+    map.getLayer(fid) && map.setLayoutProperty(fid, "visibility", "none");
+}
+function showFloor(map, fid) {
+    map.getLayer(fid) && map.setLayoutProperty(fid, "visibility", "none");
+}
+//전체 건물들 층 숨기기
+export async function hideAllFloors(map) {
+    for (const bid of CONFIG.bidList) {
+        await allFloors(map, bid, (map,fid) => hideFloor(map, fid));
+    }
+}
+
+//데이터 배열 받아서 층이나 방 만드는 함수
+function setLayers(map, sourceId, features) {
+    if (map.getSource(sourceId)) {
+        console.log(`source id: ${sourceId}가 이미 존재`);
+        return;
+    }
+    map.addSource(sourceId, {
+        type: "geojson",
+        data: ({
+            type: "FeatureCollection",
+            features: features
+        })
+    });
+    features.forEach(f => {
+        const layerId = f.properties.layerId;
+        map.addLayer({
+            id: layerId,
+            type: "fill-extrusion",
+            source: sourceId,
+            filter: ["==", ["get", "layerId"], layerId],
+            paint: {
+                "fill-extrusion-color": ["get", "color"],
+                "fill-extrusion-base": ["get", "base"],
+                "fill-extrusion-height": ["get", "height"],
+                "fill-extrusion-opacity": 1
+            }
+        });
+    });
+}
+
+//건물 내 전체 층에 대해 콜백
+async function allFloors(map, bid, cb) {
+    const info = await searchFloorInfoByBid(bid);
+    for (let i = info.bmLevel * -1; i <0; i ++){
+        cb(map, CONFIG.idRules.fid(bid, i));
+    }
+    for (let i = 1; i <= info.flLevel; i++) {
+        cb(map, CONFIG.idRules.fid(bid, i));
+    }
+}
+//층 생성/보이기
+export function setFloors(map, info) {
+    const bid = info.bid;
+    if (map.getSource(CONFIG.idRules.floorSourceId(bid))) {
+        allFloors(map, bid, (map,fid) => showFloor(map, fid));
+    }
+    else {
+        generateFloors(map, info);
+    }
+}
+//층 생성하는 함수
+function generateFloors(map, info) {
+    const bid = info.bid;
+    const { floorThickness, floorGap, colorPalette, basementPalette } = CONFIG.buildingDefaults;
+
+    //geojson에 저장된 층수랑 층 배열 길이가 같은지 검사
+    if (info.totLevel != info.flList.length) {
+        console.log(`층수 오류 | 지상:${info.bmLevel} + 지하:${info.flLevel}, 배열 길이${info.flList.length}`);
+        return;
+    }
+
+    //층 모양(폴리곤이랑 높이 등)이랑 각종 정보들 floorSpec에 저장
+    let floorsSpec = []
+    info.flList.forEach((flVarNum, i) => {
+        let fi = i - info.bmLevel;
+        let bi = info.bmLevel - i;
+        const colorJump = parseInt(colorPalette.length / info.flLevel)
+        const base = i * (floorThickness + floorGap);
+        floorsSpec.push({
+            type: "Feature",
+            properties: {
+                name: `${i + 1}F`,
+                base,
+                height: base + floorThickness,
+                color: i >= info.bmLevel ? colorPalette[fi * colorJump] : basementPalette[bi - 1],
+                layerId: i >= info.bmLevel ? CONFIG.idRules.fid(bid, fi + 1) : CONFIG.idRules.fid(bid, bi * -1)
+            },
+            geometry: { type: "Polygon", coordinates: [info.flVars[flVarNum]] }
+        })
+    })
+
+    // floorSpec 기반으로 source로 저장
+    setLayers(map, CONFIG.idRules.floorSourceId(bid), floorsSpec);
+    // 핸들러 지정
+    floorsSpec.forEach(f => {
+        const fid = f.properties.layerId;
+        setHandler(map, fid, e => handleFloorClick(bid, fid, f.properties.level))
+    });
 }

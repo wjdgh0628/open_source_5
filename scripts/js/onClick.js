@@ -1,5 +1,5 @@
 import { CONFIG } from './config.js';
-import { showCampusBase, hideCampusBase, generateFloors, removeAllFloors,
+import { showCampusBase, hideCampusBase, hideAllFloors, setFloors,
     flyCamera, searchBasicInfoByBid, searchFloorInfoByBid
 } from './mapUtils.js';
 
@@ -15,9 +15,9 @@ export async function handleBuildingClick(map, e) {
     const floor = await searchFloorInfoByBid(bid);
 
     // 건물 숨김, 층 생성, 카메라 이동
-    await removeAllFloors(map);
+    await hideAllFloors(map);
     hideCampusBase(map);
-    generateFloors(map, floor);
+    setFloors(map, floor);
     flyCamera(map, CONFIG.camera.building, basic.center, basic.bearing);
 }
 //리스트 클릭 시 실행
@@ -27,14 +27,15 @@ export async function handleBuildingListClick(map, bid) {
     console.log(`리스트에서 [${basic.name}] 클릭됨.`);
 
     // 건물 숨김, 층 생성, 카메라 이동
-    await removeAllFloors(map);
+    await hideAllFloors(map);
     hideCampusBase(map);
-    generateFloors(map, floor);
+    setFloors(map, floor);
     flyCamera(map, CONFIG.camera.building, basic.center, basic.bearing);
 }
 // 층 클릭시 실행할 코드 (수정됨)
 export function handleFloorClick(bid, fid, level) {
     console.log(fid, "클릭됨");
+    
 }
 //배경 클릭시 실행할 코드
 export function handleBackgroundClick(map, e) {
@@ -46,7 +47,7 @@ export function handleBackgroundClick(map, e) {
     else CONFIG.bgIdList.forEach(v => { if (topFeature.layer.id.includes(v)) isBackground = true });
 
     if (isBackground) {
-        removeAllFloors(map);
+        hideAllFloors(map);
         showCampusBase(map);
         console.log("배경 클릭됨");
     }

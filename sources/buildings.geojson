@@ -334,7 +334,7 @@
     {
       "type": "Feature",
       "properties": {
-        "@id": "main_2",
+        "@id": "main_alt",
         "origin": "main",
         "building": "university",
         "building:levels": 9
@@ -586,7 +586,7 @@
     {
       "type": "Feature",
       "properties": {
-        "@id": "grad_2",
+        "@id": "grad_alt",
         "origin": "grad",
         "building": "university",
         "building:levels": 2
