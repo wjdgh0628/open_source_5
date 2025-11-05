@@ -1,5 +1,5 @@
 import { CONFIG } from './config.js';
-import { showCampusBase, hideCampusBase, hideAllFloors, setFloors,
+import { showLayer, hideLayer, hideAllFloors, setFloors,
     flyCamera, searchBasicInfoByBid, searchFloorInfoByBid
 } from './mapUtils.js';
 
@@ -16,7 +16,7 @@ export async function handleBuildingClick(map, e) {
 
     // 건물 숨김, 층 생성, 카메라 이동
     await hideAllFloors(map);
-    hideCampusBase(map);
+    hideLayer(map, CONFIG.idRules.buildings);
     setFloors(map, floor);
     flyCamera(map, CONFIG.camera.building, basic.center, basic.bearing);
 }
@@ -28,14 +28,14 @@ export async function handleBuildingListClick(map, bid) {
 
     // 건물 숨김, 층 생성, 카메라 이동
     await hideAllFloors(map);
-    hideCampusBase(map);
+    hideLayer(map, CONFIG.idRules.buildings);
     setFloors(map, floor);
     flyCamera(map, CONFIG.camera.building, basic.center, basic.bearing);
 }
 // 층 클릭시 실행할 코드 (수정됨)
 export function handleFloorClick(bid, fid, level) {
     console.log(fid, "클릭됨");
-    
+
 }
 //배경 클릭시 실행할 코드
 export function handleBackgroundClick(map, e) {
@@ -48,7 +48,7 @@ export function handleBackgroundClick(map, e) {
 
     if (isBackground) {
         hideAllFloors(map);
-        showCampusBase(map);
+        showLayer(map, CONFIG.idRules.buildings);
         console.log("배경 클릭됨");
     }
 }

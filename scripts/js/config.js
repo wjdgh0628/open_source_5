@@ -47,6 +47,7 @@ export const CONFIG = {
         buildings: "campus-3d",
         fid: (bid, level) => { return `${bid}_${level}` },
         floorSourceId: (bid) => { return `${bid}_floors` },
-        rid: (bid, level, index) => { return `${bid}_${level}0${index}` }
+        rid: (bid, level, index) => { return `${bid}_${level}0${index}` },
+        level: (bmLevel, levelIndex) => {return levelIndex >= bmLevel ? (levelIndex - bmLevel) + 1 : (bmLevel - levelIndex) * -1;}
     }
 };

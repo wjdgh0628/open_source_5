@@ -14,8 +14,8 @@ async function fetchBuildingByBid(bid) {
     await fetch(CONFIG.campus.geojsonUrl)
         .then(response => response.json())
         .then(data => {
-            const targetId = bid; // 원하는 @id 값
-            const feature = data.features.find(f => f.properties["@id"] === targetId);
+            const targetId = bid;
+            const feature = data.features.find(f => f.properties[CONFIG.campus.idProp] === targetId);
 
             if (feature) {
                 f = feature;
@@ -75,23 +75,18 @@ export function setHandler(map, id, callback) {
     map.on('click', id, (e) => handler(e));
 }
 
-//건물, 층 모델 보이기/숨기기
-export function hideCampusBase(map) {
-    map.getLayer(CONFIG.idRules.buildings) && map.setLayoutProperty(CONFIG.idRules.buildings, "visibility", "none");
+//레이어 보이기/숨기기
+export function showLayer(map, id) {
+    map.getLayer(id) && map.setLayoutProperty(id, "visibility", "visible");
 }
-export function showCampusBase(map) {
-    map.getLayer(CONFIG.idRules.buildings) && map.setLayoutProperty(CONFIG.idRules.buildings, "visibility", "visible");
+export function hideLayer(map, id) {
+    map.getLayer(id) && map.setLayoutProperty(id, "visibility", "none");
 }
-function hideFloor(map, fid) {
-    map.getLayer(fid) && map.setLayoutProperty(fid, "visibility", "none");
-}
-function showFloor(map, fid) {
-    map.getLayer(fid) && map.setLayoutProperty(fid, "visibility", "none");
-}
+
 //전체 건물들 층 숨기기
 export async function hideAllFloors(map) {
     for (const bid of CONFIG.bidList) {
-        await allFloors(map, bid, (map,fid) => hideFloor(map, fid));
+        await allFloors(map, bid, (map,fid) => hideLayer(map, fid));
     }
 }
 
@@ -139,7 +134,7 @@ async function allFloors(map, bid, cb) {
 export function setFloors(map, info) {
     const bid = info.bid;
     if (map.getSource(CONFIG.idRules.floorSourceId(bid))) {
-        allFloors(map, bid, (map,fid) => showFloor(map, fid));
+        allFloors(map, bid, (map,fid) => showLayer(map, fid));
     }
     else {
         generateFloors(map, info);
@@ -161,6 +156,41 @@ function generateFloors(map, info) {
     info.flList.forEach((flVarNum, i) => {
         let fi = i - info.bmLevel;
         let bi = info.bmLevel - i;
+        const colorJump = parseInt(colorPalette.length / info.flLevel);
+        const base = i * (floorThickness + floorGap);
+        const level = CONFIG.idRules.level(info.bmLevel, i);
+
+        floorsSpec.push({
+            type: "Feature",
+            properties: {
+                name: `${i + 1}F`,
+                base,
+                height: base + floorThickness,
+                color: i >= info.bmLevel ? colorPalette[fi * colorJump] : basementPalette[bi - 1],
+                level: level,
+                layerId: CONFIG.idRules.fid(bid, level)
+            },
+            geometry: { type: "Polygon", coordinates: [info.flVars[flVarNum]] }
+        })
+    })
+
+    // floorSpec 기반으로 source로 저장
+    setLayers(map, CONFIG.idRules.floorSourceId(bid), floorsSpec);
+    // 핸들러 지정
+    floorsSpec.forEach(f => {
+        const fid = f.properties.layerId;
+        setHandler(map, fid, e => handleFloorClick(bid, fid, f.properties.level))
+    });
+}
+function generateRooms(map, info, level) {
+    const bid = info.bid;
+    const { floorThickness, floorGap, colorPalette, basementPalette } = CONFIG.buildingDefaults;
+
+    //층 모양(폴리곤이랑 높이 등)이랑 각종 정보들 floorSpec에 저장
+    let floorsSpec = []
+    info.flList.forEach((flVarNum, i) => {
+        let fi = i - info.bmLevel;
+        let bi = info.bmLevel - i;
         const colorJump = parseInt(colorPalette.length / info.flLevel)
         const base = i * (floorThickness + floorGap);
         floorsSpec.push({
@@ -170,7 +200,8 @@ function generateFloors(map, info) {
                 base,
                 height: base + floorThickness,
                 color: i >= info.bmLevel ? colorPalette[fi * colorJump] : basementPalette[bi - 1],
-                layerId: i >= info.bmLevel ? CONFIG.idRules.fid(bid, fi + 1) : CONFIG.idRules.fid(bid, bi * -1)
+                level: i >= info.bmLevel ? fi + 1 : bi * -1,
+                layerId: CONFIG.idRules.fid(bid, level)
             },
             geometry: { type: "Polygon", coordinates: [info.flVars[flVarNum]] }
         })
