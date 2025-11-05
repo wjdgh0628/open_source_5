@@ -46,8 +46,14 @@ export const CONFIG = {
     idRules: {
         buildings: "campus-3d",
         fid: (bid, level) => { return `${bid}_${level}` },
-        floorSourceId: (bid) => { return `${bid}_floors` },
+        floorSid: (bid) => { return `${bid}_floors` },
         rid: (bid, level, index) => { return `${bid}_${level}0${index}` },
+        roomSid: (fid) => {return `${fid}_rooms`},
         level: (bmLevel, levelIndex) => {return levelIndex >= bmLevel ? (levelIndex - bmLevel) + 1 : (bmLevel - levelIndex) * -1;}
     }
 };
+export const current = {
+    mode: 0,
+    bid: null,
+    level: null
+}

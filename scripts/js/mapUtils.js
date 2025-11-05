@@ -1,5 +1,6 @@
 import { CONFIG } from './config.js';
 import { handleFloorClick } from './onClick.js';
+import {buildings} from '../../sources/rooms.js';
 
 //카메라 이동 함수
 export function flyCamera(map, mode, center, bearing = null) {
@@ -38,7 +39,8 @@ export async function searchBasicInfoByBid(bid) {
         name: f.properties?.["name"],
         coordinates: f.geometry.coordinates[0],
         center: f.properties?.["center"],
-        bearing: f.properties?.["bearing"]
+        bearing: f.properties?.["bearing"],
+        floorBearing: f.properties?.["floorBearing"]
     };
 }
 //bid로 건물 층 정보 검색
@@ -121,19 +123,25 @@ function setLayers(map, sourceId, features) {
 }
 
 //건물 내 전체 층에 대해 콜백
-async function allFloors(map, bid, cb) {
+export async function allFloors(map, bid, cb, excFid = null) {
     const info = await searchFloorInfoByBid(bid);
     for (let i = info.bmLevel * -1; i <0; i ++){
-        cb(map, CONFIG.idRules.fid(bid, i));
+        const fid = CONFIG.idRules.fid(bid, i);
+        if(fid === excFid)
+            continue;
+        cb(map, fid);
     }
     for (let i = 1; i <= info.flLevel; i++) {
-        cb(map, CONFIG.idRules.fid(bid, i));
+        const fid = CONFIG.idRules.fid(bid, i);
+        if(fid === excFid)
+            continue;
+        cb(map, fid);
     }
 }
 //층 생성/보이기
 export function setFloors(map, info) {
     const bid = info.bid;
-    if (map.getSource(CONFIG.idRules.floorSourceId(bid))) {
+    if (map.getSource(CONFIG.idRules.floorSid(bid))) {
         allFloors(map, bid, (map,fid) => showLayer(map, fid));
     }
     else {
@@ -175,43 +183,55 @@ function generateFloors(map, info) {
     })
 
     // floorSpec 기반으로 source로 저장
-    setLayers(map, CONFIG.idRules.floorSourceId(bid), floorsSpec);
+    setLayers(map, CONFIG.idRules.floorSid(bid), floorsSpec);
     // 핸들러 지정
     floorsSpec.forEach(f => {
         const fid = f.properties.layerId;
-        setHandler(map, fid, e => handleFloorClick(bid, fid, f.properties.level))
+        setHandler(map, fid, e => handleFloorClick(map, bid, fid, f.properties.level))
     });
 }
-function generateRooms(map, info, level) {
+export async function allRooms(map, bid, level, cb){
+    const info = await searchFloorInfoByBid(bid);
+    const levelIndex = level < 0 ? level + info.bmLevel : level + info.bmLevel - 1;
+    const rooms = buildings?.[bid][levelIndex];
+    rooms.forEach((room, i) => {
+        const rid = CONFIG.idRules.rid(bid, level, i + 1);
+        cb(map, rid);
+    })
+}
+export function setRooms(map, bid, level, info){
+    const fid = CONFIG.idRules.fid(info.bid, level)
+    if (map.getSource(CONFIG.idRules.roomSid(fid))) {
+        allRooms(map, bid, level, (map, rid) => showLayer(map, rid));
+    }
+    else {
+        generateRooms(map, info, fid, level);
+    }
+}
+function generateRooms(map, info, fid, level) {
     const bid = info.bid;
     const { floorThickness, floorGap, colorPalette, basementPalette } = CONFIG.buildingDefaults;
-
-    //층 모양(폴리곤이랑 높이 등)이랑 각종 정보들 floorSpec에 저장
-    let floorsSpec = []
-    info.flList.forEach((flVarNum, i) => {
-        let fi = i - info.bmLevel;
-        let bi = info.bmLevel - i;
-        const colorJump = parseInt(colorPalette.length / info.flLevel)
-        const base = i * (floorThickness + floorGap);
-        floorsSpec.push({
+    const levelIndex = level < 0 ? level + info.bmLevel : level + info.bmLevel - 1;
+    const base = (levelIndex * (floorThickness + floorGap)) + floorThickness;
+    let rooms = buildings?.[bid][levelIndex];
+    let roomsSpec = []
+    rooms.forEach((room, i) => {
+        roomsSpec.push({
             type: "Feature",
             properties: {
-                name: `${i + 1}F`,
+                name: room.name,
                 base,
                 height: base + floorThickness,
-                color: i >= info.bmLevel ? colorPalette[fi * colorJump] : basementPalette[bi - 1],
-                level: i >= info.bmLevel ? fi + 1 : bi * -1,
-                layerId: CONFIG.idRules.fid(bid, level)
+                color: colorPalette[i],
+                layerId: CONFIG.idRules.rid(bid, level, i + 1)
             },
-            geometry: { type: "Polygon", coordinates: [info.flVars[flVarNum]] }
+            geometry: { type: "Polygon", coordinates: [room.polygon] }
         })
     })
-
-    // floorSpec 기반으로 source로 저장
-    setLayers(map, CONFIG.idRules.floorSourceId(bid), floorsSpec);
+    
+    setLayers(map, CONFIG.idRules.roomSid(fid), roomsSpec);
     // 핸들러 지정
-    floorsSpec.forEach(f => {
+    roomsSpec.forEach(f => {
         const fid = f.properties.layerId;
-        setHandler(map, fid, e => handleFloorClick(bid, fid, f.properties.level))
     });
 }
