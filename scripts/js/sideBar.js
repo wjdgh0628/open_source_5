@@ -54,8 +54,6 @@ async function generateBuildingList(map, favorites) {
     favList.innerHTML = '';
     allList.innerHTML = '';
 
-    const nameKey = CONFIG.campus.nameProp;
-    const idKey = CONFIG.campus.idProp;
     for (const bid of CONFIG.bidList) {
         const info = await searchBasicInfoByBid(bid);
         const name = info.name;

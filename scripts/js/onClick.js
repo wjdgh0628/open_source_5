@@ -1,6 +1,6 @@
 import { CONFIG } from './config.js';
 import { showCampusBase, hideCampusBase, generateFloors, removeAllFloors,
-    flyCamera, searchBasicInfoByBid, searchFloorInfoByBid//, showFloorplanModal
+    flyCamera, searchBasicInfoByBid, searchFloorInfoByBid
 } from './mapUtils.js';
 
 //건물 클릭 시 실행
@@ -32,17 +32,10 @@ export async function handleBuildingListClick(map, bid) {
     generateFloors(map, floor);
     flyCamera(map, CONFIG.camera.building, basic.center, basic.bearing);
 }
-/* // 층 클릭시 실행할 코드 (수정됨)
+// 층 클릭시 실행할 코드 (수정됨)
 export function handleFloorClick(bid, fid, level) {
-    
-    const imageFileName = `${bid}_${level}.png`;
-    const imagePath = `/floorplans/${imageFileName}`;
-    
-    const animationDurationMs = 1200; 
-    setTimeout(() => {
-        showFloorplanModal(imagePath, bid, level); 
-    }, animationDurationMs);
-} */
+    console.log(fid, "클릭됨");
+}
 //배경 클릭시 실행할 코드
 export function handleBackgroundClick(map, e) {
     const features = map.queryRenderedFeatures(e.point);
@@ -57,37 +50,4 @@ export function handleBackgroundClick(map, e) {
         showCampusBase(map);
         console.log("배경 클릭됨");
     }
-}
-export function handleFloorClick(bid, fid, level) {
-    console.log(`[${fid}] 층을 클릭했습니다. 모달을 엽니다.`);
-
-    // 1. 모달 요소들을 가져옵니다.
-    const modal = document.getElementById('modal-overlay');
-    const modalInfo = document.getElementById('modal-floor-info');
-
-    // --- ▼▼▼ 수정된 부분 시작 ▼▼▼ ---
-
-    // 2. 이미지 경로를 설정합니다.
-    let imgPath = `${CONFIG.campus.floorplanUrl}/${bid}_${level}.png`;
-    console.log(imgPath);
-
-    // 3. 모달에 표시할 내용을 업데이트합니다.
-    modalInfo.innerHTML =
-        //<p><strong>건물 ID:</strong> ${bid}</p>
-        //<p><strong>층 ID:</strong> ${fid}</p>
-        //<p><strong>층 레벨:</strong> ${level}</p>
-        `
-            <img 
-                src="${imgPath}" 
-                alt="${bid} ${level}층 평면도" 
-                onerror="this.style.display='none'; this.nextSibling.style.display='block';" 
-            />
-            <p style="display:none; color: #888; text-align: center;">
-                (평면도 이미지를 찾을 수 없습니다.)
-            </p>
-        `;
-    // --- ▲▲▲ 수정된 부분 끝 ▲▲▲ ---
-
-    // 4. 모달을 보여줍니다.
-    modal.classList.remove('hidden');
 }

@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
-    <link href="public/style.css" rel="stylesheet">
+    <link href="./style.css" rel="stylesheet">
 </head>
 
 <body>
@@ -16,7 +16,7 @@
 
     <div id="sidebar">
         <div id="sidebar-header">
-            <img src="img/logo.png" alt="한세대학교 로고" id="sidebar-logo">
+            <img src="../sources/img/logo.png" alt="한세대학교 로고" id="sidebar-logo">
         </div>
 
         <div id="building-list-container">
@@ -35,16 +35,6 @@
 
         <div id="sidebar-collapsed-text"></div>
         <button id="sidebar-toggle-btn" title="사이드바 토글">&lt;</button>
-    </div>
-
-    <div id="modal-overlay" class="hidden">
-        <div id="modal-content">
-            <button id="modal-close-btn" title="닫기">&times;</button>
-            <h2>층 정보</h2>
-            <div id="modal-floor-info">
-                <p>층 세부 정보가 여기에 표시됩니다.</p>
-            </div>
-        </div>
     </div>
 
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.js"></script>

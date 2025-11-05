@@ -54,29 +54,4 @@ export function start() {
 
     // --- 사이드바 토글 로직
     toggleSidebar();
-
-    // --- 모달 닫기 로직 ---
-    //==============================================widgh
-    const modal = document.getElementById('modal-overlay');
-    const modalCloseBtn = document.getElementById('modal-close-btn');
-    modalCloseBtn.addEventListener('click', () => {
-        modal.classList.add('hidden');
-    });
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.classList.add('hidden');
-        }
-    });
-
-    /* //==============================================yujin
-    const modal = document.getElementById('floorplan-modal');
-    //모달 닫기 이벤트리스너
-    document.addEventListener('DOMContentLoaded', () => {
-        if (!modal) return;
-
-        const closeButton = modal.querySelector('.close-button');
-        if (closeButton) {
-            closeButton.addEventListener('click', hideFloorplanModal(modal));
-        }
-    }); */
 }

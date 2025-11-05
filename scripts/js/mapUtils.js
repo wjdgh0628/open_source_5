@@ -78,7 +78,6 @@ export async function removeFloorsFor(map, bid) {
     }
     if (!info || !Array.isArray(fidList)) return;
     fidList.forEach(id => map.getLayer(id) && map.removeLayer(id));
-    info.sourceId && map.getSource(info.sourceId) && map.removeSource(info.sourceId);
 }
 //전체 건물들 층 제거
 export async function removeAllFloors(map) {
@@ -164,29 +163,3 @@ export function setHandler(map, id, callback) {
     }
     map.on('click', id, (e) => handler(e));
 }
-/* 
-//평면도 모달 팝업 함수
-export function showFloorplanModal(imagePath, bid, level, modal) {
-    //엘리먼트 가져오기
-    const modalImage = document.getElementById('modal-floorplan-image');
-    const modalTitle = document.getElementById('modal-title');
-
-    if (!modal || !modalImage || !modalTitle) {
-        console.error("Floorplan modal or its elements not found in the DOM.");
-        alert(`평면도 이미지: ${imagePath}\n(건물: ${bid}, 층: ${level})`);
-        return;
-    }
-
-    //모달 내용 업데이트
-    modalTitle.textContent = `${bid} 건물 ${level}층 평면도`;
-    modalImage.src = imagePath;
-    modalImage.alt = `${bid} ${level}층`;
-
-    modal.classList.add('is-visible');
-}
-//평면도 모달 닫는 함수
-export function hideFloorplanModal(modal) {
-    if (modal) {
-        modal.classList.remove('is-visible');
-    }
-} */
