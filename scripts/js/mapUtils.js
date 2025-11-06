@@ -55,8 +55,8 @@ export async function searchFloorInfoByBid(bid) {
         bmLevel: floors?.["bmLevel"],
         totLevel: floors?.["flLevel"] + floors?.["bmLevel"],
         flList: floors?.["flList"],
-        flVars: floors?.["flVars"],
-        offset: f.properties.offset
+        flVars: floors?.["flVars"]
+        // offset: f.properties.offset
     };
 }
 
@@ -131,11 +131,11 @@ function setLayers(map, sourceId, features) {
                 'text-field': ["get", "name"],
                 'text-size': 14,
                 'text-anchor': ["get", "anchor"],
-                // 'text-radial-offset': ["get", "offset"],
                 'text-allow-overlap': true,
                 'symbol-placement': 'point',
-                // 'symbol-spacing': 1,
                 'symbol-z-order': "source",
+                // 'symbol-spacing': 1,
+                // 'text-radial-offset': ["get", "offset"],
                 // 'symbol-avoid-edges': true
                 // 'symbol-z-elevate': true
             },
@@ -207,7 +207,7 @@ function generateFloors(map, info) {
                 color: i >= info.bmLevel ? colorPalette[fi * colorJump] : basementPalette[bi - 1],
                 level: level,
                 anchor: "left",
-                offset: info.offset,
+                // offset: info.offset,
                 layerId: CONFIG.idRules.fid(bid, level)
             },
             geometry: { type: "Polygon", coordinates: [info.flVars[flVarNum]] }
@@ -256,7 +256,7 @@ function generateRooms(map, info, fid, level) {
                 height: base + floorThickness,
                 color: colorPalette[i],
                 anchor: "bottom",
-                offset: 0,
+                // offset: 0,
                 layerId: CONFIG.idRules.rid(bid, level, i + 1)
             },
             geometry: { type: "Polygon", coordinates: [room.polygon] }
