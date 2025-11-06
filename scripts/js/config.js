@@ -49,6 +49,7 @@ export const CONFIG = {
         floorSid: (bid) => { return `${bid}_floors` },
         rid: (bid, level, index) => { return `${bid}_${level}0${index}` },
         roomSid: (fid) => {return `${fid}_rooms`},
+        lid: (pid) => { return `${pid}_label` },
         level: (bmLevel, levelIndex) => {return levelIndex >= bmLevel ? (levelIndex - bmLevel) + 1 : (bmLevel - levelIndex) * -1;}
     }
 };

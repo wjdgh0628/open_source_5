@@ -1,6 +1,6 @@
 import { CONFIG } from './config.js';
 import { handleFloorClick } from './onClick.js';
-import {buildings} from '../../sources/rooms.js';
+import { buildings } from '../../sources/rooms.js';
 
 //카메라 이동 함수
 export function flyCamera(map, mode, center, bearing = null) {
@@ -55,7 +55,8 @@ export async function searchFloorInfoByBid(bid) {
         bmLevel: floors?.["bmLevel"],
         totLevel: floors?.["flLevel"] + floors?.["bmLevel"],
         flList: floors?.["flList"],
-        flVars: floors?.["flVars"]
+        flVars: floors?.["flVars"],
+        offset: f.properties.offset
     };
 }
 
@@ -80,15 +81,17 @@ export function setHandler(map, id, callback) {
 //레이어 보이기/숨기기
 export function showLayer(map, id) {
     map.getLayer(id) && map.setLayoutProperty(id, "visibility", "visible");
+    map.getLayer(CONFIG.idRules.lid(id)) && map.setLayoutProperty(CONFIG.idRules.lid(id), "visibility", "visible");
 }
 export function hideLayer(map, id) {
     map.getLayer(id) && map.setLayoutProperty(id, "visibility", "none");
+    map.getLayer(CONFIG.idRules.lid(id)) && map.setLayoutProperty(CONFIG.idRules.lid(id), "visibility", "none");
 }
 
 //전체 건물들 층 숨기기
 export async function hideAllFloors(map) {
     for (const bid of CONFIG.bidList) {
-        await allFloors(map, bid, (map,fid) => hideLayer(map, fid));
+        await allFloors(map, bid, (map, fid) => hideLayer(map, fid));
     }
 }
 
@@ -105,7 +108,7 @@ function setLayers(map, sourceId, features) {
             features: features
         })
     });
-    features.forEach(f => {
+    features.forEach((f, i) => {
         const layerId = f.properties.layerId;
         map.addLayer({
             id: layerId,
@@ -119,21 +122,48 @@ function setLayers(map, sourceId, features) {
                 "fill-extrusion-opacity": 1
             }
         });
+        map.addLayer({
+            id: CONFIG.idRules.lid(layerId),
+            type: 'symbol',
+            source: sourceId,
+            filter: ["==", ["get", "layerId"], layerId],
+            layout: {
+                'text-field': ["get", "name"],
+                'text-size': 14,
+                'text-anchor': ["get", "anchor"],
+                // 'text-radial-offset': ["get", "offset"],
+                'text-allow-overlap': true,
+                'symbol-placement': 'point',
+                // 'symbol-spacing': 1,
+                'symbol-z-order': "source",
+                // 'symbol-avoid-edges': true
+                // 'symbol-z-elevate': true
+            },
+            paint: {
+                'symbol-z-offset': f.properties.base,
+                'text-color': '#000000',
+                'text-halo-color': '#ffffff',
+                'text-halo-width': 2,
+                // "text-translate": [0, 0],
+                // "text-translate-anchor": "viewport"
+            }
+        });
+        // console.log(CONFIG.idRules.lid(layerId));
     });
 }
 
 //건물 내 전체 층에 대해 콜백
 export async function allFloors(map, bid, cb, excFid = null) {
     const info = await searchFloorInfoByBid(bid);
-    for (let i = info.bmLevel * -1; i <0; i ++){
+    for (let i = info.bmLevel * -1; i < 0; i++) {
         const fid = CONFIG.idRules.fid(bid, i);
-        if(fid === excFid)
+        if (fid === excFid)
             continue;
         cb(map, fid);
     }
     for (let i = 1; i <= info.flLevel; i++) {
         const fid = CONFIG.idRules.fid(bid, i);
-        if(fid === excFid)
+        if (fid === excFid)
             continue;
         cb(map, fid);
     }
@@ -142,7 +172,7 @@ export async function allFloors(map, bid, cb, excFid = null) {
 export function setFloors(map, info) {
     const bid = info.bid;
     if (map.getSource(CONFIG.idRules.floorSid(bid))) {
-        allFloors(map, bid, (map,fid) => showLayer(map, fid));
+        allFloors(map, bid, (map, fid) => showLayer(map, fid));
     }
     else {
         generateFloors(map, info);
@@ -171,11 +201,13 @@ function generateFloors(map, info) {
         floorsSpec.push({
             type: "Feature",
             properties: {
-                name: `${i + 1}F`,
+                name: i >= info.bmLevel ? `${fi + 1}F` : `B${bi}`,
                 base,
                 height: base + floorThickness,
                 color: i >= info.bmLevel ? colorPalette[fi * colorJump] : basementPalette[bi - 1],
                 level: level,
+                anchor: "left",
+                offset: info.offset,
                 layerId: CONFIG.idRules.fid(bid, level)
             },
             geometry: { type: "Polygon", coordinates: [info.flVars[flVarNum]] }
@@ -190,7 +222,7 @@ function generateFloors(map, info) {
         setHandler(map, fid, e => handleFloorClick(map, bid, fid, f.properties.level))
     });
 }
-export async function allRooms(map, bid, level, cb){
+export async function allRooms(map, bid, level, cb) {
     const info = await searchFloorInfoByBid(bid);
     const levelIndex = level < 0 ? level + info.bmLevel : level + info.bmLevel - 1;
     const rooms = buildings?.[bid][levelIndex];
@@ -199,7 +231,7 @@ export async function allRooms(map, bid, level, cb){
         cb(map, rid);
     })
 }
-export function setRooms(map, bid, level, info){
+export function setRooms(map, bid, level, info) {
     const fid = CONFIG.idRules.fid(info.bid, level)
     if (map.getSource(CONFIG.idRules.roomSid(fid))) {
         allRooms(map, bid, level, (map, rid) => showLayer(map, rid));
@@ -223,15 +255,18 @@ function generateRooms(map, info, fid, level) {
                 base,
                 height: base + floorThickness,
                 color: colorPalette[i],
+                anchor: "bottom",
+                offset: 0,
                 layerId: CONFIG.idRules.rid(bid, level, i + 1)
             },
             geometry: { type: "Polygon", coordinates: [room.polygon] }
         })
     })
-    
+
     setLayers(map, CONFIG.idRules.roomSid(fid), roomsSpec);
     // 핸들러 지정
     roomsSpec.forEach(f => {
         const fid = f.properties.layerId;
     });
+
 }
