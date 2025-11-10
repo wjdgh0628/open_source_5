@@ -1,0 +1,267 @@
+/* GOOGLE FONTS */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap");
+
+/* VARIABLES CSS */
+:root {
+    --nav--width: 92px;
+
+    /* Colores */
+    --first-color: #245dc7;
+    --bg-color: #ffffff; /* 흰색 배경 */
+    --sub-color: #000000; /* 하위 텍스트 */
+    --white-color: #fff;
+    --text-color: #12192c; /* 기본 텍스트 */
+
+    /* Fuente y tipografia */
+    --body-font: 'Poppins', sans-serif;
+    --normal-font-size: 1rem;
+    --small-font-size: .875rem;
+    --font-weight-bold: 600; /* 굵은 폰트 */
+
+    /* z index */
+    --z-fixed: 100;
+}
+
+/* BASE */
+*, ::before, ::after {
+    box-sizing: border-box;
+}
+
+body {
+    position: relative;
+    margin: 0;
+    padding: 2rem 0 0 6.75rem; 
+    font-family: var(--body-font);
+    font-size: var(--normal-font-size);
+    transition: .5s;
+}
+
+h1 {
+    margin: 0;
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+}
+
+/* l NAV */
+.l-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--nav--width);
+    height: 100vh;
+    background-color: var(--bg-color); 
+    color: var(--text-color); 
+    padding: 1.5rem 1.5rem 2rem;
+    transition: .5s;
+    z-index: var(--z-fixed);
+    box-shadow: 0 0 10px rgba(0,0,0,0.1); 
+}
+
+/* NAV */
+.nav {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+}
+
+.nav__brand {
+    display: grid;
+    grid-template-columns: max-content max-content;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.nav__toggle {
+    font-size: 1.25rem;
+    padding: .75rem;
+    cursor: pointer;
+}
+
+.nav__logo {
+    color: var(--text-color); 
+    font-weight: 600;
+    display: flex; 
+    align-items: center;
+}
+
+.nav__link {
+    display: grid;
+    grid-template-columns: max-content max-content;
+    align-items: center;
+    column-gap: .75rem;
+    padding: .75rem;
+    color: var(--text-color); 
+    border-radius: .5rem;
+    margin-bottom: 1rem;
+    transition: .3s;
+    cursor: pointer;
+}
+
+.nav__link:hover {
+    background-color: var(--first-color);
+}
+
+.nav__link:hover .nav__icon,
+.nav__link:hover .nav_name {
+    color: var(--white-color);
+}
+
+.nav__icon {
+    font-size: 1.25rem;
+}
+
+.nav_name {
+    font-size: var(--normal-font-size); 
+    font-weight: var(--font-weight-bold);
+}
+
+/* Expander menu */
+.expander {
+    width: calc(var(--nav--width) + 9.25rem);
+}
+
+/* Add padding body*/
+.body-pd {
+    padding: 2rem 0 0 16rem; 
+}
+
+/* (삭제) Active links menu 기능 제거 */
+
+/* COLLAPSE */
+.collapse {
+    grid-template-columns: 20px max-content 1fr;
+}
+
+.collapse__link {
+    justify-self: flex-end;
+    transition: .5;
+}
+
+.collapse__menu {
+    display: none;
+    padding: .75rem 0rem .75rem 2.75rem; 
+}
+
+ul.collapse__menu {
+    padding-left: 2.75rem; 
+}
+
+/* Show collapse */
+.showCollapse {
+    display: block;
+}
+
+.l-navbar:not(.expander) .collapse__menu {
+    display: none !important;
+}
+
+/* Rotate icon */
+.rotate {
+    transform: rotate(180deg);
+    transition: .5s;
+}
+
+
+/* ===== ▼▼▼ 기존 맵/모달/리스트 스타일 추가 ▼▼▼ ===== */
+
+#map {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1; 
+}
+
+.ml-control {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5; 
+}
+
+#modal-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); display: flex;
+  justify-content: center; align-items: center; 
+  z-index: calc(var(--z-fixed) + 10); 
+  opacity: 1; visibility: visible;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+#modal-overlay.hidden {
+  opacity: 0; visibility: hidden; pointer-events: none;
+}
+#modal-content {
+  background-color: #ffffff; padding: 24px; border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); min-width: 300px;
+  max-width: 600px; width: 80%; position: relative;
+  box-sizing: border-box; 
+  color: #333; 
+}
+#modal-close-btn {
+  position: absolute; top: 10px; right: 15px; background: none;
+  border: none; font-size: 28px; line-height: 1; color: #aaa;
+  cursor: pointer; padding: 0;
+}
+#modal-close-btn:hover { color: #333; }
+#modal-content h2 { margin-top: 0; margin-bottom: 16px; color: #333; }
+#modal-floor-info img {
+  width: 100%; max-height: 60vh; object-fit: contain;
+  border: 1px solid #eee; margin-top: 10px;
+}
+
+/* 하위 리스트 아이템 스타일 */
+.building-list-item {
+  display: flex;
+  align-items: center;
+  padding: 8px; 
+  color: var(--sub-color);
+  font-size: 0.95rem; 
+  font-weight: var(--font-weight-bold); 
+  border-radius: .5rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.building-list-item:hover {
+  background-color: var(--first-color);
+  color: var(--white-color); 
+}
+
+.building-list-item span {
+  flex-grow: 1;
+  cursor: pointer;
+}
+
+.building-list-item:hover .favorite-btn {
+    color: var(--white-color);
+}
+
+/* 즐겨찾기 버튼 스타일 */
+.favorite-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0 8px 0 0;
+  color: #ccc;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.favorite-btn:hover {
+  transform: scale(1.2);
+}
+
+.favorite-btn.favorited {
+  color: #f0c300;
+}

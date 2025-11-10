@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <title>Campus 3D Floors</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <link rel="stylesheet" href="public/style.css">
+    
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+</head>
+
+<body id="body-pd">
+
+    <div class="l-navbar" id="navbar">
+        <nav class="nav">
+            <div>
+                <div class="nav__brand">
+                    <ion-icon name="menu-outline" class="nav__toggle" id="nav-toggle"></ion-icon>
+                    <a href="#" class="nav__logo"><img src="img/logo2.png" alt="로고" style="width: 150px; height: 50px; border-radius: 50%;"></a>
+                </div>
+
+                <div class="nav__list">
+                    <div href="#" class="nav__link collapse showCollapse">
+                        <ion-icon name="star-outline" class="nav__icon"></ion-icon>
+                        <span class="nav_name">즐겨찾기</span>
+                        <ion-icon name="chevron-down-outline" class="collapse__link rotate"></ion-icon>
+                        
+                        <ul class="collapse__menu showCollapse" id="favorites-list">
+                            </ul>
+                    </div>
+
+                    <div href="#" class="nav__link collapse showCollapse">
+                        <ion-icon name="business-outline" class="nav__icon"></ion-icon>
+                        <span class="nav_name">건물 명칭</span>
+                        <ion-icon name="chevron-down-outline" class="collapse__link rotate"></ion-icon>
+                        
+                        <ul class="collapse__menu showCollapse" id="all-buildings-list">
+                            </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </div>
+    <div id="map"></div>
+    <div class="ml-control"></div>
+
+    <div id="modal-overlay" class="hidden">
+        <div id="modal-content">
+            <button id="modal-close-btn" title="닫기">&times;</button>
+            <h2>층 정보</h2>
+            <div id="modal-floor-info">
+                <p>층 세부 정보가 여기에 표시됩니다.</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="https://unpkg.com/ionicons@5.2.3/dist/ionicons/ionicons.esm.js"></script>
+    
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.js"></script>
+
+    <script type="module">
+        import { start } from './js/main.js';
+        mapboxgl.accessToken = "pk.eyJ1IjoibGF6eWRldjEwMjQiLCJhIjoiY21mdW91NnNyMTVkZDJtcHd4dHNtNHU0ayJ9.mLzbdcCPq_-BeA8DlHu1KA";
+        start(); 
+    </script>
+</body>
+
+</html>
