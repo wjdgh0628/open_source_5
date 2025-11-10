@@ -28,15 +28,9 @@ export function initMap() {
             source: "campus",
             paint: {
                 "fill-extrusion-color": ["coalesce", ["get", "color"], "#aaaaaa"],
-                "fill-extrusion-base": ["coalesce", ["to-number", ["get", "min_height"]], 0],
-                "fill-extrusion-height": [
-                    "case",
-                    ["has", "height"], ["to-number", ["get", "height"]],
-                    ["has", "building:levels"], ["*", ["to-number", ["get", "building:levels"]],
-                        CONFIG.buildingDefaults.floorThickness + CONFIG.buildingDefaults.floorGap],
-                    10
-                ],
-                "fill-extrusion-opacity": 0.9
+                "fill-extrusion-base": ["coalesce", ["*", ["get", "base"],CONFIG.buildingDefaults.levelThick], 0],
+                "fill-extrusion-height": ["*", ["get", "building:levels"],CONFIG.buildingDefaults.levelThick],
+                "fill-extrusion-opacity": 1
             }
         });
         //건물, 배경 클릭시 실행할 코드 지정

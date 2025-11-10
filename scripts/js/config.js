@@ -11,8 +11,9 @@ export const CONFIG = {
         above: { zoom: 19, pitch: 0, speed: 0.4 }
     },
     buildingDefaults: {
-        floorThickness: 1,
-        floorGap: 7,
+        floorThickness: 2,
+        floorGap: 4,
+        levelThick: 6,
         colorPalette: ["#ff0000", "#ff4400", "#ff8800", "#ffcc00", "#ffff00", "#ccff00", "#88ff00", "#44ff00", "#00ff00", "#00ff44", "#00ff88", "#00ffcc", "#00ffff", "#00ccff", "#0088ff", "#0044ff", "#0000ff"],
         basementPalette: ["#4400ff", "#8800ff", "#cc00ff", "#ff00ff"]
         // basementPalette: ["#ff00ff", "#cc00ff", "#8800ff", "#4400ff"]

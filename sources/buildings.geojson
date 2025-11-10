@@ -11,6 +11,7 @@
         "name": "본관",
         "building": "university",
         "building:levels": 4,
+        "base": 0,
         "center": [
           126.9529637,
           37.3469635
@@ -338,7 +339,8 @@
         "@id": "main_alt",
         "origin": "main",
         "building": "university",
-        "building:levels": 9
+        "building:levels": 9,
+        "base": 0
       },
       "geometry": {
         "type": "Polygon",
@@ -407,6 +409,7 @@
         "name": "대학원관",
         "building": "university",
         "building:levels": 7,
+        "base": 0,
         "center": [
           126.9528509,
           37.3459511
@@ -591,7 +594,8 @@
         "@id": "grad_alt",
         "origin": "grad",
         "building": "university",
-        "building:levels": 2
+        "building:levels": 2,
+        "base": 1
       },
       "geometry": {
         "type": "Polygon",
@@ -644,6 +648,7 @@
         "name": "디자인관",
         "building": "university",
         "building:levels": 7,
+        "base": 0,
         "center": [
           126.95292452350259,
           37.34568909478981
@@ -795,6 +800,7 @@
         "name": "게미관",
         "building": "university",
         "building:levels": 6,
+        "base": 0,
         "center": [
           126.95295976102352,
           37.34537556174354
@@ -945,6 +951,7 @@
         "name": "음악관",
         "building": "university",
         "building:levels": 5,
+        "base": 0,
         "center": [
           126.95348292589188,
           37.34506178751063
@@ -1024,6 +1031,7 @@
         "name": "로뎀관",
         "building": "dormitory",
         "building:levels": 2,
+        "base": 0,
         "center": [
           126.95386846948948,
           37.34415384000415
@@ -1178,6 +1186,7 @@
         "name": "영상비전센터",
         "building": "university",
         "building:levels": 10,
+        "base": 0,
         "center": [
           126.9532423093915,
           37.34386020030255
@@ -1276,6 +1285,7 @@
         "name": "이공관",
         "building": "university",
         "building:levels": 4,
+        "base": 0,
         "center": [
           126.95370529778302,
           37.34362930298334
@@ -1384,6 +1394,7 @@
         "name": "학생회관",
         "building": "university",
         "building:levels": 3,
+        "base": 0,
         "center": [
           126.95441884920001,
           37.34357139523682
@@ -1460,6 +1471,7 @@
         "name": "신학관",
         "building": "university",
         "building:levels": 6,
+        "base": 0,
         "center": [
           126.95395868271589,
           37.343143183662114
@@ -1538,6 +1550,7 @@
         "name": "비전관",
         "building": "university",
         "building:levels": 6,
+        "base": 0,
         "center": [
           126.95351142436266,
           37.342909151946564
