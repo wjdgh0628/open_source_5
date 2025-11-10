@@ -7,16 +7,16 @@
 
     /* Colores */
     --first-color: #245dc7;
-    --bg-color: #ffffff; /* 흰색 배경 */
-    --sub-color: #000000; /* 하위 텍스트 */
+    --bg-color: #ffffff; 
+    --sub-color: #000000; 
     --white-color: #fff;
-    --text-color: #12192c; /* 기본 텍스트 */
+    --text-color: #12192c; 
 
     /* Fuente y tipografia */
     --body-font: 'Poppins', sans-serif;
     --normal-font-size: 1rem;
     --small-font-size: .875rem;
-    --font-weight-bold: 600; /* 굵은 폰트 */
+    --font-weight-bold: 600; 
 
     /* z index */
     --z-fixed: 100;
@@ -108,14 +108,17 @@ a {
     cursor: pointer;
 }
 
-.nav__link:hover {
+/* ===== ▼▼▼ (수정) 사이드바가 "접혔을 때만" 메인 링크에 호버 효과 적용 ▼▼▼ ===== */
+.l-navbar:not(.expander) .nav__link:hover {
     background-color: var(--first-color);
 }
 
-.nav__link:hover .nav__icon,
-.nav__link:hover .nav_name {
+.l-navbar:not(.expander) .nav__link:hover .nav__icon,
+.l-navbar:not(.expander) .nav__link:hover .nav_name {
     color: var(--white-color);
 }
+/* ===== ▲▲▲ 수정 완료 ▲▲▲ ===== */
+
 
 .nav__icon {
     font-size: 1.25rem;
@@ -131,12 +134,17 @@ a {
     width: calc(var(--nav--width) + 9.25rem);
 }
 
+.l-navbar:not(.expander) .nav_name {
+    display: none;
+}
+.l-navbar:not(.expander) .collapse__link {
+    display: none;
+}
+
 /* Add padding body*/
 .body-pd {
     padding: 2rem 0 0 16rem; 
 }
-
-/* (삭제) Active links menu 기능 제거 */
 
 /* COLLAPSE */
 .collapse {
@@ -173,7 +181,7 @@ ul.collapse__menu {
 }
 
 
-/* ===== ▼▼▼ 기존 맵/모달/리스트 스타일 추가 ▼▼▼ ===== */
+/* ===== ▼▼▼ 기존 맵/모달/리스트 스타일 (동일) ▼▼▼ ===== */
 
 #map {
   position: fixed;
@@ -221,7 +229,7 @@ ul.collapse__menu {
   border: 1px solid #eee; margin-top: 10px;
 }
 
-/* 하위 리스트 아이템 스타일 */
+/* 하위 리스트 아이템 스타일 (이 부분 호버는 유지) */
 .building-list-item {
   display: flex;
   align-items: center;
