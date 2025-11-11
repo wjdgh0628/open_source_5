@@ -169,7 +169,6 @@ async function initBuildings() {
   buildingSelect.innerHTML = "";
 
   for (const bid of CONFIG.bidList) {
-    // eslint-disable-next-line no-await-in-loop
     const info = await searchBasicInfoByBid(bid);
     const opt = document.createElement("option");
     opt.value = bid;
@@ -539,7 +538,7 @@ function draw() {
     ctx.rotate(state.image.rotation);
 
     const baseScale = state.image.baseWorldScale * state.image.scale;
-    ctx.scale(baseScale, baseScale);
+    ctx.scale(baseScale, -baseScale);
 
     ctx.globalAlpha = state.image.alpha;
     ctx.drawImage(img, -img.width / 2, -img.height / 2);
