@@ -1,11 +1,11 @@
 import { CONFIG } from './config.js';
 import { setHandler } from './mapUtils.js';
 import { handleBuildingClick, handleBackgroundClick } from './onClick.js';
-import { rerenderLists, toggleSidebar } from './sideBar.js';
+import { rerenderLists, showMenu, setupCollapseMenu } from './sideBar.js';
 /*global mapboxgl*/ //eslint mapboxgl 비선언 오류 숨기기
 
 export function initMap() {
-    // ... (initMap 함수 내용은 동일) ...
+    // 맵 초기화 (기존과 동일)
     const map = new mapboxgl.Map({
         container: "map",
         style: CONFIG.map.style,
@@ -44,8 +44,9 @@ export function initMap() {
 export function start() {
     const map = initMap();
 
-    rerenderLists(map); //generateBuildingList 대신 새로고침 함수 호출
+    rerenderLists(map); // 건물 리스트 렌더링
 
-    // --- 사이드바 토글 로직
-    toggleSidebar();
+    showMenu('nav-toggle', 'navbar', 'body-pd');
+    const linkCollapse = document.getElementsByClassName('collapse__link')
+    setupCollapseMenu(linkCollapse);
 }

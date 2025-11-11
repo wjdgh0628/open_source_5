@@ -4,47 +4,27 @@ import { searchBasicInfoByBid } from './mapUtils.js';
 
 // 목록 새로고침 함수
 export function rerenderLists(map) {
-    if (!map) return; // 데이터가 없으면 실행 중지
+    if (!map) return;  // 데이터가 없으면 실행 중지
     const favorites = loadFavorites();
     // 저장된 GeoJSON 데이터와 map 객체를 사용해 리스트 재생성
     generateBuildingList(map, favorites);
 }
-// 1. 로컬 스토리지에서 즐겨찾기 목록 저장/불러오기
+// 로컬 스토리지에서 즐겨찾기 목록 저장/불러오기
 function saveFavorites(favsArray) { localStorage.setItem('campusFavorites', JSON.stringify(favsArray)); }
 function loadFavorites() {
     const favsJSON = localStorage.getItem('campusFavorites');
     return favsJSON ? JSON.parse(favsJSON) : [];
 }
 
-// 즐겨찾기 토글 함수(DOM을 직접 조작하는 대신, 저장 후 새로고침 호출)
+// 즐겨찾기 토글 함수
 function toggleFavorite(bid) {
     let favorites = loadFavorites();
     const index = favorites.indexOf(bid);
 
-    if (index > -1) { favorites.splice(index, 1); }// 이미 즐겨찾기 됨 -> 삭제
-    else { favorites.push(bid); }// 새 즐겨찾기 -> 추가
+    if (index > -1) { favorites.splice(index, 1); }
+    else { favorites.push(bid); }
 
-    saveFavorites(favorites); // 1. 로컬스토리지에 저장
-}
-
-export function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const toggleBtn = document.getElementById('sidebar-toggle-btn');
-    const icon = toggleBtn.querySelector('i');
-
-    toggleBtn.addEventListener('click', () => {
-        sidebar.classList.toggle('collapsed');
-        if (sidebar.classList.contains('collapsed')) {
-            icon.classList.replace('fa-chevron-left', 'fa-chevron-right');
-        } else {
-            icon.classList.replace('fa-chevron-right', 'fa-chevron-left');
-        }
-    });
-    if (sidebar.classList.contains('collapsed')) {
-        toggleBtn.textContent = '>';
-    } else {
-        toggleBtn.textContent = '<';
-    }
+    saveFavorites(favorites); 
 }
 
 async function generateBuildingList(map, favorites) {
@@ -62,7 +42,7 @@ async function generateBuildingList(map, favorites) {
         const isFavorited = favorites.includes(bid);
 
         const listItem = document.createElement('li');
-        listItem.classList.add('building-list-item');
+        listItem.classList.add('building-list-item'); 
 
         const favButton = document.createElement('button');
         favButton.classList.add('favorite-btn');
@@ -73,10 +53,9 @@ async function generateBuildingList(map, favorites) {
             favButton.textContent = '☆';
         }
 
-        // (수정) 클릭 시 DOM 조작 대신 toggleFavorite(bid)만 호출
         favButton.addEventListener('click', (e) => {
             e.stopPropagation();
-            toggleFavorite(bid); // buttonElement를 넘길 필요 없음
+            toggleFavorite(bid); 
             rerenderLists(map);
         });
 
@@ -93,8 +72,34 @@ async function generateBuildingList(map, favorites) {
         if (isFavorited) {
             favList.appendChild(listItem);
         } else {
-            // geojson 순서대로 추가되므로 순서가 보장됨
             allList.appendChild(listItem);
         }
     };
+}
+
+export const showMenu = (toggleId, navbarId, bodyId) => {
+    const toggle = document.getElementById(toggleId),
+    navbar = document.getElementById(navbarId),
+    bodypadding = document.getElementById(bodyId)
+
+    if( toggle && navbar ) {
+        toggle.addEventListener('click', ()=>{
+            navbar.classList.toggle('expander');
+            bodypadding.classList.toggle('body-pd')
+        })
+    }
+}
+
+
+export function setupCollapseMenu(linkCollapse) {
+    var i
+    for(i=0;i<linkCollapse.length;i++) {
+        linkCollapse[i].addEventListener('click', function(){
+            const collapseMenu = this.nextElementSibling
+            collapseMenu.classList.toggle('showCollapse')
+
+            const rotate = collapseMenu.previousElementSibling
+            rotate.classList.toggle('rotate')
+        });
+    }
 }
