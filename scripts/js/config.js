@@ -21,7 +21,7 @@ export const CONFIG = {
     defaultFloorCount: 3,
     campus: {
         geojsonUrl: "../sources/buildings.geojson",
-        roomsUrl: "../sources/rooms.js",
+        roomsUrl: "../sources/rooms.json",
         idProp: "@id",
         nameProp: "name",
     },

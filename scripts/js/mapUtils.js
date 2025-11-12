@@ -1,6 +1,5 @@
 import { CONFIG } from './config.js';
 import { handleFloorClick } from './onClick.js';
-import { buildings } from '../../sources/rooms.js';
 
 //카메라 이동 함수
 export function flyCamera(map, mode, center, bearing = null) {
@@ -36,30 +35,46 @@ export async function searchBasicInfoByBid(bid) {
     return {
         bid: bid,
         properties: f.properties,
-        name: f.properties?.["name"],
+        name: f.properties.name,
         coordinates: f.geometry.coordinates[0],
-        center: f.properties?.["center"],
-        bearing: f.properties?.["bearing"],
-        floorBearing: f.properties?.["floorBearing"]
+        center: f.properties?.center,
+        bearing: f.properties?.bearing,
+        floorBearing: f.properties?.floorBearing
     };
 }
 //bid로 건물 층 정보 검색
 export async function searchFloorInfoByBid(bid) {
     const f = await fetchBuildingByBid(bid);
     if (!f) return;
-    const floors = f.properties?.["floors"];
+    const floors = f.properties?.floors;
 
     return {
         bid: bid,
-        flLevel: floors?.["flLevel"],
-        bmLevel: floors?.["bmLevel"],
-        totLevel: floors?.["flLevel"] + floors?.["bmLevel"],
-        flList: floors?.["flList"],
-        flVars: floors?.["flVars"]
+        flLevel: floors?.flLevel,
+        bmLevel: floors?.bmLevel,
+        totLevel: floors?.flLevel + floors?.bmLevel,
+        flList: floors?.flList,
+        flVars: floors?.flVars
         // offset: f.properties.offset
     };
 }
+async function fetchRoomsByBid(bid, levelIndex) {
+    let f = null;
+    await fetch(CONFIG.campus.roomsUrl)
+        .then(response => response.json())
+        .then(data => {
+            const rooms = data?.[bid]?.[levelIndex];
 
+            if (rooms) {
+                f = rooms;
+            } else {
+                console.log("bid 혹은 층수 오류", bid, levelIndex);
+                f = false;
+            }
+        })
+        .catch(err => { console.error("파일 불러오기 실패:", err); f = null; });
+    return f;
+}
 //핸들러 적용 함수
 export function setHandler(map, id, callback) {
     const handler = e => {
@@ -225,7 +240,7 @@ function generateFloors(map, info) {
 export async function allRooms(map, bid, level, cb) {
     const info = await searchFloorInfoByBid(bid);
     const levelIndex = level < 0 ? level + info.bmLevel : level + info.bmLevel - 1;
-    const rooms = buildings?.[bid][levelIndex];
+    const rooms = await fetchRoomsByBid(bid, levelIndex);
     rooms.forEach((room, i) => {
         const rid = CONFIG.idRules.rid(bid, level, i + 1);
         cb(map, rid);
@@ -240,12 +255,12 @@ export function setRooms(map, bid, level, info) {
         generateRooms(map, info, fid, level);
     }
 }
-function generateRooms(map, info, fid, level) {
+async function  generateRooms(map, info, fid, level) {
     const bid = info.bid;
     const { floorThickness, floorGap, colorPalette, basementPalette } = CONFIG.buildingDefaults;
     const levelIndex = level < 0 ? level + info.bmLevel : level + info.bmLevel - 1;
     const base = (levelIndex * (floorThickness + floorGap)) + floorThickness;
-    let rooms = buildings?.[bid][levelIndex];
+    let rooms = await fetchRoomsByBid(bid, levelIndex);
     let roomsSpec = []
     rooms.forEach((room, i) => {
         roomsSpec.push({
