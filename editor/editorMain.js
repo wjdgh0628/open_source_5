@@ -428,6 +428,8 @@ function draw(){
     ctx.translate(im.pos.x - ox, im.pos.y - oy);
     ctx.rotate(im.rotation);
     ctx.scale(im.scale, im.scale);
+    // Re-flip vertically so the image appears upright in world coordinates
+    ctx.scale(1, -1);
     ctx.globalAlpha = im.opacity;
     ctx.drawImage(img, -img.width/2, -img.height/2);
     ctx.restore();
