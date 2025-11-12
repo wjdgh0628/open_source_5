@@ -1,30 +1,32 @@
 <!doctype html>
 <html lang="ko">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Polygon Editor (Floors & Rooms only)</title>
+  <title>Polygon Editor (Clean)</title>
   <link href="editorStyle.css" rel="stylesheet">
 </head>
-
 <body>
   <div id="editorRoot">
     <header id="topPanel">
       <div class="top-row">
         <div class="block">
-          <label for="buildingSelect">건물:</label>
+          <label for="buildingSelect">건물</label>
           <select id="buildingSelect"></select>
-          <label for="floorSelect">층:</label>
+          <label for="floorSelect">층</label>
           <select id="floorSelect"></select>
         </div>
         <div class="block">
-          <label for="floorCoordsInput">수동 층 폴리곤 좌표값</label>
+          <label for="floorCoordsInput">층 폴리곤(수동 입력)</label>
           <textarea id="floorCoordsInput" placeholder='[[126.95,37.34], ...]'></textarea>
-          <button id="applyFloorCoordsBtn">적용</button>
+          <div class="row">
+            <button id="applyFloorCoordsBtn">적용</button>
+            <button id="copyFloorCoordsBtn">층 좌표 복사</button>
+          </div>
         </div>
         <div class="block">
-          <div class="room-controls">
+          <label>방 편집</label>
+          <div class="row">
             <button id="closeRoomBtn">폴리곤 닫기</button>
           </div>
         </div>
@@ -38,12 +40,10 @@
     </main>
 
     <section id="bottomPanel">
-      <h3>방 폴리곤 목록 및 좌표</h3>
+      <h3>방 폴리곤 & 좌표</h3>
       <div id="roomList"></div>
     </section>
   </div>
-
   <script type="module" src="editorMain.js"></script>
 </body>
-
 </html>
