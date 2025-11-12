@@ -1,3 +1,9 @@
+#roomsPanel { display:flex; gap:12px; }
+.rooms-col { flex:1; min-width:0; }
+.rooms-col h4 { margin:0 0 6px; font-size:12px; color:#333; }
+.room-name { width:180px; font-size:12px; padding:2px 4px; }
+.room-header .left { display:flex; align-items:center; gap:6px; }
+.room-header .actions button { font-size:11px; }
 #imageModeBtn { padding:4px 8px; }
 #imageModeBtn[aria-pressed="true"] { background:#007aff; color:#fff; border-color:#007aff; }
 #imageOpacity { width:160px; }

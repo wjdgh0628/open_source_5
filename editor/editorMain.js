@@ -15,7 +15,12 @@ const floorSelect = el("floorSelect");
 const floorCoordsInput = el("floorCoordsInput");
 const applyFloorCoordsBtn = el("applyFloorCoordsBtn");
 const copyFloorCoordsBtn = el("copyFloorCoordsBtn");
-const roomListEl = el("roomList");
+
+// New: dual lists & file controls
+const savedRoomListEl = el("savedRoomList");
+const draftRoomListEl = el("draftRoomList");
+const saveRoomsBtn = el("saveRoomsBtn");
+const reloadRoomsBtn = el("reloadRoomsBtn");
 
 const imageModeBtn = el("imageModeBtn");
 const imageOpacityRange = el("imageOpacity");
@@ -27,8 +32,17 @@ const state = {
   floorPolygon: null, // [[lon,lat], ...]
   worldOrigin: { x: 0, y: 0 },
   view: { scale: 1, panX: 0, panY: 0, rotation: 0 },
-  rooms: [], // { id, points: [[lon,lat],...], closed }
+
+  // Draft rooms (미저장) — interactive editing target
+  rooms: [], // { id, name, points: [[lon,lat],...], closed }
   activeRoomIndex: null,
+
+  // Saved rooms (rooms.json)
+  saved: [], // { id, name, points: [[lon,lat],...], closed:true }
+
+  // Persisted DB (rooms.json content)
+  roomsDB: null,
+
   mouse: { isDown:false, button:0, lastX:0, lastY:0, dragTarget:null },
   history: [],
   imageMode: false,
@@ -42,7 +56,7 @@ function resizeCanvas(){
 }
 window.addEventListener("resize", resizeCanvas);
 
-// Affine world<->screen with rotation
+// Affine world<-&->screen with rotation
 function worldToScreen(wx, wy){
   const { scale, panX, panY, rotation } = state.view;
   const { x:ox, y:oy } = state.worldOrigin;
@@ -88,11 +102,6 @@ function fitViewTo(points){
   const sx = (canvas.width*margin)/w, sy = (canvas.height*margin)/h;
   state.view.scale = Math.min(sx, sy);
   state.view.panX = 0; state.view.panY = 0;
-}
-
-function centroidOf(points){
-  const bb = bboxOf(points); if(!bb) return {x:0,y:0};
-  return { x:(bb.minX+bb.maxX)/2, y:(bb.minY+bb.maxY)/2 };
 }
 
 function computeFidForCurrent(){
@@ -152,8 +161,60 @@ function undo(){
   if(!state.history.length) return;
   const snap = state.history.pop();
   state.rooms = snap.rooms; state.activeRoomIndex = snap.activeRoomIndex;
-  refreshRoomList(); draw();
+  refreshDraftList(); draw();
 }
+
+// ==== rooms.json I/O ===============================================================
+async function loadRoomsDB(){
+  try{
+    const res = await fetch(CONFIG.campus.roomsUrl);
+    const data = await res.json();
+    state.roomsDB = data || {};
+  }catch(e){
+    console.error("rooms.json 로드 실패:", e);
+    state.roomsDB = {};
+  }
+}
+function ensureRoomsArrayForBuilding(bid, totLevel){
+  if(!state.roomsDB) state.roomsDB = {};
+  if(!Array.isArray(state.roomsDB[bid])) state.roomsDB[bid] = [];
+  // pad to totLevel with empty arrays
+  while(state.roomsDB[bid].length < totLevel) state.roomsDB[bid].push([]);
+}
+function ensureClosed(points){
+  if(!points || points.length<3) return points||[];
+  const [fx,fy] = points[0]; const [lx,ly] = points[points.length-1];
+  if(fx===lx && fy===ly) return points;
+  return [...points, [fx,fy]];
+}
+function loadSavedRoomsForCurrent(){
+  state.saved = [];
+  if(!state.roomsDB || !state.building || state.floorIndex==null) return;
+  const arr = state.roomsDB[state.building]?.[state.floorIndex] || [];
+  state.saved = arr.map((r, idx)=>({
+    id: `s${idx+1}`,
+    name: r.name || "",
+    points: Array.isArray(r.polygon) ? r.polygon : [],
+    closed: true
+  }));
+}
+function writeSavedBackToDB(){
+  if(!state.roomsDB || !state.building || state.floorIndex==null) return;
+  state.roomsDB[state.building][state.floorIndex] = state.saved.map(r=>({
+    name: r.name || "",
+    polygon: ensureClosed(r.points)
+  }));
+}
+/* function downloadRoomsJSON(){
+  if(!state.roomsDB) return;
+  const blob = new Blob([JSON.stringify(state.roomsDB, null, 4)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "rooms.json";
+  document.body.appendChild(a);
+  a.click();
+  requestAnimationFrame(()=>{ URL.revokeObjectURL(a.href); a.remove(); });
+} */
 
 // ==== Loading =======================================================================
 async function initBuildings(){
@@ -179,6 +240,8 @@ async function onBuildingChange(){
     opt.value = String(i); opt.textContent = levelNum>0? `${levelNum}F` : `B${-levelNum}`;
     floorSelect.appendChild(opt);
   }
+  // rooms.json 보장 및 로드
+  ensureRoomsArrayForBuilding(bid, state.floorInfo.totLevel);
   floorSelect.value = "0"; await onFloorChange();
 }
 
@@ -190,8 +253,12 @@ async function onFloorChange(){
   state.floorPolygon = flVars[flVarIndex];
   loadFloorImage();
   fitViewTo(state.floorPolygon);
+
+  // reset drafts and load saved
   state.rooms = []; state.activeRoomIndex = null; state.history = [];
-  refreshFloorInput(); refreshRoomList(); draw();
+  loadSavedRoomsForCurrent();
+
+  refreshFloorInput(); refreshSavedList(); refreshDraftList(); draw();
 }
 
 // ==== Floor: input/output shared helpers ============================================
@@ -211,56 +278,106 @@ async function copyFloorCoords(){
   if(!ok) console.error("클립보드 복사 실패");
 }
 
-// ==== Rooms =========================================================================
-function getOrCreateActiveOpenRoom(){
+// ==== Rooms (Drafts) ================================================================
+function getOrCreateActiveOpenDraft(){
   if(state.activeRoomIndex!=null){ const r = state.rooms[state.activeRoomIndex]; if(r && !r.closed) return r; }
   for(let i=state.rooms.length-1;i>=0;i--) if(!state.rooms[i].closed){ state.activeRoomIndex=i; return state.rooms[i]; }
-  const room = { id: roomIdCounter++, points: [], closed:false }; state.rooms.push(room); state.activeRoomIndex = state.rooms.length-1; refreshRoomList(); return room;
+  const room = { id: roomIdCounter++, name:"", points: [], closed:false };
+  state.rooms.push(room); state.activeRoomIndex = state.rooms.length-1;
+  refreshDraftList(); return room;
 }
 function closeActiveRoom(){
   if(state.activeRoomIndex==null) return; const r = state.rooms[state.activeRoomIndex]; if(!r || r.closed || r.points.length<3) return;
-  pushHistory(); r.closed = true; refreshRoomList(); draw();
+  pushHistory(); r.closed = true; refreshDraftList(); draw();
 }
-function deleteRoom(index){
+function deleteDraft(index){
   if(index<0 || index>=state.rooms.length) return; pushHistory();
   state.rooms.splice(index,1);
   if(state.activeRoomIndex===index) state.activeRoomIndex=null; else if(state.activeRoomIndex>index) state.activeRoomIndex-=1;
-  refreshRoomList(); draw();
+  refreshDraftList(); draw();
 }
-function setActiveRoom(index){ if(index<0 || index>=state.rooms.length) return; state.activeRoomIndex=index; refreshRoomList(); draw(); }
+function setActiveDraft(index){ if(index<0 || index>=state.rooms.length) return; state.activeRoomIndex=index; refreshDraftList(); draw(); }
 
-function refreshRoomList(){
-  roomListEl.innerHTML = "";
-  state.rooms.forEach((room, idx)=>{
-    const div = document.createElement("div"); div.className = "room-item"; if(idx===state.activeRoomIndex) div.classList.add("active");
+// ==== Saved / Draft list rendering & actions =======================================
+function refreshSavedList(){
+  savedRoomListEl.innerHTML = "";
+  state.saved.forEach((room, idx)=>{
+    const div = document.createElement("div"); div.className = "room-item";
     const header = document.createElement("div"); header.className = "room-header";
-    const title = document.createElement("span"); title.textContent = `방 ${idx+1} (id:${room.id})`;
+
+    const left = document.createElement("div"); left.className = "left";
+    const nameInput = document.createElement("input"); nameInput.className="room-name"; nameInput.placeholder="이름"; nameInput.value = room.name||"";
+    nameInput.addEventListener("change", ()=>{ room.name = nameInput.value.trim(); writeSavedBackToDB(); });
+
+    const title = document.createElement("span"); title.textContent = `저장 ${idx+1}`;
+    left.append(title, nameInput);
+
     const actions = document.createElement("div"); actions.className = "actions";
+    const toDraft = document.createElement("button"); toDraft.textContent = "빼기";
+    toDraft.onclick = ()=>{
+      const r = state.saved.splice(idx,1)[0];
+      writeSavedBackToDB();
+      const draft = { id: roomIdCounter++, name: r.name||"", points: r.points.map(p=>[p[0],p[1]]), closed:true };
+      state.rooms.push(draft);
+      refreshSavedList(); refreshDraftList(); draw();
+    };
+    const del = document.createElement("button"); del.textContent = "삭제";
+    del.onclick = ()=>{
+      state.saved.splice(idx,1); writeSavedBackToDB(); refreshSavedList(); draw();
+    };
+    const copy = document.createElement("button"); copy.textContent = "좌표 복사";
+    copy.onclick = async ()=>{ await copyText(formatCoords(room.points, {decimals:COORD_DECIMALS, close:true})); };
 
-    const sel = document.createElement("button"); sel.textContent = "선택"; sel.onclick = ()=>setActiveRoom(idx);
-    const del = document.createElement("button"); del.textContent = "삭제"; del.onclick = ()=>deleteRoom(idx);
-    const copy = document.createElement("button"); copy.textContent = "좌표 복사"; copy.onclick = async ()=>{ await copyText(formatCoords(room.points, {decimals:COORD_DECIMALS, close:true})); };
-
-    actions.append(sel, del, copy); header.append(title, actions); div.appendChild(header);
+    actions.append(toDraft, del, copy);
+    header.append(left, actions);
+    div.appendChild(header);
 
     const pre = document.createElement("pre"); pre.className = "room-coords";
     pre.textContent = formatCoords(room.points, {decimals:COORD_DECIMALS, close:true});
     div.appendChild(pre);
 
-    roomListEl.appendChild(div);
+    savedRoomListEl.appendChild(div);
   });
 }
 
-function findNearestVertex(screenX, screenY, thresholdPx=8){
-  let best=null, bestDist=Infinity;
-  state.rooms.forEach((room, rIndex)=>{
-    room.points.forEach((pt, pIndex)=>{
-      const s = worldToScreen(pt[0], pt[1]);
-      const dx=s.x-screenX, dy=s.y-screenY; const d=Math.hypot(dx,dy);
-      if(d<=thresholdPx && d<bestDist){ bestDist=d; best={ roomIndex:rIndex, pointIndex:pIndex }; }
-    });
+function refreshDraftList(){
+  draftRoomListEl.innerHTML = "";
+  state.rooms.forEach((room, idx)=>{
+    const div = document.createElement("div"); div.className = "room-item"; if(idx===state.activeRoomIndex) div.classList.add("active");
+    const header = document.createElement("div"); header.className = "room-header";
+
+    const left = document.createElement("div"); left.className = "left";
+    const title = document.createElement("span"); title.textContent = `작업 ${idx+1} (id:${room.id})`;
+    const nameInput = document.createElement("input"); nameInput.className="room-name"; nameInput.placeholder="이름"; nameInput.value = room.name||"";
+    nameInput.addEventListener("change", ()=>{ room.name = nameInput.value.trim(); });
+
+    left.append(title, nameInput);
+
+    const actions = document.createElement("div"); actions.className = "actions";
+    const sel = document.createElement("button"); sel.textContent = "선택"; sel.onclick = ()=>setActiveDraft(idx);
+    const save = document.createElement("button"); save.textContent = "저장";
+    save.onclick = ()=>{
+      const r = state.rooms[idx];
+      if(!r || r.points.length<3) return;
+      const savedEntry = { id:`s${Date.now()}_${idx}`, name:r.name||"", points: ensureClosed(r.points), closed:true };
+      state.saved.push(savedEntry);
+      writeSavedBackToDB();
+      deleteDraft(idx);
+      refreshSavedList(); draw();
+    };
+    const del = document.createElement("button"); del.textContent = "삭제"; del.onclick = ()=>deleteDraft(idx);
+    const copy = document.createElement("button"); copy.textContent = "좌표 복사"; copy.onclick = async ()=>{ await copyText(formatCoords(room.points, {decimals:COORD_DECIMALS, close:true})); };
+
+    actions.append(sel, save, del, copy);
+    header.append(left, actions);
+    div.appendChild(header);
+
+    const pre = document.createElement("pre"); pre.className = "room-coords";
+    pre.textContent = formatCoords(room.points, {decimals:COORD_DECIMALS, close:true});
+    div.appendChild(pre);
+
+    draftRoomListEl.appendChild(div);
   });
-  return best;
 }
 
 // ==== Draw (all in screen space) =====================================================
@@ -273,7 +390,15 @@ function draw(){
   drawPathScreen(floorScreen, true);
   ctx.lineWidth = 1; ctx.strokeStyle = "#008000"; ctx.fillStyle = "rgba(0,128,0,.05)"; ctx.fill(); ctx.stroke();
 
-  // Rooms
+  // Saved Rooms (display-only)
+  state.saved.forEach((room)=>{
+    if(!room.points.length) return;
+    const screenPts = toScreenPath(room.points);
+    drawPathScreen(screenPts, true);
+    ctx.lineWidth = 1.5; ctx.strokeStyle = "#555"; ctx.fillStyle = "rgba(0,0,0,.05)"; ctx.fill(); ctx.stroke();
+  });
+
+  // Draft Rooms (editable)
   state.rooms.forEach((room, idx)=>{
     if(!room.points.length) return;
     const screenPts = toScreenPath(room.points);
@@ -282,7 +407,7 @@ function draw(){
     if(room.closed){ ctx.fillStyle = "rgba(0,122,255,.08)"; ctx.fill(); }
   });
 
-  // Vertices
+  // Draft vertices only
   state.rooms.forEach((room, idx)=>{
     const active = idx===state.activeRoomIndex;
     room.points.forEach(([wx,wy])=>{
@@ -309,6 +434,19 @@ function draw(){
   }
 }
 
+// Only draft vertices are draggable/selectable
+function findNearestVertex(screenX, screenY, thresholdPx=8){
+  let best=null, bestDist=Infinity;
+  state.rooms.forEach((room, rIndex)=>{
+    room.points.forEach((pt, pIndex)=>{
+      const s = worldToScreen(pt[0], pt[1]);
+      const dx=s.x-screenX, dy=s.y-screenY; const d=Math.hypot(dx,dy);
+      if(d<=thresholdPx && d<bestDist){ bestDist=d; best={ roomIndex:rIndex, pointIndex:pIndex }; }
+    });
+  });
+  return best;
+}
+
 // ==== Input (mouse/keyboard) ========================================================
 function onMouseDown(e){
   const r = canvas.getBoundingClientRect(); const x=e.clientX-r.left, y=e.clientY-r.top;
@@ -326,9 +464,9 @@ function onMouseDown(e){
       // Modifier (Cmd/Ctrl) + Left: add point
       const wpt = screenToWorld(x,y);
       pushHistory();
-      const room = getOrCreateActiveOpenRoom();
+      const room = getOrCreateActiveOpenDraft();
       room.points.push(wpt);
-      refreshRoomList(); draw();
+      refreshDraftList(); draw();
     } else if(hit){
       // Left on a vertex: drag that vertex
       pushHistory();
@@ -363,7 +501,7 @@ function onMouseMove(e){
     } else if(t.type==="point"){
       const [wx,wy]=screenToWorld(x,y);
       const room = state.rooms[t.roomIndex];
-      if(room && room.points[t.pointIndex]){ room.points[t.pointIndex][0]=wx; room.points[t.pointIndex][1]=wy; refreshRoomList(); }
+      if(room && room.points[t.pointIndex]){ room.points[t.pointIndex][0]=wx; room.points[t.pointIndex][1]=wy; refreshDraftList(); }
       draw();
     } else if(t.type==="pan"){
       state.view.panX += dx; state.view.panY += dy; // screen-space pan
@@ -441,6 +579,29 @@ function bind(){
   window.addEventListener("mouseup", onMouseUp);
   window.addEventListener("keydown", onKeyDown);
   window.addEventListener("keyup", onKeyUp);
+
+  if (reloadRoomsBtn) reloadRoomsBtn.addEventListener("click", async ()=>{
+    await loadRoomsDB();
+    if(state.building && state.floorInfo) ensureRoomsArrayForBuilding(state.building, state.floorInfo.totLevel);
+    loadSavedRoomsForCurrent(); refreshSavedList(); draw();
+  });
+  if (saveRoomsBtn) saveRoomsBtn.addEventListener("click", saveRoomsToServer);
 }
-async function init(){ resizeCanvas(); bind(); await initBuildings(); }
+async function init(){ resizeCanvas(); bind(); await loadRoomsDB(); await initBuildings(); }
 init();
+
+async function saveRoomsToServer(){
+  try{
+    writeSavedBackToDB(); // state.saved → state.roomsDB 반영
+    const res = await fetch(CONFIG.campus.roomsUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(state.roomsDB)
+    });
+    if(!res.ok) throw new Error("save_failed");
+    alert("rooms.json 서버 저장 완료");
+  }catch(e){
+    console.error(e);
+    alert("서버 저장 실패 — 콘솔을 확인하세요.");
+  }
+}
