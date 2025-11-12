@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Polygon Point Order Viewer + Center</title>
+  <title>Polygon Editor (Floors & Rooms only)</title>
   <link href="editorStyle.css" rel="stylesheet">
 </head>
 
@@ -24,23 +24,8 @@
           <button id="applyFloorCoordsBtn">적용</button>
         </div>
         <div class="block">
-          <fieldset class="mode-fieldset">
-            <legend>모드</legend>
-            <label><input type="radio" name="mode" value="view" checked> 시점 이동</label>
-            <label><input type="radio" name="mode" value="image"> 이미지 편집</label>
-            <label><input type="radio" name="mode" value="room"> 방 편집</label>
-          </fieldset>
-          <div class="image-controls">
-            <span>이미지 불투명도</span>
-            <input id="imageOpacity" type="range" min="0" max="1" step="0.05" value="0.6">
-            <span>이미지 스케일</span>
-            <input id="imageScale" type="range" min="0.2" max="3" step="0.05" value="1">
-            <span>이미지 회전</span>
-            <input id="imageRotation" type="range" min="-180" max="180" step="1" value="0">
-          </div>
           <div class="room-controls">
             <button id="closeRoomBtn">폴리곤 닫기</button>
-            <button id="resetViewBtn">시점 리셋</button>
           </div>
         </div>
       </div>
