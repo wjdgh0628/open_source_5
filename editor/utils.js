@@ -22,7 +22,7 @@ export const CONFIG = {
     campus: {
         geojsonUrl: "../sources/buildings.geojson",
         roomsUrl: "../sources/rooms.js",
-        floorplanUrl: "../../floorplans/",
+        floorplanUrl: "floorplans/",
         idProp: "@id",
         nameProp: "name",
     },

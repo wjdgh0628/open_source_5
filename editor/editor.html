@@ -25,9 +25,11 @@
           </div>
         </div>
         <div class="block">
-          <label>방 편집</label>
+          <label>이미지 조작</label>
           <div class="row">
-            <button id="closeRoomBtn">폴리곤 닫기</button>
+            <button id="imageModeBtn" aria-pressed="false">시점 조작 모드</button>
+            <label for="imageOpacity" style="margin-left:8px;">투명도</label>
+            <input id="imageOpacity" type="range" min="0" max="100" value="60" />
           </div>
         </div>
       </div>

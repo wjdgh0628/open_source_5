@@ -5,14 +5,20 @@ const COORD_DECIMALS = 8;
 const canvas = document.getElementById("editorCanvas");
 const ctx = canvas.getContext("2d");
 
+// Platform helpers for modifier key (Cmd/Ctrl abstraction)
+const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+const modDown = (e) => isMac ? e.metaKey : e.ctrlKey;
+
 const el = (id) => document.getElementById(id);
 const buildingSelect = el("buildingSelect");
 const floorSelect = el("floorSelect");
 const floorCoordsInput = el("floorCoordsInput");
 const applyFloorCoordsBtn = el("applyFloorCoordsBtn");
 const copyFloorCoordsBtn = el("copyFloorCoordsBtn");
-const closeRoomBtn = el("closeRoomBtn");
 const roomListEl = el("roomList");
+
+const imageModeBtn = el("imageModeBtn");
+const imageOpacityRange = el("imageOpacity");
 
 const state = {
   building: null,
@@ -20,11 +26,13 @@ const state = {
   floorInfo: null,
   floorPolygon: null, // [[lon,lat], ...]
   worldOrigin: { x: 0, y: 0 },
-  view: { scale: 1, panX: 0, panY: 0 },
+  view: { scale: 1, panX: 0, panY: 0, rotation: 0 },
   rooms: [], // { id, points: [[lon,lat],...], closed }
   activeRoomIndex: null,
   mouse: { isDown:false, button:0, lastX:0, lastY:0, dragTarget:null },
-  history: []
+  history: [],
+  imageMode: false,
+  image: { img:null, loaded:false, pos:{x:0,y:0}, scale:1, rotation:0, opacity:0.6 },
 };
 let roomIdCounter = 1;
 
@@ -34,18 +42,35 @@ function resizeCanvas(){
 }
 window.addEventListener("resize", resizeCanvas);
 
-// Affine world<->screen (no rotation)
+// Affine world<->screen with rotation
 function worldToScreen(wx, wy){
-  const { scale, panX, panY } = state.view;
+  const { scale, panX, panY, rotation } = state.view;
   const { x:ox, y:oy } = state.worldOrigin;
   const cx = canvas.width/2, cy = canvas.height/2;
-  return { x: cx + panX + (wx-ox)*scale, y: cy + panY - (wy-oy)*scale };
+  const dx = wx - ox; const dy = wy - oy;
+  const cos = Math.cos(rotation), sin = Math.sin(rotation);
+  const rx = dx * cos - dy * sin;
+  const ry = dx * sin + dy * cos;
+  return { x: cx + panX + rx*scale, y: cy + panY - ry*scale };
 }
 function screenToWorld(sx, sy){
-  const { scale, panX, panY } = state.view;
+  const { scale, panX, panY, rotation } = state.view;
   const { x:ox, y:oy } = state.worldOrigin;
   const cx = canvas.width/2, cy = canvas.height/2;
-  return [ ox + (sx - cx - panX)/scale, oy + (cy + panY - sy)/scale ];
+  const rx = (sx - cx - panX)/scale;
+  const ry = -(sy - cy - panY)/scale;
+  const cos = Math.cos(rotation), sin = Math.sin(rotation);
+  const dx = rx * cos + ry * sin;      // R(-theta)
+  const dy = -rx * sin + ry * cos;
+  return [ ox + dx, oy + dy ];
+}
+function getActiveOpenRoomOrNull(){
+  if(state.activeRoomIndex!=null){
+    const r = state.rooms[state.activeRoomIndex];
+    if(r && !r.closed) return r;
+  }
+  for(let i=state.rooms.length-1;i>=0;i--) if(!state.rooms[i].closed) return state.rooms[i];
+  return null;
 }
 
 function bboxOf(points){
@@ -63,6 +88,38 @@ function fitViewTo(points){
   const sx = (canvas.width*margin)/w, sy = (canvas.height*margin)/h;
   state.view.scale = Math.min(sx, sy);
   state.view.panX = 0; state.view.panY = 0;
+}
+
+function centroidOf(points){
+  const bb = bboxOf(points); if(!bb) return {x:0,y:0};
+  return { x:(bb.minX+bb.maxX)/2, y:(bb.minY+bb.maxY)/2 };
+}
+
+function computeFidForCurrent(){
+  if(!state.floorInfo || state.floorIndex==null) return null;
+  const levelNum = CONFIG.idRules.level(state.floorInfo.bmLevel, state.floorIndex);
+  return CONFIG.idRules.fid(state.building, levelNum);
+}
+
+function loadFloorImage(){
+  const fid = computeFidForCurrent();
+  state.image.loaded = false; state.image.img = null;
+  if(!fid) return;
+  const src = `${CONFIG.campus.floorplanUrl}${fid}.png`;
+  const img = new Image();
+  img.onload = () => {
+    state.image.img = img; state.image.loaded = true;
+    // initialize position to floor bbox center and scale to roughly fit width
+    const bb = bboxOf(state.floorPolygon);
+    const cx = (bb.minX+bb.maxX)/2, cy=(bb.minY+bb.maxY)/2; state.image.pos.x=cx; state.image.pos.y=cy;
+    const worldW = Math.max(1e-6, (bb.maxX - bb.minX));
+    const targetRatio = worldW / img.width; // world units per pixel
+    state.image.scale = targetRatio; // uniform world scale per image pixel
+    state.image.rotation = 0;
+    draw();
+  };
+  img.onerror = () => { state.image.img = null; state.image.loaded=false; draw(); };
+  img.src = src;
 }
 
 function drawPathScreen(screenPts, close=true){
@@ -131,6 +188,7 @@ async function onFloorChange(){
   state.floorIndex = idx;
   const { flList, flVars } = state.floorInfo; const flVarIndex = flList[idx];
   state.floorPolygon = flVars[flVarIndex];
+  loadFloorImage();
   fitViewTo(state.floorPolygon);
   state.rooms = []; state.activeRoomIndex = null; state.history = [];
   refreshFloorInput(); refreshRoomList(); draw();
@@ -231,24 +289,133 @@ function draw(){
       const s = worldToScreen(wx,wy); ctx.beginPath(); ctx.arc(s.x,s.y, active?4:3, 0, Math.PI*2); ctx.fillStyle = active?"#007aff":"#e53935"; ctx.fill(); ctx.strokeStyle = "#fff"; ctx.lineWidth = 1; ctx.stroke();
     });
   });
+
+  // Floorplan Image Overlay (on top of polygons)
+  if(state.image.loaded && state.image.img){
+    const img = state.image.img; const im = state.image;
+    ctx.save();
+    const { scale, panX, panY, rotation } = state.view;
+    const { x:ox, y:oy } = state.worldOrigin;
+    const cx = canvas.width/2, cy = canvas.height/2;
+    ctx.translate(cx + panX, cy + panY);
+    ctx.scale(scale, -scale); // flip Y to match world coords
+    ctx.rotate(rotation);
+    ctx.translate(im.pos.x - ox, im.pos.y - oy);
+    ctx.rotate(im.rotation);
+    ctx.scale(im.scale, im.scale);
+    ctx.globalAlpha = im.opacity;
+    ctx.drawImage(img, -img.width/2, -img.height/2);
+    ctx.restore();
+  }
 }
 
 // ==== Input (mouse/keyboard) ========================================================
 function onMouseDown(e){
   const r = canvas.getBoundingClientRect(); const x=e.clientX-r.left, y=e.clientY-r.top;
+  if(state.imageMode){
+    state.mouse.isDown=true; state.mouse.button=e.button; state.mouse.lastX=x; state.mouse.lastY=y; state.mouse.dragTarget=null;
+    if(e.button===0){ state.mouse.dragTarget = { type:"img-pan" }; }
+    else if(e.button===2){ state.mouse.dragTarget = { type:"img-rotate" }; }
+    return; // do not fall through to normal handlers
+  }
   state.mouse.isDown=true; state.mouse.button=e.button; state.mouse.lastX=x; state.mouse.lastY=y; state.mouse.dragTarget=null;
-  if(e.button!==0) return;
-  const hit = findNearestVertex(x,y);
-  if(hit){ pushHistory(); state.mouse.dragTarget = { type:"point", roomIndex:hit.roomIndex, pointIndex:hit.pointIndex }; }
-  else{ const wpt = screenToWorld(x,y); pushHistory(); const room = getOrCreateActiveOpenRoom(); room.points.push(wpt); refreshRoomList(); draw(); }
+
+  if(e.button===0){
+    const hit = findNearestVertex(x,y);
+    if(modDown(e)){
+      // Modifier (Cmd/Ctrl) + Left: add point
+      const wpt = screenToWorld(x,y);
+      pushHistory();
+      const room = getOrCreateActiveOpenRoom();
+      room.points.push(wpt);
+      refreshRoomList(); draw();
+    } else if(hit){
+      // Left on a vertex: drag that vertex
+      pushHistory();
+      state.mouse.dragTarget = { type:"point", roomIndex:hit.roomIndex, pointIndex:hit.pointIndex };
+    } else {
+      // Left on empty space: pan view
+      state.mouse.dragTarget = { type:"pan" };
+    }
+  } else if(e.button===2){
+    // Right-drag: rotate view around mouse anchor
+    const [wx, wy] = screenToWorld(x, y);
+    state.mouse.dragTarget = { type:"rotate", anchorWorld:[wx,wy], anchorScreen:{x, y} };
+  }
 }
+
 function onMouseMove(e){
   if(!state.mouse.isDown) return; const r = canvas.getBoundingClientRect(); const x=e.clientX-r.left, y=e.clientY-r.top;
-  const t = state.mouse.dragTarget; if(t && t.type==="point"){ const [wx,wy]=screenToWorld(x,y); const room = state.rooms[t.roomIndex]; if(room && room.points[t.pointIndex]){ room.points[t.pointIndex][0]=wx; room.points[t.pointIndex][1]=wy; refreshRoomList(); draw(); } }
+  const dx = x - state.mouse.lastX; const dy = y - state.mouse.lastY;
+  const t = state.mouse.dragTarget;
+  if(t){
+    if(t.type==="img-pan"){
+      // translate image in world space based on mouse movement
+      const [wx1, wy1] = screenToWorld(state.mouse.lastX, state.mouse.lastY);
+      const [wx2, wy2] = screenToWorld(x, y);
+      state.image.pos.x += (wx2 - wx1);
+      state.image.pos.y += (wy2 - wy1);
+      draw();
+    } else if(t.type==="img-rotate"){
+      const sensitivity = 0.005; // radians per pixel, horizontal drag
+      state.image.rotation += (x - state.mouse.lastX) * sensitivity;
+      draw();
+    } else if(t.type==="point"){
+      const [wx,wy]=screenToWorld(x,y);
+      const room = state.rooms[t.roomIndex];
+      if(room && room.points[t.pointIndex]){ room.points[t.pointIndex][0]=wx; room.points[t.pointIndex][1]=wy; refreshRoomList(); }
+      draw();
+    } else if(t.type==="pan"){
+      state.view.panX += dx; state.view.panY += dy; // screen-space pan
+      draw();
+    } else if(t.type==="rotate"){
+      const sensitivity = 0.005; // radians per pixel
+      const prevRot = state.view.rotation;
+      state.view.rotation = prevRot + dx * sensitivity; // horizontal drag rotates
+
+      // Keep the anchor world point under the original mouse position
+      const before = t.anchorScreen; // {x,y}
+      const after = worldToScreen(t.anchorWorld[0], t.anchorWorld[1]);
+      state.view.panX += (before.x - after.x);
+      state.view.panY += (before.y - after.y);
+      draw();
+    }
+  }
   state.mouse.lastX=x; state.mouse.lastY=y;
 }
+
 function onMouseUp(){ state.mouse.isDown=false; state.mouse.dragTarget=null; }
+
 function onKeyDown(e){ if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==="z"){ e.preventDefault(); undo(); } }
+
+function onKeyUp(e){
+  if ((isMac && e.key === "Meta") || (!isMac && e.key === "Control")){
+    const r = getActiveOpenRoomOrNull();
+    if(r && r.points.length>=3 && state.activeRoomIndex!=null && !state.rooms[state.activeRoomIndex].closed){
+      closeActiveRoom();
+    }
+  }
+}
+
+function onWheel(e){
+  e.preventDefault();
+  if(state.imageMode && state.image.loaded){
+    const zoom = Math.exp(-e.deltaY * 0.002);
+    state.image.scale *= zoom;
+    draw();
+    return;
+  }
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left, y = e.clientY - rect.top;
+  const [wx, wy] = screenToWorld(x, y);
+  const before = worldToScreen(wx, wy);
+  const zoom = Math.exp(-e.deltaY * 0.002);
+  state.view.scale *= zoom;
+  const after = worldToScreen(wx, wy);
+  state.view.panX += (before.x - after.x);
+  state.view.panY += (before.y - after.y);
+  draw();
+}
 
 // ==== Init ==========================================================================
 function bind(){
@@ -256,11 +423,24 @@ function bind(){
   floorSelect.addEventListener("change", onFloorChange);
   applyFloorCoordsBtn.addEventListener("click", applyManualFloorCoords);
   copyFloorCoordsBtn.addEventListener("click", copyFloorCoords);
-  closeRoomBtn.addEventListener("click", closeActiveRoom);
+
+  imageModeBtn.addEventListener("click", ()=>{
+    state.imageMode = !state.imageMode;
+    imageModeBtn.setAttribute("aria-pressed", String(state.imageMode));
+    imageModeBtn.textContent = state.imageMode ? "이미지 조작 모드" : "시점 조작 모드";
+  });
+  imageOpacityRange.addEventListener("input", ()=>{
+    const v = Number(imageOpacityRange.value)||0; state.image.opacity = Math.max(0, Math.min(1, v/100)); draw();
+  });
+
   canvas.addEventListener("mousedown", onMouseDown);
   canvas.addEventListener("mousemove", onMouseMove);
+  canvas.addEventListener("wheel", onWheel, { passive:false });
+  canvas.addEventListener("contextmenu", (e)=> e.preventDefault());
+
   window.addEventListener("mouseup", onMouseUp);
   window.addEventListener("keydown", onKeyDown);
+  window.addEventListener("keyup", onKeyUp);
 }
 async function init(){ resizeCanvas(); bind(); await initBuildings(); }
 init();

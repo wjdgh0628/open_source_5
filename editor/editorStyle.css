@@ -1,3 +1,6 @@
+#imageModeBtn { padding:4px 8px; }
+#imageModeBtn[aria-pressed="true"] { background:#007aff; color:#fff; border-color:#007aff; }
+#imageOpacity { width:160px; }
 
 html, body { margin:0; padding:0; height:100%; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; box-sizing:border-box; }
 *, *::before, *::after { box-sizing: inherit; }
