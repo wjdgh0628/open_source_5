@@ -440,8 +440,8 @@ function refreshRoomList() {
         coordsPre.className = "room-coords";
 
         const coords = room.points.map((p) => [
-            Number(p[0].toFixed(5)),
-            Number(p[1].toFixed(5))
+            Number(p[0].toFixed(8)),
+            Number(p[1].toFixed(8))
         ]);
 
         if (coords.length >= 3) {
@@ -476,7 +476,9 @@ function findNearestVertex(screenX, screenY, thresholdPx = 8) {
 }
 
 // ----- Drawing -----
+// ----- Drawing -----
 function draw() {
+    // 기본 상태로 초기화
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -484,10 +486,10 @@ function draw() {
 
     const { a, b, c, d, e, f } = computeViewMatrix();
 
+    // 1) Floor polygon (맨 아래)
     ctx.save();
     ctx.setTransform(a, b, c, d, e, f);
 
-    // Floor polygon
     ctx.beginPath();
     state.floorPolygon.forEach((pt, i) => {
         if (i === 0) ctx.moveTo(pt[0], pt[1]);
@@ -500,7 +502,36 @@ function draw() {
     ctx.fill();
     ctx.stroke();
 
-    // Rooms
+    ctx.restore();
+
+    // 2) 이미지 오버레이 (층 위, 방 선 아래)
+    if (state.image.img) {
+        const img = state.image.img;
+        ctx.save();
+        ctx.setTransform(a, b, c, d, e, f);
+
+        ctx.translate(
+            state.worldOrigin.x + state.image.offsetX,
+            state.worldOrigin.y + state.image.offsetY
+        );
+        // view 회전은 이미 view matrix에 포함되어 있으므로 여기서는 이미지 자체 회전만 적용
+        ctx.rotate(state.image.rotation);
+
+        const baseScale = state.image.baseWorldScale * state.image.scale;
+        // view matrix에서 이미 y축이 한 번 뒤집혀 있으므로,
+        // 이미지가 최종적으로 뒤집혀 보이지 않게 로컬 좌표에서 한 번 더 y를 뒤집어 준다.
+        ctx.scale(baseScale, -baseScale);
+
+        ctx.globalAlpha = state.image.alpha;
+        ctx.drawImage(img, -img.width / 2, -img.height / 2);
+        ctx.restore();
+        ctx.globalAlpha = 1;
+    }
+
+    // 3) 방 폴리곤들 (이미지 위)
+    ctx.save();
+    ctx.setTransform(a, b, c, d, e, f);
+
     state.rooms.forEach((room, idx) => {
         if (!room.points.length) return;
         ctx.beginPath();
@@ -525,30 +556,7 @@ function draw() {
 
     ctx.restore();
 
-    // Image overlay (after floor, before vertices)
-    if (state.image.img) {
-        const { a: ia, b: ib, c: ic, d: id, e: ie, f: iF } = computeViewMatrix();
-        const img = state.image.img;
-        ctx.save();
-        ctx.setTransform(ia, ib, ic, id, ie, iF);
-
-        ctx.translate(
-            state.worldOrigin.x + state.image.offsetX,
-            state.worldOrigin.y + state.image.offsetY
-        );
-        // view 회전은 이미 view matrix에 포함되어 있으므로 여기서는 이미지 자체 회전만 적용
-        ctx.rotate(state.image.rotation);
-
-        const baseScale = state.image.baseWorldScale * state.image.scale;
-        ctx.scale(baseScale, -baseScale);
-
-        ctx.globalAlpha = state.image.alpha;
-        ctx.drawImage(img, -img.width / 2, -img.height / 2);
-        ctx.restore();
-        ctx.globalAlpha = 1;
-    }
-
-    // Draw vertices in screen space
+    // 4) 버텍스(점)를 화면 좌표 기준으로 최상단에 그리기
     ctx.save();
     state.rooms.forEach((room, idx) => {
         const isActive = idx === state.activeRoomIndex;
