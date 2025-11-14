@@ -19,8 +19,6 @@ const copyFloorCoordsBtn = el("copyFloorCoordsBtn");
 // New: dual lists & file controls
 const savedRoomListEl = el("savedRoomList");
 const draftRoomListEl = el("draftRoomList");
-const saveRoomsBtn = el("saveRoomsBtn");
-const reloadRoomsBtn = el("reloadRoomsBtn");
 
 const imageModeBtn = el("imageModeBtn");
 const imageOpacityRange = el("imageOpacity");
@@ -43,7 +41,7 @@ const state = {
   // Persisted DB (rooms.json content)
   roomsDB: null,
 
-  mouse: { isDown:false, button:0, lastX:0, lastY:0, dragTarget:null },
+  mouse: { isDown:false, button:0, lastX:0, lastY:0, dragTarget:null, savedChanged:false },
   history: [],
   imageMode: false,
   image: { img:null, loaded:false, pos:{x:0,y:0}, scale:1, rotation:0, opacity:0.6 },
@@ -154,14 +152,24 @@ async function copyText(text){
 }
 
 function pushHistory(){
-  state.history.push({ rooms: JSON.parse(JSON.stringify(state.rooms)), activeRoomIndex: state.activeRoomIndex });
+  state.history.push({
+    rooms: JSON.parse(JSON.stringify(state.rooms)),
+    saved: JSON.parse(JSON.stringify(state.saved)),
+    activeRoomIndex: state.activeRoomIndex
+  });
   if (state.history.length>100) state.history.shift();
 }
 function undo(){
   if(!state.history.length) return;
   const snap = state.history.pop();
-  state.rooms = snap.rooms; state.activeRoomIndex = snap.activeRoomIndex;
-  refreshDraftList(); draw();
+  state.rooms = snap.rooms;
+  state.saved = snap.saved || state.saved;
+  state.activeRoomIndex = snap.activeRoomIndex;
+  writeSavedBackToDB();
+  requestSaveRoomsToServer();
+  refreshSavedList();
+  refreshDraftList();
+  draw();
 }
 
 // ==== rooms.json I/O ===============================================================
@@ -205,16 +213,12 @@ function writeSavedBackToDB(){
     polygon: ensureClosed(r.points)
   }));
 }
-/* function downloadRoomsJSON(){
-  if(!state.roomsDB) return;
-  const blob = new Blob([JSON.stringify(state.roomsDB, null, 4)], { type: "application/json" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "rooms.json";
-  document.body.appendChild(a);
-  a.click();
-  requestAnimationFrame(()=>{ URL.revokeObjectURL(a.href); a.remove(); });
-} */
+
+let roomsSaveTimer = null;
+function requestSaveRoomsToServer(){
+  if(roomsSaveTimer) clearTimeout(roomsSaveTimer);
+  roomsSaveTimer = setTimeout(()=>{ saveRoomsToServer(); }, 300);
+}
 
 // ==== Loading =======================================================================
 async function initBuildings(){
@@ -307,7 +311,11 @@ function refreshSavedList(){
 
     const left = document.createElement("div"); left.className = "left";
     const nameInput = document.createElement("input"); nameInput.className="room-name"; nameInput.placeholder="이름"; nameInput.value = room.name||"";
-    nameInput.addEventListener("change", ()=>{ room.name = nameInput.value.trim(); writeSavedBackToDB(); });
+    nameInput.addEventListener("change", ()=>{
+      room.name = nameInput.value.trim();
+      writeSavedBackToDB();
+      requestSaveRoomsToServer();
+    });
 
     const title = document.createElement("span"); title.textContent = `저장 ${idx+1}`;
     left.append(title, nameInput);
@@ -317,13 +325,17 @@ function refreshSavedList(){
     toDraft.onclick = ()=>{
       const r = state.saved.splice(idx,1)[0];
       writeSavedBackToDB();
+      requestSaveRoomsToServer();
       const draft = { id: roomIdCounter++, name: r.name||"", points: r.points.map(p=>[p[0],p[1]]), closed:true };
       state.rooms.push(draft);
       refreshSavedList(); refreshDraftList(); draw();
     };
     const del = document.createElement("button"); del.textContent = "삭제";
     del.onclick = ()=>{
-      state.saved.splice(idx,1); writeSavedBackToDB(); refreshSavedList(); draw();
+      state.saved.splice(idx,1);
+      writeSavedBackToDB();
+      requestSaveRoomsToServer();
+      refreshSavedList(); draw();
     };
     const copy = document.createElement("button"); copy.textContent = "좌표 복사";
     copy.onclick = async ()=>{ await copyText(formatCoords(room.points, {decimals:COORD_DECIMALS, close:true})); };
@@ -359,11 +371,22 @@ function refreshDraftList(){
     save.onclick = ()=>{
       const r = state.rooms[idx];
       if(!r || r.points.length<3) return;
-      const savedEntry = { id:`s${Date.now()}_${idx}`, name:r.name||"", points: ensureClosed(r.points), closed:true };
+      let name = (r.name || "").trim();
+      if(!name){
+        const input = window.prompt("방 이름을 입력하세요:", "");
+        if(input===null) return; // cancelled
+        name = input.trim();
+        if(!name) return;
+        r.name = name;
+        nameInput.value = name;
+      }
+      const savedEntry = { id:`s${Date.now()}_${idx}`, name, points: ensureClosed(r.points), closed:true };
       state.saved.push(savedEntry);
       writeSavedBackToDB();
+      requestSaveRoomsToServer();
       deleteDraft(idx);
-      refreshSavedList(); draw();
+      refreshSavedList();
+      draw();
     };
     const del = document.createElement("button"); del.textContent = "삭제"; del.onclick = ()=>deleteDraft(idx);
     const copy = document.createElement("button"); copy.textContent = "좌표 복사"; copy.onclick = async ()=>{ await copyText(formatCoords(room.points, {decimals:COORD_DECIMALS, close:true})); };
@@ -390,12 +413,30 @@ function draw(){
   drawPathScreen(floorScreen, true);
   ctx.lineWidth = 1; ctx.strokeStyle = "#008000"; ctx.fillStyle = "rgba(0,128,0,.05)"; ctx.fill(); ctx.stroke();
 
-  // Saved Rooms (display-only)
+  // Saved Rooms (rooms.json) — editable, stronger color
   state.saved.forEach((room)=>{
     if(!room.points.length) return;
     const screenPts = toScreenPath(room.points);
     drawPathScreen(screenPts, true);
-    ctx.lineWidth = 1.5; ctx.strokeStyle = "#555"; ctx.fillStyle = "rgba(0,0,0,.05)"; ctx.fill(); ctx.stroke();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "#ff9500";
+    ctx.fillStyle = "rgba(255,149,0,.08)";
+    ctx.fill();
+    ctx.stroke();
+  });
+
+  // Saved vertices (editable)
+  state.saved.forEach((room)=>{
+    room.points.forEach(([wx,wy])=>{
+      const s = worldToScreen(wx,wy);
+      ctx.beginPath();
+      ctx.arc(s.x,s.y, 3.5, 0, Math.PI*2);
+      ctx.fillStyle = "#ff9500";
+      ctx.fill();
+      ctx.strokeStyle = "#fff";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    });
   });
 
   // Draft Rooms (editable)
@@ -436,14 +477,29 @@ function draw(){
   }
 }
 
-// Only draft vertices are draggable/selectable
+// Draft and saved vertices are draggable/selectable
 function findNearestVertex(screenX, screenY, thresholdPx=8){
   let best=null, bestDist=Infinity;
+  // Draft rooms
   state.rooms.forEach((room, rIndex)=>{
     room.points.forEach((pt, pIndex)=>{
       const s = worldToScreen(pt[0], pt[1]);
       const dx=s.x-screenX, dy=s.y-screenY; const d=Math.hypot(dx,dy);
-      if(d<=thresholdPx && d<bestDist){ bestDist=d; best={ roomIndex:rIndex, pointIndex:pIndex }; }
+      if(d<=thresholdPx && d<bestDist){
+        bestDist=d;
+        best={ list:"draft", roomIndex:rIndex, pointIndex:pIndex };
+      }
+    });
+  });
+  // Saved rooms
+  state.saved.forEach((room, rIndex)=>{
+    room.points.forEach((pt, pIndex)=>{
+      const s = worldToScreen(pt[0], pt[1]);
+      const dx=s.x-screenX, dy=s.y-screenY; const d=Math.hypot(dx,dy);
+      if(d<=thresholdPx && d<bestDist){
+        bestDist=d;
+        best={ list:"saved", roomIndex:rIndex, pointIndex:pIndex };
+      }
     });
   });
   return best;
@@ -453,12 +509,12 @@ function findNearestVertex(screenX, screenY, thresholdPx=8){
 function onMouseDown(e){
   const r = canvas.getBoundingClientRect(); const x=e.clientX-r.left, y=e.clientY-r.top;
   if(state.imageMode){
-    state.mouse.isDown=true; state.mouse.button=e.button; state.mouse.lastX=x; state.mouse.lastY=y; state.mouse.dragTarget=null;
+    state.mouse.isDown=true; state.mouse.button=e.button; state.mouse.lastX=x; state.mouse.lastY=y; state.mouse.dragTarget=null; state.mouse.savedChanged=false;
     if(e.button===0){ state.mouse.dragTarget = { type:"img-pan" }; }
     else if(e.button===2){ state.mouse.dragTarget = { type:"img-rotate" }; }
     return; // do not fall through to normal handlers
   }
-  state.mouse.isDown=true; state.mouse.button=e.button; state.mouse.lastX=x; state.mouse.lastY=y; state.mouse.dragTarget=null;
+  state.mouse.isDown=true; state.mouse.button=e.button; state.mouse.lastX=x; state.mouse.lastY=y; state.mouse.dragTarget=null; state.mouse.savedChanged=false;
 
   if(e.button===0){
     const hit = findNearestVertex(x,y);
@@ -470,9 +526,15 @@ function onMouseDown(e){
       room.points.push(wpt);
       refreshDraftList(); draw();
     } else if(hit){
-      // Left on a vertex: drag that vertex
+      // Left on a vertex: drag that vertex (draft or saved)
       pushHistory();
-      state.mouse.dragTarget = { type:"point", roomIndex:hit.roomIndex, pointIndex:hit.pointIndex };
+      state.mouse.dragTarget = {
+        type:"point",
+        list: hit.list,
+        roomIndex: hit.roomIndex,
+        pointIndex: hit.pointIndex
+      };
+      state.mouse.savedChanged = false;
     } else {
       // Left on empty space: pan view
       state.mouse.dragTarget = { type:"pan" };
@@ -502,8 +564,22 @@ function onMouseMove(e){
       draw();
     } else if(t.type==="point"){
       const [wx,wy]=screenToWorld(x,y);
-      const room = state.rooms[t.roomIndex];
-      if(room && room.points[t.pointIndex]){ room.points[t.pointIndex][0]=wx; room.points[t.pointIndex][1]=wy; refreshDraftList(); }
+      if(t.list==="draft"){
+        const room = state.rooms[t.roomIndex];
+        if(room && room.points[t.pointIndex]){
+          room.points[t.pointIndex][0]=wx;
+          room.points[t.pointIndex][1]=wy;
+          refreshDraftList();
+        }
+      } else if(t.list==="saved"){
+        const room = state.saved[t.roomIndex];
+        if(room && room.points[t.pointIndex]){
+          room.points[t.pointIndex][0]=wx;
+          room.points[t.pointIndex][1]=wy;
+          state.mouse.savedChanged = true;
+          refreshSavedList();
+        }
+      }
       draw();
     } else if(t.type==="pan"){
       state.view.panX += dx; state.view.panY += dy; // screen-space pan
@@ -524,7 +600,14 @@ function onMouseMove(e){
   state.mouse.lastX=x; state.mouse.lastY=y;
 }
 
-function onMouseUp(){ state.mouse.isDown=false; state.mouse.dragTarget=null; }
+function onMouseUp(){
+  if(state.mouse.dragTarget && state.mouse.dragTarget.type==="point" && state.mouse.dragTarget.list==="saved" && state.mouse.savedChanged){
+    writeSavedBackToDB();
+    requestSaveRoomsToServer();
+  }
+  state.mouse.isDown=false;
+  state.mouse.dragTarget=null;
+}
 
 function onKeyDown(e){ if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==="z"){ e.preventDefault(); undo(); } }
 
@@ -581,13 +664,6 @@ function bind(){
   window.addEventListener("mouseup", onMouseUp);
   window.addEventListener("keydown", onKeyDown);
   window.addEventListener("keyup", onKeyUp);
-
-  if (reloadRoomsBtn) reloadRoomsBtn.addEventListener("click", async ()=>{
-    await loadRoomsDB();
-    if(state.building && state.floorInfo) ensureRoomsArrayForBuilding(state.building, state.floorInfo.totLevel);
-    loadSavedRoomsForCurrent(); refreshSavedList(); draw();
-  });
-  if (saveRoomsBtn) saveRoomsBtn.addEventListener("click", saveRoomsToServer);
 }
 async function init(){ resizeCanvas(); bind(); await loadRoomsDB(); await initBuildings(); }
 init();
@@ -601,9 +677,8 @@ async function saveRoomsToServer(){
       body: JSON.stringify(state.roomsDB)
     });
     if(!res.ok) throw new Error("save_failed");
-    alert("rooms.json 서버 저장 완료");
+    console.log("rooms.json 서버 저장 완료");
   }catch(e){
-    console.error(e);
-    alert("서버 저장 실패 — 콘솔을 확인하세요.");
+    console.error("rooms.json 서버 저장 실패:", e);
   }
 }
