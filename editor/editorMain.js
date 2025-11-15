@@ -193,7 +193,8 @@ function ensureClosed(points){
   if(!points || points.length<3) return points||[];
   const [fx,fy] = points[0]; const [lx,ly] = points[points.length-1];
   if(fx===lx && fy===ly) return points;
-  return [...points, [fx,fy]];
+  // return [...points, [fx,fy]];
+  return [...points];
 }
 function loadSavedRoomsForCurrent(){
   state.saved = [];
