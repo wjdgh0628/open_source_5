@@ -43,6 +43,7 @@ const state = {
 
   mouse: { isDown:false, button:0, lastX:0, lastY:0, dragTarget:null, savedChanged:false },
   history: [],
+  clipboard: null,
   imageMode: false,
   image: { img:null, loaded:false, pos:{x:0,y:0}, scale:1, rotation:0, opacity:0.6 },
 };
@@ -189,13 +190,7 @@ function ensureRoomsArrayForBuilding(bid, totLevel){
   // pad to totLevel with empty arrays
   while(state.roomsDB[bid].length < totLevel) state.roomsDB[bid].push([]);
 }
-function ensureClosed(points){
-  if(!points || points.length<3) return points||[];
-  const [fx,fy] = points[0]; const [lx,ly] = points[points.length-1];
-  if(fx===lx && fy===ly) return points;
-  // return [...points, [fx,fy]];
-  return [...points];
-}
+
 function loadSavedRoomsForCurrent(){
   state.saved = [];
   if(!state.roomsDB || !state.building || state.floorIndex==null) return;
@@ -211,7 +206,8 @@ function writeSavedBackToDB(){
   if(!state.roomsDB || !state.building || state.floorIndex==null) return;
   state.roomsDB[state.building][state.floorIndex] = state.saved.map(r=>({
     name: r.name || "",
-    polygon: ensureClosed(r.points)
+    // polygon: ensureClosed(r.points)
+    polygon: r.points
   }));
 }
 
@@ -367,7 +363,6 @@ function refreshDraftList(){
     left.append(title, nameInput);
 
     const actions = document.createElement("div"); actions.className = "actions";
-    const sel = document.createElement("button"); sel.textContent = "선택"; sel.onclick = ()=>setActiveDraft(idx);
     const save = document.createElement("button"); save.textContent = "저장";
     save.onclick = ()=>{
       const r = state.rooms[idx];
@@ -381,7 +376,8 @@ function refreshDraftList(){
         r.name = name;
         nameInput.value = name;
       }
-      const savedEntry = { id:`s${Date.now()}_${idx}`, name, points: ensureClosed(r.points), closed:true };
+      // const savedEntry = { id:`s${Date.now()}_${idx}`, name, points: ensureClosed(r.points), closed:true };
+      const savedEntry = { id:`s${Date.now()}_${idx}`, name, points: r.points, closed:true };
       state.saved.push(savedEntry);
       writeSavedBackToDB();
       requestSaveRoomsToServer();
@@ -392,13 +388,21 @@ function refreshDraftList(){
     const del = document.createElement("button"); del.textContent = "삭제"; del.onclick = ()=>deleteDraft(idx);
     const copy = document.createElement("button"); copy.textContent = "좌표 복사"; copy.onclick = async ()=>{ await copyText(formatCoords(room.points, {decimals:COORD_DECIMALS, close:true})); };
 
-    actions.append(sel, save, del, copy);
+    actions.append(save, del, copy);
     header.append(left, actions);
     div.appendChild(header);
 
     const pre = document.createElement("pre"); pre.className = "room-coords";
     pre.textContent = formatCoords(room.points, {decimals:COORD_DECIMALS, close:true});
     div.appendChild(pre);
+
+    // Add click handler to select/activate draft room
+    div.addEventListener("click", function(event) {
+      // If the click target is a BUTTON, do nothing (let button actions work)
+      if (event.target.tagName === "BUTTON") return;
+      setActiveDraft(idx);
+      draw();
+    });
 
     draftRoomListEl.appendChild(div);
   });
@@ -478,6 +482,40 @@ function draw(){
   }
 }
 
+// Hit test against filled room polygons (screen space)
+function pointInPolygonScreen(px, py, screenPts){
+  let inside = false;
+  for(let i=0, j=screenPts.length-1; i<screenPts.length; j=i++){
+    const xi = screenPts[i].x, yi = screenPts[i].y;
+    const xj = screenPts[j].x, yj = screenPts[j].y;
+    const intersect = ((yi > py) !== (yj > py)) &&
+      (px < ( (xj - xi) * (py - yi) / ((yj - yi) || 1e-12) + xi ));
+    if(intersect) inside = !inside;
+  }
+  return inside;
+}
+
+function hitTestFilledRoom(screenX, screenY){
+  let hit = null;
+  // Saved rooms first
+  state.saved.forEach((room, idx)=>{
+    if(!room.points || room.points.length < 3) return;
+    const pts = toScreenPath(room.points);
+    if(pointInPolygonScreen(screenX, screenY, pts)){
+      hit = { list:"saved", roomIndex: idx };
+    }
+  });
+  // Draft rooms (closed ones) drawn on top
+  state.rooms.forEach((room, idx)=>{
+    if(!room.closed || !room.points || room.points.length < 3) return;
+    const pts = toScreenPath(room.points);
+    if(pointInPolygonScreen(screenX, screenY, pts)){
+      hit = { list:"draft", roomIndex: idx };
+    }
+  });
+  return hit;
+}
+
 // Draft and saved vertices are draggable/selectable
 function findNearestVertex(screenX, screenY, thresholdPx=8){
   let best=null, bestDist=Infinity;
@@ -518,6 +556,24 @@ function onMouseDown(e){
   state.mouse.isDown=true; state.mouse.button=e.button; state.mouse.lastX=x; state.mouse.lastY=y; state.mouse.dragTarget=null; state.mouse.savedChanged=false;
 
   if(e.button===0){
+    const shiftHeld = e.shiftKey;
+    if(shiftHeld){
+      const hitRoom = hitTestFilledRoom(x, y);
+      if(hitRoom){
+        pushHistory();
+        const [wx, wy] = screenToWorld(x, y);
+        state.mouse.dragTarget = {
+          type: "room-move",
+          list: hitRoom.list,
+          roomIndex: hitRoom.roomIndex,
+          startWorld: [wx, wy],
+          lastWorld: [wx, wy]
+        };
+        state.mouse.savedChanged = false;
+        return;
+      }
+    }
+
     const hit = findNearestVertex(x,y);
     if(modDown(e)){
       // Modifier (Cmd/Ctrl) + Left: add point
@@ -537,6 +593,12 @@ function onMouseDown(e){
       };
       state.mouse.savedChanged = false;
     } else {
+      // Left on a filled draft polygon: select that room
+      const filled = hitTestFilledRoom(x, y);
+      if(filled && filled.list === "draft"){
+        setActiveDraft(filled.roomIndex);
+        return;
+      }
       // Left on empty space: pan view
       state.mouse.dragTarget = { type:"pan" };
     }
@@ -582,6 +644,35 @@ function onMouseMove(e){
         }
       }
       draw();
+    } else if(t.type==="room-move"){
+      const [wx, wy] = screenToWorld(x, y);
+      const last = t.lastWorld || t.startWorld;
+      const dxWorld = wx - last[0];
+      const dyWorld = wy - last[1];
+      if(dxWorld !== 0 || dyWorld !== 0){
+        if(t.list === "draft"){
+          const room = state.rooms[t.roomIndex];
+          if(room && room.points){
+            room.points.forEach(p => {
+              p[0] += dxWorld;
+              p[1] += dyWorld;
+            });
+            refreshDraftList();
+          }
+        } else if(t.list === "saved"){
+          const room = state.saved[t.roomIndex];
+          if(room && room.points){
+            room.points.forEach(p => {
+              p[0] += dxWorld;
+              p[1] += dyWorld;
+            });
+            state.mouse.savedChanged = true;
+            refreshSavedList();
+          }
+        }
+        draw();
+      }
+      t.lastWorld = [wx, wy];
     } else if(t.type==="pan"){
       state.view.panX += dx; state.view.panY += dy; // screen-space pan
       draw();
@@ -602,7 +693,12 @@ function onMouseMove(e){
 }
 
 function onMouseUp(){
-  if(state.mouse.dragTarget && state.mouse.dragTarget.type==="point" && state.mouse.dragTarget.list==="saved" && state.mouse.savedChanged){
+  if(
+    state.mouse.dragTarget &&
+    state.mouse.dragTarget.list === "saved" &&
+    state.mouse.savedChanged &&
+    (state.mouse.dragTarget.type === "point" || state.mouse.dragTarget.type === "room-move")
+  ){
     writeSavedBackToDB();
     requestSaveRoomsToServer();
   }
@@ -610,7 +706,53 @@ function onMouseUp(){
   state.mouse.dragTarget=null;
 }
 
-function onKeyDown(e){ if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==="z"){ e.preventDefault(); undo(); } }
+function onKeyDown(e){
+  const tag = document.activeElement && document.activeElement.tagName;
+  // Don't steal shortcuts when typing in inputs/textarea
+  if(tag === "INPUT" || tag === "TEXTAREA") return;
+
+  const key = e.key.toLowerCase();
+
+  if((e.ctrlKey||e.metaKey) && key==="z"){
+    e.preventDefault();
+    undo();
+  } else if((e.ctrlKey||e.metaKey) && key==="c"){
+    // Copy active draft room
+    const idx = state.activeRoomIndex;
+    if(idx!=null){
+      const r = state.rooms[idx];
+      if(r && Array.isArray(r.points) && r.points.length){
+        state.clipboard = {
+          name: r.name || "",
+          points: r.points.map(p=>[p[0], p[1]])
+        };
+      }
+    }
+  } else if((e.ctrlKey||e.metaKey) && key==="v"){
+    // Paste as new draft room
+    if(!state.clipboard || !Array.isArray(state.clipboard.points) || !state.clipboard.points.length) return;
+    pushHistory();
+    const newRoom = {
+      id: roomIdCounter++,
+      name: state.clipboard.name || "",
+      points: state.clipboard.points.map(p=>[p[0], p[1]]),
+      closed: true
+    };
+    state.rooms.push(newRoom);
+    state.activeRoomIndex = state.rooms.length-1;
+    refreshDraftList();
+    draw();
+  } else if (
+    (e.key === "Backspace" || key === "backspace") &&
+    !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey
+  ) {
+    e.preventDefault();
+    if (state.activeRoomIndex != null) {
+      deleteDraft(state.activeRoomIndex);
+      draw();
+    }
+  }
+}
 
 function onKeyUp(e){
   if ((isMac && e.key === "Meta") || (!isMac && e.key === "Control")){
