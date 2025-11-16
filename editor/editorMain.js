@@ -3,6 +3,34 @@ import { CONFIG, searchBasicInfoByBid, searchFloorInfoByBid, current as currentC
 // ==== Constants & Shared Helpers =====================================================
 const COORD_DECIMALS = 8;
 const canvas = document.getElementById("editorCanvas");
+const EARTH_RADIUS = 6378137;
+const DEG2RAD = Math.PI / 180;
+const RAD2DEG = 180 / Math.PI;
+
+// Local reference point (lon, lat) to keep world coordinates small and Mapbox-like
+const REF_LON = 126.95336;
+const REF_LAT = 37.34524;
+const REF_LAMBDA = REF_LON * DEG2RAD;
+const REF_PHI = REF_LAT * DEG2RAD;
+const REF_MX = EARTH_RADIUS * REF_LAMBDA;
+const REF_MY = EARTH_RADIUS * Math.log(Math.tan(Math.PI / 4 + REF_PHI / 2));
+
+// Convert between lon/lat (GeoJSON) and local "world" coordinates (meters, Web Mercator-like)
+function lonLatToWorld(lon, lat) {
+  const lambda = lon * DEG2RAD;
+  const phi = lat * DEG2RAD;
+  const x = EARTH_RADIUS * lambda;
+  const y = EARTH_RADIUS * Math.log(Math.tan(Math.PI / 4 + phi / 2));
+  return [x - REF_MX, y - REF_MY];
+}
+
+function worldToLonLat(wx, wy) {
+  const mx = wx + REF_MX;
+  const my = wy + REF_MY;
+  const lambda = mx / EARTH_RADIUS;
+  const phi = 2 * Math.atan(Math.exp(my / EARTH_RADIUS)) - Math.PI / 2;
+  return [lambda * RAD2DEG, phi * RAD2DEG];
+}
 const ctx = canvas.getContext("2d");
 
 // Platform helpers for modifier key (Cmd/Ctrl abstraction)
@@ -34,6 +62,7 @@ const state = {
   // Draft rooms (미저장) — interactive editing target
   rooms: [], // { id, name, points: [[lon,lat],...], closed }
   activeRoomIndex: null,
+  activeSavedIndex: null,
 
   // Saved rooms (rooms.json)
   saved: [], // { id, name, points: [[lon,lat],...], closed:true }
@@ -55,12 +84,13 @@ function resizeCanvas(){
 }
 window.addEventListener("resize", resizeCanvas);
 
-// Affine world<-&->screen with rotation
+// Affine world<-&->screen with rotation, now using lon/lat <-> world projection
 function worldToScreen(wx, wy){
   const { scale, panX, panY, rotation } = state.view;
   const { x:ox, y:oy } = state.worldOrigin;
   const cx = canvas.width/2, cy = canvas.height/2;
-  const dx = wx - ox; const dy = wy - oy;
+  const [mx, my] = lonLatToWorld(wx, wy);
+  const dx = mx - ox; const dy = my - oy;
   const cos = Math.cos(rotation), sin = Math.sin(rotation);
   const rx = dx * cos - dy * sin;
   const ry = dx * sin + dy * cos;
@@ -75,7 +105,9 @@ function screenToWorld(sx, sy){
   const cos = Math.cos(rotation), sin = Math.sin(rotation);
   const dx = rx * cos + ry * sin;      // R(-theta)
   const dy = -rx * sin + ry * cos;
-  return [ ox + dx, oy + dy ];
+  const wx = ox + dx;
+  const wy = oy + dy;
+  return worldToLonLat(wx, wy);
 }
 function getActiveOpenRoomOrNull(){
   if(state.activeRoomIndex!=null){
@@ -92,8 +124,24 @@ function bboxOf(points){
   for(const [x,y] of points){ if(x<minX)minX=x; if(x>maxX)maxX=x; if(y<minY)minY=y; if(y>maxY)maxY=y; }
   return { minX,minY,maxX,maxY };
 }
+
+function bboxOfWorld(points){
+  if (!points || !points.length) return null;
+  const [lon0, lat0] = points[0];
+  let [minX, minY] = lonLatToWorld(lon0, lat0);
+  let [maxX, maxY] = [minX, minY];
+  for (const [lon, lat] of points) {
+    const [x, y] = lonLatToWorld(lon, lat);
+    if (x < minX) minX = x;
+    if (x > maxX) maxX = x;
+    if (y < minY) minY = y;
+    if (y > maxY) maxY = y;
+  }
+  return { minX, minY, maxX, maxY };
+}
+
 function fitViewTo(points){
-  const bb = bboxOf(points); if(!bb) return;
+  const bb = bboxOfWorld(points); if(!bb) return;
   const cx = (bb.minX+bb.maxX)/2, cy = (bb.minY+bb.maxY)/2;
   state.worldOrigin.x = cx; state.worldOrigin.y = cy;
   const w = (bb.maxX-bb.minX)||1, h = (bb.maxY-bb.minY)||1;
@@ -118,7 +166,7 @@ function loadFloorImage(){
   img.onload = () => {
     state.image.img = img; state.image.loaded = true;
     // initialize position to floor bbox center and scale to roughly fit width
-    const bb = bboxOf(state.floorPolygon);
+    const bb = bboxOfWorld(state.floorPolygon);
     const cx = (bb.minX+bb.maxX)/2, cy=(bb.minY+bb.maxY)/2; state.image.pos.x=cx; state.image.pos.y=cy;
     const worldW = Math.max(1e-6, (bb.maxX - bb.minX));
     const targetRatio = worldW / img.width; // world units per pixel
@@ -156,7 +204,8 @@ function pushHistory(){
   state.history.push({
     rooms: JSON.parse(JSON.stringify(state.rooms)),
     saved: JSON.parse(JSON.stringify(state.saved)),
-    activeRoomIndex: state.activeRoomIndex
+    activeRoomIndex: state.activeRoomIndex,
+    activeSavedIndex: state.activeSavedIndex
   });
   if (state.history.length>100) state.history.shift();
 }
@@ -166,6 +215,7 @@ function undo(){
   state.rooms = snap.rooms;
   state.saved = snap.saved || state.saved;
   state.activeRoomIndex = snap.activeRoomIndex;
+  state.activeSavedIndex = snap.activeSavedIndex;
   writeSavedBackToDB();
   requestSaveRoomsToServer();
   refreshSavedList();
@@ -256,7 +306,7 @@ async function onFloorChange(){
   fitViewTo(state.floorPolygon);
 
   // reset drafts and load saved
-  state.rooms = []; state.activeRoomIndex = null; state.history = [];
+  state.rooms = []; state.activeRoomIndex = null; state.activeSavedIndex = null; state.history = [];
   loadSavedRoomsForCurrent();
 
   refreshFloorInput(); refreshSavedList(); refreshDraftList(); draw();
@@ -297,13 +347,21 @@ function deleteDraft(index){
   if(state.activeRoomIndex===index) state.activeRoomIndex=null; else if(state.activeRoomIndex>index) state.activeRoomIndex-=1;
   refreshDraftList(); draw();
 }
-function setActiveDraft(index){ if(index<0 || index>=state.rooms.length) return; state.activeRoomIndex=index; refreshDraftList(); draw(); }
+function setActiveDraft(index){
+  if(index<0 || index>=state.rooms.length) return;
+  state.activeRoomIndex = index;
+  state.activeSavedIndex = null;
+  refreshDraftList();
+  refreshSavedList();
+  draw();
+}
 
 // ==== Saved / Draft list rendering & actions =======================================
 function refreshSavedList(){
   savedRoomListEl.innerHTML = "";
   state.saved.forEach((room, idx)=>{
     const div = document.createElement("div"); div.className = "room-item";
+    if(idx===state.activeSavedIndex) div.classList.add("active");
     const header = document.createElement("div"); header.className = "room-header";
 
     const left = document.createElement("div"); left.className = "left";
@@ -344,6 +402,15 @@ function refreshSavedList(){
     const pre = document.createElement("pre"); pre.className = "room-coords";
     pre.textContent = formatCoords(room.points, {decimals:COORD_DECIMALS, close:true});
     div.appendChild(pre);
+
+    div.addEventListener("click", function(event){
+      if (event.target.tagName === "BUTTON" || event.target.tagName === "INPUT") return;
+      state.activeSavedIndex = idx;
+      state.activeRoomIndex = null;
+      refreshSavedList();
+      refreshDraftList();
+      draw();
+    });
 
     savedRoomListEl.appendChild(div);
   });
@@ -398,10 +465,9 @@ function refreshDraftList(){
 
     // Add click handler to select/activate draft room
     div.addEventListener("click", function(event) {
-      // If the click target is a BUTTON, do nothing (let button actions work)
-      if (event.target.tagName === "BUTTON") return;
+      // If the click target is a BUTTON or INPUT, do nothing (let button/input actions work)
+      if (event.target.tagName === "BUTTON" || event.target.tagName === "INPUT") return;
       setActiveDraft(idx);
-      draw();
     });
 
     draftRoomListEl.appendChild(div);
@@ -419,13 +485,20 @@ function draw(){
   ctx.lineWidth = 1; ctx.strokeStyle = "#008000"; ctx.fillStyle = "rgba(0,128,0,.05)"; ctx.fill(); ctx.stroke();
 
   // Saved Rooms (rooms.json) — editable, stronger color
-  state.saved.forEach((room)=>{
+  state.saved.forEach((room, idx)=>{
     if(!room.points.length) return;
     const screenPts = toScreenPath(room.points);
     drawPathScreen(screenPts, true);
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = "#ff9500";
-    ctx.fillStyle = "rgba(255,149,0,.08)";
+    const active = idx === state.activeSavedIndex;
+    if (active) {
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = "#ff3b30";
+      ctx.fillStyle = "rgba(255,59,48,.20)";
+    } else {
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "#ff9500";
+      ctx.fillStyle = "rgba(255,149,0,.08)";
+    }
     ctx.fill();
     ctx.stroke();
   });
@@ -592,11 +665,28 @@ function onMouseDown(e){
         pointIndex: hit.pointIndex
       };
       state.mouse.savedChanged = false;
+      if (hit.list === "draft") {
+        setActiveDraft(hit.roomIndex);
+      } else if (hit.list === "saved") {
+        state.activeSavedIndex = hit.roomIndex;
+        state.activeRoomIndex = null;
+        refreshSavedList();
+        refreshDraftList();
+        draw();
+      }
     } else {
-      // Left on a filled draft polygon: select that room
+      // Left on a filled polygon: select that room (draft or saved)
       const filled = hitTestFilledRoom(x, y);
-      if(filled && filled.list === "draft"){
-        setActiveDraft(filled.roomIndex);
+      if(filled){
+        if(filled.list === "draft"){
+          setActiveDraft(filled.roomIndex);
+        } else if(filled.list === "saved"){
+          state.activeSavedIndex = filled.roomIndex;
+          state.activeRoomIndex = null;
+          refreshSavedList();
+          refreshDraftList();
+          draw();
+        }
         return;
       }
       // Left on empty space: pan view
@@ -616,8 +706,10 @@ function onMouseMove(e){
   if(t){
     if(t.type==="img-pan"){
       // translate image in world space based on mouse movement
-      const [wx1, wy1] = screenToWorld(state.mouse.lastX, state.mouse.lastY);
-      const [wx2, wy2] = screenToWorld(x, y);
+      const [lon1, lat1] = screenToWorld(state.mouse.lastX, state.mouse.lastY);
+      const [lon2, lat2] = screenToWorld(x, y);
+      const [wx1, wy1] = lonLatToWorld(lon1, lat1);
+      const [wx2, wy2] = lonLatToWorld(lon2, lat2);
       state.image.pos.x += (wx2 - wx1);
       state.image.pos.y += (wy2 - wy1);
       draw();
@@ -717,25 +809,39 @@ function onKeyDown(e){
     e.preventDefault();
     undo();
   } else if((e.ctrlKey||e.metaKey) && key==="c"){
-    // Copy active draft room
-    const idx = state.activeRoomIndex;
-    if(idx!=null){
-      const r = state.rooms[idx];
-      if(r && Array.isArray(r.points) && r.points.length){
+    // Copy from active draft or saved room
+    let src = null;
+    if (state.activeRoomIndex != null) {
+      src = { list: "draft", index: state.activeRoomIndex };
+    } else if (state.activeSavedIndex != null) {
+      src = { list: "saved", index: state.activeSavedIndex };
+    }
+    if (src) {
+      let r = null;
+      if (src.list === "draft") {
+        r = state.rooms[src.index];
+      } else if (src.list === "saved") {
+        r = state.saved[src.index];
+      }
+      if (r && Array.isArray(r.points) && r.points.length) {
         state.clipboard = {
           name: r.name || "",
-          points: r.points.map(p=>[p[0], p[1]])
+          points: r.points.map(p => [p[0], p[1]])
         };
       }
     }
   } else if((e.ctrlKey||e.metaKey) && key==="v"){
-    // Paste as new draft room
+    // Paste as new draft room, slightly offset from original
     if(!state.clipboard || !Array.isArray(state.clipboard.points) || !state.clipboard.points.length) return;
     pushHistory();
+    // Offset logic: right and down by 5% of bbox, or a small value if degenerate
+    const bb = bboxOf(state.clipboard.points);
+    const offsetX = (bb.maxX - bb.minX) * 0.05 || 1e-5;
+    const offsetY = (bb.maxY - bb.minY) * 0.05 || 1e-5;
     const newRoom = {
       id: roomIdCounter++,
       name: state.clipboard.name || "",
-      points: state.clipboard.points.map(p=>[p[0], p[1]]),
+      points: state.clipboard.points.map(p=>[p[0] + offsetX, p[1] - offsetY]),
       closed: true
     };
     state.rooms.push(newRoom);
@@ -748,8 +854,21 @@ function onKeyDown(e){
   ) {
     e.preventDefault();
     if (state.activeRoomIndex != null) {
+      // Delete currently selected draft room
       deleteDraft(state.activeRoomIndex);
       draw();
+    } else if (state.activeSavedIndex != null) {
+      // Delete currently selected saved room (rooms.json)
+      const idx = state.activeSavedIndex;
+      if (idx != null && idx >= 0 && idx < state.saved.length) {
+        pushHistory();
+        state.saved.splice(idx, 1);
+        writeSavedBackToDB();
+        requestSaveRoomsToServer();
+        state.activeSavedIndex = null;
+        refreshSavedList();
+        draw();
+      }
     }
   }
 }
