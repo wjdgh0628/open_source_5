@@ -45,8 +45,9 @@ export async function handleFloorClick(map, bid, fid, level) {
     const basic = await searchBasicInfoByBid(bid);
     const floor = await searchFloorInfoByBid(bid);
 
-    allFloors(map, bid, (map, fid) => hideLayer(map, fid), fid);
+    await hideAllFloors(map);
     setRooms(map, bid, level, floor);
+    showLayer(map, CONFIG.idRules.clickedFloor(bid, level));
     flyCamera(map, CONFIG.camera.floor, basic.center, basic.floorBearing);
 
     current.mode = 2;
@@ -77,7 +78,7 @@ export async function handleBackgroundClick(map, e) {
             current.bid = basic.bid;
         }
         else {
-            hideAllFloors(map);
+            await hideAllFloors(map);
             showLayer(map, CONFIG.idRules.buildings);
             console.log("배경 클릭됨");
             current.mode = 0;

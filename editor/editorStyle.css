@@ -31,3 +31,9 @@ select, button, textarea { font-size:12px; }
 .room-header .actions { display:flex; gap:6px; }
 .room-coords { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size:11px; white-space:pre; max-height:80px; overflow:auto; }
 .room-item.active { border-color:#007aff; box-shadow:0 0 0 1px rgba(0,122,255,.3); }
+.room-color {
+  width: 32px;
+  height: 18px;
+  padding: 0;
+  border: none;
+}

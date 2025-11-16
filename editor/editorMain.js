@@ -248,6 +248,7 @@ function loadSavedRoomsForCurrent(){
   state.saved = arr.map((r, idx)=>({
     id: `s${idx+1}`,
     name: r.name || "",
+    color: r.color || "#ff9500",
     points: Array.isArray(r.polygon) ? r.polygon : [],
     closed: true
   }));
@@ -256,6 +257,7 @@ function writeSavedBackToDB(){
   if(!state.roomsDB || !state.building || state.floorIndex==null) return;
   state.roomsDB[state.building][state.floorIndex] = state.saved.map(r=>({
     name: r.name || "",
+    color: r.color || "#ff9500",
     // polygon: ensureClosed(r.points)
     polygon: r.points
   }));
@@ -333,7 +335,7 @@ async function copyFloorCoords(){
 function getOrCreateActiveOpenDraft(){
   if(state.activeRoomIndex!=null){ const r = state.rooms[state.activeRoomIndex]; if(r && !r.closed) return r; }
   for(let i=state.rooms.length-1;i>=0;i--) if(!state.rooms[i].closed){ state.activeRoomIndex=i; return state.rooms[i]; }
-  const room = { id: roomIdCounter++, name:"", points: [], closed:false };
+  const room = { id: roomIdCounter++, name:"", color: "#007aff", points: [], closed:false };
   state.rooms.push(room); state.activeRoomIndex = state.rooms.length-1;
   refreshDraftList(); return room;
 }
@@ -372,8 +374,20 @@ function refreshSavedList(){
       requestSaveRoomsToServer();
     });
 
+    const colorInput = document.createElement("input");
+    colorInput.type = "color";
+    colorInput.className = "room-color";
+    colorInput.value = room.color || "#ff9500";
+    colorInput.addEventListener("change", () => {
+      pushHistory();
+      room.color = colorInput.value;
+      writeSavedBackToDB();
+      requestSaveRoomsToServer();
+      draw();
+    });
+
     const title = document.createElement("span"); title.textContent = `저장 ${idx+1}`;
-    left.append(title, nameInput);
+    left.append(title, nameInput, colorInput);
 
     const actions = document.createElement("div"); actions.className = "actions";
     const toDraft = document.createElement("button"); toDraft.textContent = "빼기";
@@ -381,7 +395,7 @@ function refreshSavedList(){
       const r = state.saved.splice(idx,1)[0];
       writeSavedBackToDB();
       requestSaveRoomsToServer();
-      const draft = { id: roomIdCounter++, name: r.name||"", points: r.points.map(p=>[p[0],p[1]]), closed:true };
+      const draft = { id: roomIdCounter++, name: r.name||"", color: r.color || "#007aff", points: r.points.map(p=>[p[0],p[1]]), closed:true };
       state.rooms.push(draft);
       refreshSavedList(); refreshDraftList(); draw();
     };
@@ -427,7 +441,18 @@ function refreshDraftList(){
     const nameInput = document.createElement("input"); nameInput.className="room-name"; nameInput.placeholder="이름"; nameInput.value = room.name||"";
     nameInput.addEventListener("change", ()=>{ room.name = nameInput.value.trim(); });
 
-    left.append(title, nameInput);
+    const colorInput = document.createElement("input");
+    colorInput.type = "color";
+    colorInput.className = "room-color";
+    colorInput.value = room.color || "#007aff";
+    colorInput.addEventListener("change", () => {
+      pushHistory();
+      room.color = colorInput.value;
+      refreshDraftList();
+      draw();
+    });
+
+    left.append(title, nameInput, colorInput);
 
     const actions = document.createElement("div"); actions.className = "actions";
     const save = document.createElement("button"); save.textContent = "저장";
@@ -443,8 +468,7 @@ function refreshDraftList(){
         r.name = name;
         nameInput.value = name;
       }
-      // const savedEntry = { id:`s${Date.now()}_${idx}`, name, points: ensureClosed(r.points), closed:true };
-      const savedEntry = { id:`s${Date.now()}_${idx}`, name, points: r.points, closed:true };
+      const savedEntry = { id:`s${Date.now()}_${idx}`, name, color: r.color || "#ff9500", points: r.points, closed:true };
       state.saved.push(savedEntry);
       writeSavedBackToDB();
       requestSaveRoomsToServer();
@@ -522,7 +546,10 @@ function draw(){
     if(!room.points.length) return;
     const screenPts = toScreenPath(room.points);
     drawPathScreen(screenPts, room.closed);
-    const active = idx===state.activeRoomIndex; ctx.lineWidth = active? 2: 1.5; ctx.strokeStyle = active? "#007aff":"#e53935"; ctx.stroke();
+    const active = idx===state.activeRoomIndex; 
+    ctx.lineWidth = active? 2: 1.5; 
+    ctx.strokeStyle = active? "#007aff":"#e53935"; 
+    ctx.stroke();
     if(room.closed){ ctx.fillStyle = "rgba(0,122,255,.08)"; ctx.fill(); }
   });
 
@@ -530,7 +557,14 @@ function draw(){
   state.rooms.forEach((room, idx)=>{
     const active = idx===state.activeRoomIndex;
     room.points.forEach(([wx,wy])=>{
-      const s = worldToScreen(wx,wy); ctx.beginPath(); ctx.arc(s.x,s.y, active?4:3, 0, Math.PI*2); ctx.fillStyle = active?"#007aff":"#e53935"; ctx.fill(); ctx.strokeStyle = "#fff"; ctx.lineWidth = 1; ctx.stroke();
+      const s = worldToScreen(wx,wy); 
+      ctx.beginPath(); 
+      ctx.arc(s.x,s.y, active?4:3, 0, Math.PI*2); 
+      ctx.fillStyle = active?"#007aff":"#e53935"; 
+      ctx.fill(); 
+      ctx.strokeStyle = "#fff"; 
+      ctx.lineWidth = 1; 
+      ctx.stroke();
     });
   });
 
@@ -826,6 +860,7 @@ function onKeyDown(e){
       if (r && Array.isArray(r.points) && r.points.length) {
         state.clipboard = {
           name: r.name || "",
+          color: r.color || "#007aff",
           points: r.points.map(p => [p[0], p[1]])
         };
       }
@@ -841,6 +876,7 @@ function onKeyDown(e){
     const newRoom = {
       id: roomIdCounter++,
       name: state.clipboard.name || "",
+      color: state.clipboard.color || "#007aff",
       points: state.clipboard.points.map(p=>[p[0] + offsetX, p[1] - offsetY]),
       closed: true
     };
@@ -943,4 +979,14 @@ async function saveRoomsToServer(){
   }catch(e){
     console.error("rooms.json 서버 저장 실패:", e);
   }
+}
+// ==== Color helpers ================================================================
+function hexToRgba(hex, alpha) {
+  if (!hex) return `rgba(0,0,0,${alpha})`;
+  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  if (!m) return `rgba(0,0,0,${alpha})`;
+  const r = parseInt(m[1], 16);
+  const g = parseInt(m[2], 16);
+  const b = parseInt(m[3], 16);
+  return `rgba(${r},${g},${b},${alpha})`;
 }

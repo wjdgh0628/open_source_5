@@ -15,7 +15,8 @@ export const CONFIG = {
         floorGap: 4,
         levelThick: 6,
         colorPalette: ["#ff0000", "#ff4400", "#ff8800", "#ffcc00", "#ffff00", "#ccff00", "#88ff00", "#44ff00", "#00ff00", "#00ff44", "#00ff88", "#00ffcc", "#00ffff", "#00ccff", "#0088ff", "#0044ff", "#0000ff"],
-        basementPalette: ["#4400ff", "#8800ff", "#cc00ff", "#ff00ff"]
+        basementPalette: ["#4400ff", "#8800ff", "#cc00ff", "#ff00ff"],
+        clickedFloorColor: "#888888"
         // basementPalette: ["#ff00ff", "#cc00ff", "#8800ff", "#4400ff"]
     },
     defaultFloorCount: 3,
@@ -50,6 +51,7 @@ export const CONFIG = {
         floorSid: (bid) => { return `${bid}_floors` },
         rid: (bid, level, index) => { return `${bid}_${level}0${index}` },
         roomSid: (fid) => {return `${fid}_rooms`},
+        clickedFloor: (bid, level) => { return `${bid}_${level}_base` },
         lid: (pid) => { return `${pid}_label` },
         level: (bmLevel, levelIndex) => {return levelIndex >= bmLevel ? (levelIndex - bmLevel) + 1 : (bmLevel - levelIndex) * -1;}
     }

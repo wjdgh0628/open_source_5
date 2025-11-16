@@ -107,6 +107,10 @@ export function hideLayer(map, id) {
 export async function hideAllFloors(map) {
     for (const bid of CONFIG.bidList) {
         await allFloors(map, bid, (map, fid) => hideLayer(map, fid));
+        await allFloors(map, bid, (map, fid, level) => {
+            hideLayer(map, CONFIG.idRules.clickedFloor(bid, level));
+            allRooms(map, bid, level, (map, rid) => hideLayer(map, rid));
+        });
     }
 }
 
@@ -137,6 +141,7 @@ function setLayers(map, sourceId, features) {
                 "fill-extrusion-opacity": 1
             }
         });
+        if(!f.properties.name) return; //이름이 없으면 라벨 생성 안함
         map.addLayer({
             id: CONFIG.idRules.lid(layerId),
             type: 'symbol',
@@ -174,13 +179,13 @@ export async function allFloors(map, bid, cb, excFid = null) {
         const fid = CONFIG.idRules.fid(bid, i);
         if (fid === excFid)
             continue;
-        cb(map, fid);
+        cb(map, fid, i);
     }
     for (let i = 1; i <= info.flLevel; i++) {
         const fid = CONFIG.idRules.fid(bid, i);
         if (fid === excFid)
             continue;
-        cb(map, fid);
+        cb(map, fid, i);
     }
 }
 //층 생성/보이기
@@ -255,21 +260,32 @@ export function setRooms(map, bid, level, info) {
         generateRooms(map, info, fid, level);
     }
 }
-async function  generateRooms(map, info, fid, level) {
+async function generateRooms(map, info, fid, level) {
     const bid = info.bid;
     const { floorThickness, floorGap, colorPalette, basementPalette } = CONFIG.buildingDefaults;
     const levelIndex = level < 0 ? level + info.bmLevel : level + info.bmLevel - 1;
-    const base = (levelIndex * (floorThickness + floorGap)) + floorThickness;
+    const base = (levelIndex * (floorThickness + floorGap));
     let rooms = await fetchRoomsByBid(bid, levelIndex);
     let roomsSpec = []
+    roomsSpec.push({
+        type: "Feature",
+        properties: {
+            base: base,
+            height: base + floorThickness,
+            color: CONFIG.buildingDefaults.clickedFloorColor,
+            // offset: 0,
+            layerId: CONFIG.idRules.clickedFloor(bid, level)
+        },
+        geometry: { type: "Polygon", coordinates: [info.flVars[info.flList[levelIndex]]] }
+    })
     rooms.forEach((room, i) => {
         roomsSpec.push({
             type: "Feature",
             properties: {
                 name: room.name,
-                base,
-                height: base + floorThickness,
-                color: colorPalette[i],
+                base: base + floorThickness,
+                height: base + floorThickness + (floorThickness/2),
+                color: room.color ? room.color : colorPalette[i],
                 anchor: "bottom",
                 // offset: 0,
                 layerId: CONFIG.idRules.rid(bid, level, i + 1)
