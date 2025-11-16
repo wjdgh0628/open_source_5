@@ -1,5 +1,5 @@
 import { CONFIG } from './config.js';
-import { handleFloorClick } from './onClick.js';
+import { handleFloorClick, handleRoomClick } from './onClick.js';
 
 //카메라 이동 함수
 export function flyCamera(map, mode, center, bearing = null) {
@@ -58,7 +58,8 @@ export async function searchFloorInfoByBid(bid) {
         // offset: f.properties.offset
     };
 }
-async function fetchRoomsByBid(bid, levelIndex) {
+
+export async function fetchRoomsByBid(bid, levelIndex) {
     let f = null;
     await fetch(CONFIG.campus.roomsUrl)
         .then(response => response.json())
@@ -111,7 +112,7 @@ export async function hideAllFloors(map) {
 }
 
 //데이터 배열 받아서 층이나 방 만드는 함수
-function setLayers(map, sourceId, features) {
+function setLayers(map, sourceId, features, bid, level) { // (수정) bid, level 파라미터 추가
     if (map.getSource(sourceId)) {
         console.log(`source id: ${sourceId}가 이미 존재`);
         return;
@@ -124,7 +125,9 @@ function setLayers(map, sourceId, features) {
         })
     });
     features.forEach((f, i) => {
-        const layerId = f.properties.layerId;
+        const layerId = f.properties.layerId; // 예: "stem_4_1"
+        const labelLayerId = CONFIG.idRules.lid(layerId); // 예: "stem_4_1_label"
+
         map.addLayer({
             id: layerId,
             type: "fill-extrusion",
@@ -138,7 +141,7 @@ function setLayers(map, sourceId, features) {
             }
         });
         map.addLayer({
-            id: CONFIG.idRules.lid(layerId),
+            id: labelLayerId, // (수정) 변수 사용
             type: 'symbol',
             source: sourceId,
             filter: ["==", ["get", "layerId"], layerId],
@@ -149,21 +152,29 @@ function setLayers(map, sourceId, features) {
                 'text-allow-overlap': true,
                 'symbol-placement': 'point',
                 'symbol-z-order': "source",
-                // 'symbol-spacing': 1,
-                // 'text-radial-offset': ["get", "offset"],
-                // 'symbol-avoid-edges': true
-                // 'symbol-z-elevate': true
             },
             paint: {
                 'symbol-z-offset': f.properties.base,
                 'text-color': '#000000',
                 'text-halo-color': '#ffffff',
                 'text-halo-width': 2,
-                // "text-translate": [0, 0],
-                // "text-translate-anchor": "viewport"
             }
         });
-        // console.log(CONFIG.idRules.lid(layerId));
+
+        // ===== ▼▼▼ (수정) 강의실 폴리곤과 라벨 모두에 핸들러 추가 ▼▼▼ =====
+        if (bid && level) {
+            const roomName = f.properties.name;
+            const callback = e => {
+                handleRoomClick(map, bid, layerId, level, roomName);
+            };
+            
+            // 1. 폴리곤 레이어에 핸들러 추가
+            setHandler(map, layerId, callback);
+            
+            // 2. 라벨 레이어에 핸들러 추가
+            setHandler(map, labelLayerId, callback);
+        }
+        // ===== ▲▲▲ 수정 완료 ▲▲▲ =====
     });
 }
 
@@ -198,13 +209,11 @@ function generateFloors(map, info) {
     const bid = info.bid;
     const { floorThickness, floorGap, colorPalette, basementPalette } = CONFIG.buildingDefaults;
 
-    //geojson에 저장된 층수랑 층 배열 길이가 같은지 검사
     if (info.totLevel != info.flList.length) {
         console.log(`층수 오류 | 지상:${info.bmLevel} + 지하:${info.flLevel}, 배열 길이${info.flList.length}`);
         return;
     }
 
-    //층 모양(폴리곤이랑 높이 등)이랑 각종 정보들 floorSpec에 저장
     let floorsSpec = []
     info.flList.forEach((flVarNum, i) => {
         let fi = i - info.bmLevel;
@@ -222,15 +231,13 @@ function generateFloors(map, info) {
                 color: i >= info.bmLevel ? colorPalette[fi * colorJump] : basementPalette[bi - 1],
                 level: level,
                 anchor: "left",
-                // offset: info.offset,
                 layerId: CONFIG.idRules.fid(bid, level)
             },
             geometry: { type: "Polygon", coordinates: [info.flVars[flVarNum]] }
         })
     })
 
-    // floorSpec 기반으로 source로 저장
-    setLayers(map, CONFIG.idRules.floorSid(bid), floorsSpec);
+    setLayers(map, CONFIG.idRules.floorSid(bid), floorsSpec); // (수정) bid, level 안 넘김
     // 핸들러 지정
     floorsSpec.forEach(f => {
         const fid = f.properties.layerId;
@@ -241,6 +248,7 @@ export async function allRooms(map, bid, level, cb) {
     const info = await searchFloorInfoByBid(bid);
     const levelIndex = level < 0 ? level + info.bmLevel : level + info.bmLevel - 1;
     const rooms = await fetchRoomsByBid(bid, levelIndex);
+    if (!rooms) return; 
     rooms.forEach((room, i) => {
         const rid = CONFIG.idRules.rid(bid, level, i + 1);
         cb(map, rid);
@@ -261,6 +269,9 @@ async function  generateRooms(map, info, fid, level) {
     const levelIndex = level < 0 ? level + info.bmLevel : level + info.bmLevel - 1;
     const base = (levelIndex * (floorThickness + floorGap)) + floorThickness;
     let rooms = await fetchRoomsByBid(bid, levelIndex);
+    
+    if (!rooms) return; 
+
     let roomsSpec = []
     rooms.forEach((room, i) => {
         roomsSpec.push({
@@ -269,19 +280,13 @@ async function  generateRooms(map, info, fid, level) {
                 name: room.name,
                 base,
                 height: base + floorThickness,
-                color: colorPalette[i],
+                color: colorPalette[i % colorPalette.length], 
                 anchor: "bottom",
-                // offset: 0,
                 layerId: CONFIG.idRules.rid(bid, level, i + 1)
             },
             geometry: { type: "Polygon", coordinates: [room.polygon] }
         })
     })
 
-    setLayers(map, CONFIG.idRules.roomSid(fid), roomsSpec);
-    // 핸들러 지정
-    roomsSpec.forEach(f => {
-        const fid = f.properties.layerId;
-    });
-
+    setLayers(map, CONFIG.idRules.roomSid(fid), roomsSpec, bid, level); 
 }

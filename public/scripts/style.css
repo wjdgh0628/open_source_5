@@ -108,7 +108,7 @@ a {
     cursor: pointer;
 }
 
-/* ===== ▼▼▼ (수정) 사이드바가 "접혔을 때만" 메인 링크에 호버 효과 적용 ▼▼▼ ===== */
+/* (수정) 사이드바가 "접혔을 때만" 메인 링크에 호버 효과 적용 */
 .l-navbar:not(.expander) .nav__link:hover {
     background-color: var(--first-color);
 }
@@ -117,8 +117,6 @@ a {
 .l-navbar:not(.expander) .nav__link:hover .nav_name {
     color: var(--white-color);
 }
-/* ===== ▲▲▲ 수정 완료 ▲▲▲ ===== */
-
 
 .nav__icon {
     font-size: 1.25rem;
@@ -129,10 +127,12 @@ a {
     font-weight: var(--font-weight-bold);
 }
 
-/* Expander menu */
+/* ===== ▼▼▼ (수정) 사이드바 확장 폭 늘리기 (9.25rem -> 12rem) ▼▼▼ ===== */
 .expander {
-    width: calc(var(--nav--width) + 9.25rem);
+    width: calc(var(--nav--width) + 12rem);
 }
+/* ===== ▲▲▲ 수정 완료 ▲▲▲ ===== */
+
 
 .l-navbar:not(.expander) .nav_name {
     display: none;
@@ -141,10 +141,11 @@ a {
     display: none;
 }
 
-/* Add padding body*/
+/* ===== ▼▼▼ (수정) 확장된 폭에 맞춰 body padding 늘리기 (16rem -> 18.75rem) ▼▼▼ ===== */
 .body-pd {
-    padding: 2rem 0 0 16rem; 
+    padding: 2rem 0 0 18.75rem; 
 }
+/* ===== ▲▲▲ 수정 완료 ▲▲▲ ===== */
 
 /* COLLAPSE */
 .collapse {
@@ -153,7 +154,7 @@ a {
 
 .collapse__link {
     justify-self: flex-end;
-    transition: .5;
+    transition: .5s;
 }
 
 .collapse__menu {
@@ -199,39 +200,7 @@ ul.collapse__menu {
   z-index: 5; 
 }
 
-/* (수정) 접힌 상태일 때 버튼 위치 */
-#sidebar.collapsed #sidebar-toggle-btn {
- left: 50px; /* 접힌 너비만큼 이동 */
-}
-
-/* ===== ▼▼▼ (수정) 세로 텍스트 스타일 다시 추가 ▼▼▼ ===== */
-#sidebar-collapsed-text {
-  visibility: hidden; 
-  opacity: 0;
-  position: absolute;
-  top: 50%;
-  left: 25px; /* 접힌 너비(50px)의 중앙 */
-  transform: translateY(-50%) rotate(90deg); /* 세로로 회전 */
-  transform-origin: center;
-  white-space: nowrap;
-  font-size: 1.1rem;
-  font-weight: bold;
-  
-  color: #004a9e; /* 파란색 "글자" */
-  background: none; /* 배경 없음 */
-  padding: 0; 
-  border-radius: 0; 
-
-  transition: opacity 0.3s ease;
-  pointer-events: none; 
-  z-index: 11;
-}
-
-#sidebar.collapsed #sidebar-collapsed-text {
-  opacity: 1;
-  visibility: visible;
-}
-/* ===== ▲▲▲ 사이드바 로직 전체 수정 끝 ▲▲▲ ===== */
+/* (삭제) #sidebar 관련 CSS 삭제 (l-navbar로 대체됨) */
 
 /* 하위 리스트 아이템 스타일 (이 부분 호버는 유지) */
 .building-list-item {
@@ -243,6 +212,7 @@ ul.collapse__menu {
   font-weight: var(--font-weight-bold); 
   border-radius: .5rem;
   transition: all 0.2s ease-in-out;
+  overflow: hidden;
 }
 
 .building-list-item:hover {
@@ -253,7 +223,15 @@ ul.collapse__menu {
 .building-list-item span {
   flex-grow: 1;
   cursor: pointer;
+  /* ===== ▼▼▼ (수정) 한 줄로 표시 (줄바꿈 방지) ▼▼▼ ===== */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; 
+  /* ===== ▲▲▲ 수정 완료 ▲▲▲ ===== */
 }
+
+/* (삭제) .expander .building-list-item span 관련 규칙 삭제 */
+
 
 .building-list-item:hover .favorite-btn {
     color: var(--white-color);
@@ -268,6 +246,7 @@ ul.collapse__menu {
   padding: 0 8px 0 0;
   color: #ccc;
   transition: color 0.2s ease, transform 0.2s ease;
+  flex-shrink: 0;
 }
 
 .favorite-btn:hover {
@@ -276,4 +255,104 @@ ul.collapse__menu {
 
 .favorite-btn.favorited {
   color: #f0c300;
+}
+
+/* (기존) 평면도 이미지 모달 */
+#modal-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); display: flex;
+  justify-content: center; align-items: center; 
+  z-index: 200; 
+  opacity: 1; visibility: visible;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+#modal-overlay.hidden {
+  opacity: 0; visibility: hidden; pointer-events: none;
+}
+#modal-content {
+  background-color: #ffffff; padding: 24px; border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); min-width: 300px;
+  max-width: 600px; width: 80%; position: relative;
+  box-sizing: border-box; 
+  color: #333; 
+}
+#modal-close-btn {
+  position: absolute; top: 10px; right: 15px; background: none;
+  border: none; font-size: 28px; line-height: 1; color: #aaa;
+  cursor: pointer; padding: 0;
+}
+#modal-close-btn:hover { color: #333; }
+#modal-content h2 { margin-top: 0; margin-bottom: 16px; color: #333; }
+#modal-floor-info img {
+  width: 100%; max-height: 60vh; object-fit: contain;
+  border: 1px solid #eee; margin-top: 10px;
+}
+
+
+/* (신규) 확인 모달 스타일 */
+#confirm-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 201; 
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+#confirm-modal-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+#confirm-modal-content {
+  background-color: #ffffff;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 300px;
+  max-width: 400px;
+  text-align: center;
+}
+
+#confirm-modal-content h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #333;
+}
+#confirm-modal-content p {
+  margin-bottom: 20px;
+  color: #555;
+  font-size: 14px;
+}
+
+#confirm-modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+#confirm-modal-buttons button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#confirm-modal-no {
+  background-color: #eee;
+  color: #333;
+}
+
+#confirm-modal-yes {
+  background-color: var(--first-color);
+  color: var(--white-color);
 }
