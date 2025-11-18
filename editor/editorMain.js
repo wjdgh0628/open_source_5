@@ -48,7 +48,6 @@ const copyFloorCoordsBtn = el("copyFloorCoordsBtn");
 const savedRoomListEl = el("savedRoomList");
 const draftRoomListEl = el("draftRoomList");
 
-const imageModeBtn = el("imageModeBtn");
 const imageOpacityRange = el("imageOpacity");
 
 const state = {
@@ -70,12 +69,16 @@ const state = {
   // Persisted DB (rooms.json content)
   roomsDB: null,
 
-  mouse: { isDown:false, button:0, lastX:0, lastY:0, dragTarget:null, savedChanged:false },
+  mouse: { isDown:false, lastX:0, lastY:0, dragTarget:null, savedChanged:false },
   history: [],
   clipboard: null,
-  imageMode: false,
   image: { img:null, loaded:false, pos:{x:0,y:0}, scale:1, rotation:0, opacity:0.6 },
 };
+function getRoom(list, index){
+  if (list === "draft") return state.rooms[index] || null;
+  if (list === "saved") return state.saved[index] || null;
+  return null;
+}
 let roomIdCounter = 1;
 
 function resizeCanvas(){
@@ -393,11 +396,24 @@ function deleteDraft(index){
   refreshDraftList(); draw();
 }
 function setActiveDraft(index){
-  if(index<0 || index>=state.rooms.length) return;
-  state.activeRoomIndex = index;
-  state.activeSavedIndex = null;
-  refreshDraftList();
+  setActiveRoom("draft", index);
+}
+
+// ==== Saved / Draft list rendering & actions =======================================
+function setActiveRoom(list, index){
+  if(list === "draft"){
+    if(index<0 || index>=state.rooms.length) return;
+    state.activeRoomIndex = index;
+    state.activeSavedIndex = null;
+  } else if(list === "saved"){
+    if(index<0 || index>=state.saved.length) return;
+    state.activeSavedIndex = index;
+    state.activeRoomIndex = null;
+  } else {
+    return;
+  }
   refreshSavedList();
+  refreshDraftList();
   draw();
 }
 
@@ -462,11 +478,7 @@ function refreshSavedList(){
 
     div.addEventListener("click", function(event){
       if (event.target.tagName === "BUTTON" || event.target.tagName === "INPUT") return;
-      state.activeSavedIndex = idx;
-      state.activeRoomIndex = null;
-      refreshSavedList();
-      refreshDraftList();
-      draw();
+      setActiveRoom("saved", idx);
     });
 
     savedRoomListEl.appendChild(div);
@@ -703,7 +715,6 @@ function onMouseDown(e){
   // Alt/Option + drag: image manipulation (no toggle button needed)
   if (e.altKey && state.image.loaded && state.image.img) {
     state.mouse.isDown = true;
-    state.mouse.button = e.button;
     state.mouse.lastX = x;
     state.mouse.lastY = y;
     state.mouse.dragTarget = null;
@@ -718,7 +729,6 @@ function onMouseDown(e){
   }
 
   state.mouse.isDown = true;
-  state.mouse.button = e.button;
   state.mouse.lastX = x;
   state.mouse.lastY = y;
   state.mouse.dragTarget = null;
@@ -746,11 +756,7 @@ function onMouseDown(e){
         if (hitRoom.list === "draft") {
           setActiveDraft(hitRoom.roomIndex);
         } else if (hitRoom.list === "saved") {
-          state.activeSavedIndex = hitRoom.roomIndex;
-          state.activeRoomIndex = null;
-          refreshSavedList();
-          refreshDraftList();
-          draw();
+          setActiveRoom("saved", hitRoom.roomIndex);
         }
         return;
       }
@@ -780,11 +786,7 @@ function onMouseDown(e){
       if (hit.list === "draft") {
         setActiveDraft(hit.roomIndex);
       } else if (hit.list === "saved") {
-        state.activeSavedIndex = hit.roomIndex;
-        state.activeRoomIndex = null;
-        refreshSavedList();
-        refreshDraftList();
-        draw();
+        setActiveRoom("saved", hit.roomIndex);
       }
     } else {
       // Left on a filled polygon: select that room but still allow panning
@@ -793,11 +795,7 @@ function onMouseDown(e){
         if (filled.list === "draft") {
           setActiveDraft(filled.roomIndex);
         } else if (filled.list === "saved") {
-          state.activeSavedIndex = filled.roomIndex;
-          state.activeRoomIndex = null;
-          refreshSavedList();
-          refreshDraftList();
-          draw();
+          setActiveRoom("saved", filled.roomIndex);
         }
         // Start view panning even when clicking on a polygon
         state.mouse.dragTarget = { type: "pan" };
@@ -813,10 +811,7 @@ function onMouseDown(e){
     if (e.shiftKey) {
       const hitRoom = hitTestFilledRoom(x, y);
       if (hitRoom) {
-        const room =
-          hitRoom.list === "draft"
-            ? state.rooms[hitRoom.roomIndex]
-            : state.saved[hitRoom.roomIndex];
+        const room = getRoom(hitRoom.list, hitRoom.roomIndex);
 
         if (room && room.points && room.points.length >= 3) {
           pushHistory();
@@ -839,11 +834,7 @@ function onMouseDown(e){
           if (hitRoom.list === "draft") {
             setActiveDraft(hitRoom.roomIndex);
           } else if (hitRoom.list === "saved") {
-            state.activeSavedIndex = hitRoom.roomIndex;
-            state.activeRoomIndex = null;
-            refreshSavedList();
-            refreshDraftList();
-            draw();
+            setActiveRoom("saved", hitRoom.roomIndex);
           }
           return;
         }
@@ -882,18 +873,13 @@ function onMouseMove(e){
       draw();
     } else if(t.type==="point"){
       const [wx,wy]=screenToWorld(x,y);
-      if(t.list==="draft"){
-        const room = state.rooms[t.roomIndex];
-        if(room && room.points[t.pointIndex]){
-          room.points[t.pointIndex][0]=wx;
-          room.points[t.pointIndex][1]=wy;
+      const room = getRoom(t.list, t.roomIndex);
+      if (room && room.points && room.points[t.pointIndex]) {
+        room.points[t.pointIndex][0] = wx;
+        room.points[t.pointIndex][1] = wy;
+        if (t.list === "draft") {
           refreshDraftList();
-        }
-      } else if(t.list==="saved"){
-        const room = state.saved[t.roomIndex];
-        if(room && room.points[t.pointIndex]){
-          room.points[t.pointIndex][0]=wx;
-          room.points[t.pointIndex][1]=wy;
+        } else if (t.list === "saved") {
           state.mouse.savedChanged = true;
           refreshSavedList();
         }
@@ -905,22 +891,15 @@ function onMouseMove(e){
       const dxWorld = wx - last[0];
       const dyWorld = wy - last[1];
       if(dxWorld !== 0 || dyWorld !== 0){
-        if(t.list === "draft"){
-          const room = state.rooms[t.roomIndex];
-          if(room && room.points){
-            room.points.forEach(p => {
-              p[0] += dxWorld;
-              p[1] += dyWorld;
-            });
+        const room = getRoom(t.list, t.roomIndex);
+        if (room && room.points) {
+          room.points.forEach(p => {
+            p[0] += dxWorld;
+            p[1] += dyWorld;
+          });
+          if (t.list === "draft") {
             refreshDraftList();
-          }
-        } else if(t.list === "saved"){
-          const room = state.saved[t.roomIndex];
-          if(room && room.points){
-            room.points.forEach(p => {
-              p[0] += dxWorld;
-              p[1] += dyWorld;
-            });
+          } else if (t.list === "saved") {
             state.mouse.savedChanged = true;
             refreshSavedList();
           }
@@ -929,9 +908,7 @@ function onMouseMove(e){
       }
       t.lastWorld = [wx, wy];
     } else if(t.type==="room-rotate"){
-      const room = t.list === "draft"
-        ? state.rooms[t.roomIndex]
-        : state.saved[t.roomIndex];
+      const room = getRoom(t.list, t.roomIndex);
 
       if (!room || !room.points || !room.points.length || !t.baseWorldPoints || !t.centerWorld) {
         return;
@@ -1096,41 +1073,30 @@ function onWheel(e){
   if (e.shiftKey) {
     const hit = hitTestFilledRoom(x, y);
     if (hit) {
-      const room = hit.list === "draft"
-        ? state.rooms[hit.roomIndex]
-        : state.saved[hit.roomIndex];
+      const room = getRoom(hit.list, hit.roomIndex);
 
       if (room && room.points && room.points.length) {
         pushHistory();
         const zoomRoom = Math.exp(-e.deltaY * 0.002);
+        const centerInfo = getWorldCenterFromLonLatPoints(room.points);
+        if (centerInfo) {
+          room.points = applyTransformToLonLatPoints(
+            centerInfo.worldPts,
+            centerInfo,
+            zoomRoom,
+            0
+          );
 
-        const worldPts = room.points.map(([lon, lat]) => lonLatToWorld(lon, lat));
-        let cx = 0, cy = 0;
-        worldPts.forEach(([wx, wy]) => {
-          cx += wx;
-          cy += wy;
-        });
-        cx /= worldPts.length;
-        cy /= worldPts.length;
-
-        room.points = worldPts.map(([wx, wy]) => {
-          const dx = wx - cx;
-          const dy = wy - cy;
-          const sx = dx * zoomRoom;
-          const sy = dy * zoomRoom;
-          const lonlat = worldToLonLat(cx + sx, cy + sy);
-          return [lonlat[0], lonlat[1]];
-        });
-
-        if (hit.list === "saved") {
-          writeSavedBackToDB();
-          requestSaveRoomsToServer();
-          refreshSavedList();
-        } else {
-          refreshDraftList();
+          if (hit.list === "saved") {
+            writeSavedBackToDB();
+            requestSaveRoomsToServer();
+            refreshSavedList();
+          } else {
+            refreshDraftList();
+          }
+          draw();
+          return;
         }
-        draw();
-        return;
       }
     }
   }
@@ -1155,9 +1121,6 @@ function bind(){
   applyFloorCoordsBtn.addEventListener("click", applyManualFloorCoords);
   copyFloorCoordsBtn.addEventListener("click", copyFloorCoords);
 
-  imageModeBtn.addEventListener("click", () => {
-    alert("이미지 조작은 이제 Alt/Option 키를 누른 상태에서 드래그(이동/회전)와 휠(확대/축소)로 할 수 있습니다.");
-  });
   imageOpacityRange.addEventListener("input", ()=>{
     const v = Number(imageOpacityRange.value)||0; state.image.opacity = Math.max(0, Math.min(1, v/100)); draw();
   });
@@ -1187,14 +1150,4 @@ async function saveRoomsToServer(){
   }catch(e){
     console.error("rooms.json 서버 저장 실패:", e);
   }
-}
-// ==== Color helpers ================================================================
-function hexToRgba(hex, alpha) {
-  if (!hex) return `rgba(0,0,0,${alpha})`;
-  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  if (!m) return `rgba(0,0,0,${alpha})`;
-  const r = parseInt(m[1], 16);
-  const g = parseInt(m[2], 16);
-  const b = parseInt(m[3], 16);
-  return `rgba(${r},${g},${b},${alpha})`;
 }
