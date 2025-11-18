@@ -140,6 +140,49 @@ function bboxOfWorld(points){
   return { minX, minY, maxX, maxY };
 }
 
+// --- World center and transform helpers ---
+function getWorldCenterFromLonLatPoints(points){
+  if (!points || !points.length) return null;
+  const worldPts = points.map(([lon, lat]) => lonLatToWorld(lon, lat));
+  let cx = 0, cy = 0;
+  worldPts.forEach(([wx, wy]) => {
+    cx += wx;
+    cy += wy;
+  });
+  cx /= worldPts.length;
+  cy /= worldPts.length;
+  return { cx, cy, worldPts };
+}
+
+function applyTransformToLonLatPoints(worldPts, centerWorld, scaleFactor, rotationAngle){
+  const { cx, cy } = centerWorld;
+  const cos = Math.cos(rotationAngle || 0);
+  const sin = Math.sin(rotationAngle || 0);
+  const s = scaleFactor == null ? 1 : scaleFactor;
+  const result = [];
+  for (let i = 0; i < worldPts.length; i++){
+    const [wx, wy] = worldPts[i];
+    let dx = wx - cx;
+    let dy = wy - cy;
+
+    // scale first
+    dx *= s;
+    dy *= s;
+
+    // then rotate
+    let rx = dx;
+    let ry = dy;
+    if (rotationAngle){
+      rx = dx * cos - dy * sin;
+      ry = dx * sin + dy * cos;
+    }
+
+    const lonlat = worldToLonLat(cx + rx, cy + ry);
+    result.push([lonlat[0], lonlat[1]]);
+  }
+  return result;
+}
+
 function fitViewTo(points){
   const bb = bboxOfWorld(points); if(!bb) return;
   const cx = (bb.minX+bb.maxX)/2, cy = (bb.minY+bb.maxY)/2;
@@ -653,20 +696,41 @@ function findNearestVertex(screenX, screenY, thresholdPx=8){
 
 // ==== Input (mouse/keyboard) ========================================================
 function onMouseDown(e){
-  const r = canvas.getBoundingClientRect(); const x=e.clientX-r.left, y=e.clientY-r.top;
-  if(state.imageMode){
-    state.mouse.isDown=true; state.mouse.button=e.button; state.mouse.lastX=x; state.mouse.lastY=y; state.mouse.dragTarget=null; state.mouse.savedChanged=false;
-    if(e.button===0){ state.mouse.dragTarget = { type:"img-pan" }; }
-    else if(e.button===2){ state.mouse.dragTarget = { type:"img-rotate" }; }
-    return; // do not fall through to normal handlers
-  }
-  state.mouse.isDown=true; state.mouse.button=e.button; state.mouse.lastX=x; state.mouse.lastY=y; state.mouse.dragTarget=null; state.mouse.savedChanged=false;
+  const r = canvas.getBoundingClientRect();
+  const x = e.clientX - r.left;
+  const y = e.clientY - r.top;
 
-  if(e.button===0){
+  // Alt/Option + drag: image manipulation (no toggle button needed)
+  if (e.altKey && state.image.loaded && state.image.img) {
+    state.mouse.isDown = true;
+    state.mouse.button = e.button;
+    state.mouse.lastX = x;
+    state.mouse.lastY = y;
+    state.mouse.dragTarget = null;
+    state.mouse.savedChanged = false;
+
+    if (e.button === 0) {
+      state.mouse.dragTarget = { type: "img-pan" };
+    } else if (e.button === 2) {
+      state.mouse.dragTarget = { type: "img-rotate" };
+    }
+    return;
+  }
+
+  state.mouse.isDown = true;
+  state.mouse.button = e.button;
+  state.mouse.lastX = x;
+  state.mouse.lastY = y;
+  state.mouse.dragTarget = null;
+  state.mouse.savedChanged = false;
+
+  if (e.button === 0) {
     const shiftHeld = e.shiftKey;
-    if(shiftHeld){
+
+    // Shift + Left: move whole room polygon when clicking on a filled room
+    if (shiftHeld) {
       const hitRoom = hitTestFilledRoom(x, y);
-      if(hitRoom){
+      if (hitRoom) {
         pushHistory();
         const [wx, wy] = screenToWorld(x, y);
         state.mouse.dragTarget = {
@@ -677,28 +741,42 @@ function onMouseDown(e){
           lastWorld: [wx, wy]
         };
         state.mouse.savedChanged = false;
+
+        // Select that room as active
+        if (hitRoom.list === "draft") {
+          setActiveDraft(hitRoom.roomIndex);
+        } else if (hitRoom.list === "saved") {
+          state.activeSavedIndex = hitRoom.roomIndex;
+          state.activeRoomIndex = null;
+          refreshSavedList();
+          refreshDraftList();
+          draw();
+        }
         return;
       }
     }
 
-    const hit = findNearestVertex(x,y);
-    if(modDown(e)){
-      // Modifier (Cmd/Ctrl) + Left: add point
-      const wpt = screenToWorld(x,y);
+    const hit = findNearestVertex(x, y);
+
+    if (modDown(e)) {
+      // Cmd/Ctrl + Left: add vertex to active open draft
+      const wpt = screenToWorld(x, y);
       pushHistory();
       const room = getOrCreateActiveOpenDraft();
       room.points.push(wpt);
-      refreshDraftList(); draw();
-    } else if(hit){
+      refreshDraftList();
+      draw();
+    } else if (hit) {
       // Left on a vertex: drag that vertex (draft or saved)
       pushHistory();
       state.mouse.dragTarget = {
-        type:"point",
+        type: "point",
         list: hit.list,
         roomIndex: hit.roomIndex,
         pointIndex: hit.pointIndex
       };
       state.mouse.savedChanged = false;
+
       if (hit.list === "draft") {
         setActiveDraft(hit.roomIndex);
       } else if (hit.list === "saved") {
@@ -709,27 +787,78 @@ function onMouseDown(e){
         draw();
       }
     } else {
-      // Left on a filled polygon: select that room (draft or saved)
+      // Left on a filled polygon: select that room but still allow panning
       const filled = hitTestFilledRoom(x, y);
-      if(filled){
-        if(filled.list === "draft"){
+      if (filled) {
+        if (filled.list === "draft") {
           setActiveDraft(filled.roomIndex);
-        } else if(filled.list === "saved"){
+        } else if (filled.list === "saved") {
           state.activeSavedIndex = filled.roomIndex;
           state.activeRoomIndex = null;
           refreshSavedList();
           refreshDraftList();
           draw();
         }
-        return;
+        // Start view panning even when clicking on a polygon
+        state.mouse.dragTarget = { type: "pan" };
+      } else {
+        // Left on empty space: pan view
+        state.mouse.dragTarget = { type: "pan" };
       }
-      // Left on empty space: pan view
-      state.mouse.dragTarget = { type:"pan" };
     }
-  } else if(e.button===2){
-    // Right-drag: rotate view around mouse anchor
-    const [wx, wy] = screenToWorld(x, y);
-    state.mouse.dragTarget = { type:"rotate", anchorWorld:[wx,wy], anchorScreen:{x, y} };
+  } else if (e.button === 2) {
+    // Right button
+
+    // Shift + Right: rotate whole room polygon around its center
+    if (e.shiftKey) {
+      const hitRoom = hitTestFilledRoom(x, y);
+      if (hitRoom) {
+        const room =
+          hitRoom.list === "draft"
+            ? state.rooms[hitRoom.roomIndex]
+            : state.saved[hitRoom.roomIndex];
+
+        if (room && room.points && room.points.length >= 3) {
+          pushHistory();
+
+          const centerInfo = getWorldCenterFromLonLatPoints(room.points);
+          if (!centerInfo) return;
+          const { cx, cy, worldPts } = centerInfo;
+
+          state.mouse.dragTarget = {
+            type: "room-rotate",
+            list: hitRoom.list,
+            roomIndex: hitRoom.roomIndex,
+            centerWorld: { cx, cy },
+            baseWorldPoints: worldPts.slice(),
+            totalAngle: 0
+          };
+          state.mouse.savedChanged = hitRoom.list === "saved";
+
+          // Select room
+          if (hitRoom.list === "draft") {
+            setActiveDraft(hitRoom.roomIndex);
+          } else if (hitRoom.list === "saved") {
+            state.activeSavedIndex = hitRoom.roomIndex;
+            state.activeRoomIndex = null;
+            refreshSavedList();
+            refreshDraftList();
+            draw();
+          }
+          return;
+        }
+      }
+    }
+
+    // Default: rotate view around screen center (camera center)
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    const [wx, wy] = screenToWorld(cx, cy);
+    state.mouse.dragTarget = {
+      type: "rotate",
+      anchorWorld: [wx, wy],
+      anchorScreen: { x: cx, y: cy }
+    };
   }
 }
 
@@ -799,6 +928,33 @@ function onMouseMove(e){
         draw();
       }
       t.lastWorld = [wx, wy];
+    } else if(t.type==="room-rotate"){
+      const room = t.list === "draft"
+        ? state.rooms[t.roomIndex]
+        : state.saved[t.roomIndex];
+
+      if (!room || !room.points || !room.points.length || !t.baseWorldPoints || !t.centerWorld) {
+        return;
+      }
+
+      const sensitivity = 0.005; // radians per pixel, match view/image
+      t.totalAngle = (t.totalAngle || 0) + dx * sensitivity;
+      const angle = t.totalAngle;
+
+      room.points = applyTransformToLonLatPoints(
+        t.baseWorldPoints,
+        t.centerWorld,
+        1,
+        angle
+      );
+
+      if (t.list === "draft") {
+        refreshDraftList();
+      } else {
+        state.mouse.savedChanged = true;
+        refreshSavedList();
+      }
+      draw();
     } else if(t.type==="pan"){
       state.view.panX += dx; state.view.panY += dy; // screen-space pan
       draw();
@@ -823,7 +979,11 @@ function onMouseUp(){
     state.mouse.dragTarget &&
     state.mouse.dragTarget.list === "saved" &&
     state.mouse.savedChanged &&
-    (state.mouse.dragTarget.type === "point" || state.mouse.dragTarget.type === "room-move")
+    (
+      state.mouse.dragTarget.type === "point" ||
+      state.mouse.dragTarget.type === "room-move" ||
+      state.mouse.dragTarget.type === "room-rotate"
+    )
   ){
     writeSavedBackToDB();
     requestSaveRoomsToServer();
@@ -920,15 +1080,65 @@ function onKeyUp(e){
 
 function onWheel(e){
   e.preventDefault();
-  if(state.imageMode && state.image.loaded){
-    const zoom = Math.exp(-e.deltaY * 0.002);
-    state.image.scale *= zoom;
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  // Alt/Option + wheel: image zoom
+  if (e.altKey && state.image.loaded && state.image.img) {
+    const zoomImg = Math.exp(-e.deltaY * 0.002);
+    state.image.scale *= zoomImg;
     draw();
     return;
   }
-  const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left, y = e.clientY - rect.top;
-  const [wx, wy] = screenToWorld(x, y);
+
+  // Shift + wheel: scale room polygon under cursor
+  if (e.shiftKey) {
+    const hit = hitTestFilledRoom(x, y);
+    if (hit) {
+      const room = hit.list === "draft"
+        ? state.rooms[hit.roomIndex]
+        : state.saved[hit.roomIndex];
+
+      if (room && room.points && room.points.length) {
+        pushHistory();
+        const zoomRoom = Math.exp(-e.deltaY * 0.002);
+
+        const worldPts = room.points.map(([lon, lat]) => lonLatToWorld(lon, lat));
+        let cx = 0, cy = 0;
+        worldPts.forEach(([wx, wy]) => {
+          cx += wx;
+          cy += wy;
+        });
+        cx /= worldPts.length;
+        cy /= worldPts.length;
+
+        room.points = worldPts.map(([wx, wy]) => {
+          const dx = wx - cx;
+          const dy = wy - cy;
+          const sx = dx * zoomRoom;
+          const sy = dy * zoomRoom;
+          const lonlat = worldToLonLat(cx + sx, cy + sy);
+          return [lonlat[0], lonlat[1]];
+        });
+
+        if (hit.list === "saved") {
+          writeSavedBackToDB();
+          requestSaveRoomsToServer();
+          refreshSavedList();
+        } else {
+          refreshDraftList();
+        }
+        draw();
+        return;
+      }
+    }
+  }
+
+  // Default: view zoom around screen center (camera center)
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2;
+  const [wx, wy] = screenToWorld(cx, cy);
   const before = worldToScreen(wx, wy);
   const zoom = Math.exp(-e.deltaY * 0.002);
   state.view.scale *= zoom;
@@ -945,10 +1155,8 @@ function bind(){
   applyFloorCoordsBtn.addEventListener("click", applyManualFloorCoords);
   copyFloorCoordsBtn.addEventListener("click", copyFloorCoords);
 
-  imageModeBtn.addEventListener("click", ()=>{
-    state.imageMode = !state.imageMode;
-    imageModeBtn.setAttribute("aria-pressed", String(state.imageMode));
-    imageModeBtn.textContent = state.imageMode ? "이미지 조작 모드" : "시점 조작 모드";
+  imageModeBtn.addEventListener("click", () => {
+    alert("이미지 조작은 이제 Alt/Option 키를 누른 상태에서 드래그(이동/회전)와 휠(확대/축소)로 할 수 있습니다.");
   });
   imageOpacityRange.addEventListener("input", ()=>{
     const v = Number(imageOpacityRange.value)||0; state.image.opacity = Math.max(0, Math.min(1, v/100)); draw();
