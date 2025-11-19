@@ -1,6 +1,6 @@
 import { CONFIG, current } from './config.js';
 import {
-    showLayer, hideLayer, allFloors, hideAllFloors, setFloors, allRooms,
+    showLayer, hideLayer, hideFloorsByBid, hideAllRooms,setFloors,
     flyCamera, searchBasicInfoByBid, searchFloorInfoByBid, setRooms
 } from './mapUtils.js';
 
@@ -9,46 +9,46 @@ export async function handleBuildingClick(map, e) {
     const properties = e.properties
     const bid = properties?.["origin"] ? properties?.["origin"] : properties?.[CONFIG.campus.idProp];
 
-    console.log("건물 클릭됨: ", properties?.[CONFIG.campus.idProp]);
+    console.log(`건물 클릭됨: ${properties?.[CONFIG.campus.idProp]}`);
 
     // 층 배열 생성 (지하층/지상층 정보 활용)
-    const basic = await searchBasicInfoByBid(bid);
-    const floor = await searchFloorInfoByBid(bid);
+    const bInfo = await searchBasicInfoByBid(bid);
+    const fInfo = await searchFloorInfoByBid(bid);
 
     // 건물 숨김, 층 생성, 카메라 이동
-    await hideAllFloors(map);
+    if(current.bid) await hideFloorsByBid(map, current.bid);
     hideLayer(map, CONFIG.idRules.buildings);
-    setFloors(map, floor);
-    flyCamera(map, CONFIG.camera.building, basic.center, basic.bearing);
+    setFloors(map, fInfo);
+    flyCamera(map, CONFIG.camera.building, bInfo.center, bInfo.bearing);
 
     current.mode = 1;
     current.bid = bid;
 }
 //리스트 클릭 시 실행
 export async function handleBuildingListClick(map, bid) {
-    const basic = await searchBasicInfoByBid(bid);
-    const floor = await searchFloorInfoByBid(bid);
-    console.log(`리스트에서 [${basic.name}] 클릭됨.`);
+    const bInfo = await searchBasicInfoByBid(bid);
+    const fInfo = await searchFloorInfoByBid(bid);
+    console.log(`리스트에서 건물 클릭됨: [${bInfo.name}]`);
 
     // 건물 숨김, 층 생성, 카메라 이동
-    await hideAllFloors(map);
+    if(current.bid) await hideFloorsByBid(map, current.bid);
     hideLayer(map, CONFIG.idRules.buildings);
-    setFloors(map, floor);
-    flyCamera(map, CONFIG.camera.building, basic.center, basic.bearing);
+    setFloors(map, fInfo);
+    flyCamera(map, CONFIG.camera.building, bInfo.center, bInfo.bearing);
 
     current.mode = 1;
     current.bid = bid;
 }
 // 층 클릭시 실행할 코드 (수정됨)
-export async function handleFloorClick(map, bid, fid, level) {
-    console.log(fid, "클릭됨");
-    const basic = await searchBasicInfoByBid(bid);
-    const floor = await searchFloorInfoByBid(bid);
+export async function handleFloorClick(map, bid, fid, level, lvI) {
+    console.log(`층 클릭됨: ${fid}`);
+    const bInfo = await searchBasicInfoByBid(bid);
+    const fInfo = await searchFloorInfoByBid(bid);
 
-    await hideAllFloors(map);
-    setRooms(map, bid, level, floor);
+    if(current.bid) await hideFloorsByBid(map, current.bid);
+    setRooms(map, bid, level, lvI, fInfo);
     showLayer(map, CONFIG.idRules.clickedFloor(bid, level));
-    flyCamera(map, CONFIG.camera.floor, basic.center, basic.floorBearing);
+    flyCamera(map, CONFIG.camera.floor, bInfo.center, bInfo.floorBearing);
 
     current.mode = 2;
     current.level = level;
@@ -62,25 +62,24 @@ export async function handleBackgroundClick(map, e) {
     if (features.length == 0) isBackground = true;
     else CONFIG.bgIdList.forEach(v => { if (topFeature.layer.id.includes(v)) isBackground = true });
     if (isBackground) {
+        console.log("배경 클릭됨");
         if (current.mode == 2) {
-            const floor = await searchFloorInfoByBid(current.bid);
-            const basic = await searchBasicInfoByBid(current.bid);
-            console.log("배경 클릭됨");
+            const fInfo = await searchFloorInfoByBid(current.bid);
+            const bInfo = await searchBasicInfoByBid(current.bid);
+            const lvI = CONFIG.idRules.lvI(fInfo.bmLevel, current.level);
+            
             // 건물 숨김, 층 생성, 카메라 이동
-            await hideAllFloors(map);
-
+            await hideAllRooms(map, current.bid, current.level, lvI);
             hideLayer(map, CONFIG.idRules.buildings);
-            allRooms(map, current.bid, current.level, (map, rid) => hideLayer(map, rid));
-            setFloors(map, floor);
-            flyCamera(map, CONFIG.camera.building, basic.center, basic.bearing);
+            setFloors(map, fInfo);
+            flyCamera(map, CONFIG.camera.building, bInfo.center, bInfo.bearing);
 
             current.mode = 1;
-            current.bid = basic.bid;
+            current.bid = bInfo.bid;
         }
         else {
-            await hideAllFloors(map);
+            if(current.bid) await hideFloorsByBid(map, current.bid);
             showLayer(map, CONFIG.idRules.buildings);
-            console.log("배경 클릭됨");
             current.mode = 0;
             current.bid = null;
         }
