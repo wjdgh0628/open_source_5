@@ -13,7 +13,7 @@ async function requestBuildingByBid(bid) {
     let f = null;
     if (cache.buildings[bid]) {
         f = cache.buildings[bid];
-        console.log(`캐시에서 불러옴: ${bid}`);
+        console.log(`캐시에서 불러옴: ${bid}, ${++cache.cachingCount}`);
     }
     else {
         await fetch(CONFIG.campus.geojsonUrl)
@@ -25,7 +25,7 @@ async function requestBuildingByBid(bid) {
                 if (feature) {
                     f = feature;
                     cache.buildings[bid] = f;
-                    console.log(`파일에서 불러옴: ${bid}`);
+                    console.log(`파일에서 불러옴: ${bid}, ${++cache.fetchCount}`);
                 } else {
                     console.log("해당 ID를 가진 객체가 없습니다.:", bid);
                     f = false;
@@ -78,7 +78,7 @@ async function requestRoomsByBid(bid, lvI) {
     let f = null;
     if (cache.rooms[bid]?.[lvI]) {
         f = cache.rooms[bid][lvI];
-        console.log(`캐시에서 불러옴: ${bid} lvI: ${lvI}`);
+        console.log(`캐시에서 불러옴: ${bid} lvI: ${lvI}, ${++cache.cachingCount}`);
     } else {
         await fetch(CONFIG.campus.roomsUrl)
             .then(response => response.json())
@@ -89,7 +89,7 @@ async function requestRoomsByBid(bid, lvI) {
                     f = rooms;
                     if (!cache.rooms[bid]) cache.rooms[bid] = {};
                     cache.rooms[bid][lvI] = f;
-                    console.log(`파일에서 불러옴: ${bid} lvI: ${lvI}`);
+                    console.log(`파일에서 불러옴: ${bid} lvI: ${lvI}, ${++cache.fetchCount}`);
                 } else {
                     console.log("bid 혹은 층수 오류", bid, lvI);
                     f = false;

@@ -65,6 +65,8 @@ export const current = {
     level: null
 }
 export const cache = {
+    fetchCount: 0,
+    cachingCount: 0,
     buildings: {},
     rooms: {}
 }
