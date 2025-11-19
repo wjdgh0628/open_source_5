@@ -1,1 +1,4 @@
-editor/floorplans/
+floorplans
+node_modules
+package-lock.json
+TODO.txt

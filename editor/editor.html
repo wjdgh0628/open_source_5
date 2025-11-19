@@ -27,7 +27,6 @@
         <div class="block">
           <label>이미지 조작</label>
           <div class="row">
-            <button id="imageModeBtn" aria-pressed="false">시점 조작 모드</button>
             <label for="imageOpacity" style="margin-left:8px;">투명도</label>
             <input id="imageOpacity" type="range" min="0" max="100" value="60" />
           </div>
@@ -42,8 +41,17 @@
     </main>
 
     <section id="bottomPanel">
-      <h3>방 폴리곤 & 좌표</h3>
-      <div id="roomList"></div>
+      <h3>방 관리</h3>
+      <div id="roomsPanel">
+        <div class="rooms-col">
+          <h4>저장됨 (rooms.json)</h4>
+          <div id="savedRoomList"></div>
+        </div>
+        <div class="rooms-col">
+          <h4>미저장(작업중)</h4>
+          <div id="draftRoomList"></div>
+        </div>
+      </div>
     </section>
   </div>
   <script type="module" src="editorMain.js"></script>
