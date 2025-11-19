@@ -141,7 +141,7 @@ function setLayers(map, sourceId, features) {
                 "fill-extrusion-opacity": 1
             }
         });
-        if(!f.properties.name) return; //이름이 없으면 라벨 생성 안함
+        if (!f.properties.name) return; //이름이 없으면 라벨 생성 안함
         map.addLayer({
             id: CONFIG.idRules.lid(layerId),
             type: 'symbol',
@@ -262,7 +262,7 @@ export function setRooms(map, bid, level, info) {
 }
 async function generateRooms(map, info, fid, level) {
     const bid = info.bid;
-    const { floorThickness, floorGap, colorPalette, basementPalette } = CONFIG.buildingDefaults;
+    const { floorThickness, floorGap, colorPalette, baseThickness, roomThickness } = CONFIG.buildingDefaults;
     const levelIndex = level < 0 ? level + info.bmLevel : level + info.bmLevel - 1;
     const base = (levelIndex * (floorThickness + floorGap));
     let rooms = await fetchRoomsByBid(bid, levelIndex);
@@ -271,7 +271,7 @@ async function generateRooms(map, info, fid, level) {
         type: "Feature",
         properties: {
             base: base,
-            height: base + floorThickness,
+            height: base + baseThickness,
             color: CONFIG.buildingDefaults.clickedFloorColor,
             // offset: 0,
             layerId: CONFIG.idRules.clickedFloor(bid, level)
@@ -283,8 +283,8 @@ async function generateRooms(map, info, fid, level) {
             type: "Feature",
             properties: {
                 name: room.name,
-                base: base + floorThickness,
-                height: base + floorThickness + (floorThickness/2),
+                base: base + baseThickness,
+                height: base + baseThickness + roomThickness,
                 color: room.color ? room.color : colorPalette[i],
                 anchor: "bottom",
                 // offset: 0,
@@ -296,8 +296,9 @@ async function generateRooms(map, info, fid, level) {
 
     setLayers(map, CONFIG.idRules.roomSid(fid), roomsSpec);
     // 핸들러 지정
-    roomsSpec.forEach(f => {
-        const fid = f.properties.layerId;
+    roomsSpec.forEach((r, i) => {
+        if (i === 0) return; // 클릭된 층 베이스는 핸들러 지정 안함
+        const rid = r.properties.layerId;
     });
 
 }
