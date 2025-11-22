@@ -34,7 +34,7 @@ export function initMap() {
             }
         });
         //건물, 배경 클릭시 실행할 코드 지정
-        setHandler(map, CONFIG.idRules.buildings, e => handleBuildingClick(map, e));
+        setHandler(map, "click",CONFIG.idRules.buildings, e => handleBuildingClick(map, e));
         map.on('click', (e) => handleBackgroundClick(map, e));
         // map.on('click', (e) =>{console.log(map.queryRenderedFeatures(e.point))});
     });
