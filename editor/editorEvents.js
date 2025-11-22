@@ -1,4 +1,4 @@
-import { hitTestFilledRoom, screenToWorld, findNearestVertex, draw, getWorldCenterFromLonLatPoints, lonLatToWorld, applyTransformToLonLatPoints, worldToScreen, bboxOf } from "./editorDraw.js";
+import { hitTestFilledRoom, screenToWorld, findNearestVertex, draw, getWorldCenterFromLonLatPoints, lonLatToWorld, worldToLonLat, applyTransformToLonLatPoints, worldToScreen, bboxOf } from "./editorDraw.js";
 import { canvas, state, pushHistory, setActiveDraft, setActiveRoom, modDown, getOrCreateActiveOpenDraft, refreshDraftList, getRoom, refreshSavedList, undo, deleteDraft, isMac, getActiveOpenRoomOrNull, closeActiveRoom } from "./editorMain.js";
 import { writeSavedBackToDB, requestSaveRoomsToServer } from "./editorFileIO.js";
 
@@ -61,13 +61,17 @@ export function onMouseDown(e) {
     const hit = findNearestVertex(x, y);
 
     if (modDown(e)) {
-      // Cmd/Ctrl + Left: add vertex to active open draft
-      const wpt = screenToWorld(x, y);
-      pushHistory();
-      const room = getOrCreateActiveOpenDraft();
-      room.points.push(wpt);
-      refreshDraftList();
-      draw();
+      // Cmd/Ctrl + Left: click adds a point, drag creates a rectangular room
+      const startLonLat = screenToWorld(x, y);
+      state.mouse.dragTarget = {
+        type: "mod-add",
+        startScreen: { x, y },
+        startLonLat,
+        hasRect: false,
+        rectRoomIndex: null
+      };
+      state.mouse.savedChanged = false;
+      return;
     } else if (hit) {
       // Left on a vertex: drag that vertex (draft or saved)
       pushHistory();
@@ -156,6 +160,65 @@ export function onMouseMove(e) {
   const dy = y - state.mouse.lastY;
   const t = state.mouse.dragTarget;
   if (t) {
+    if (t.type === "mod-add") {
+      const distX = x - t.startScreen.x;
+      const distY = y - t.startScreen.y;
+      const threshold = 4; // pixels, to distinguish click vs drag
+      const moved = distX * distX + distY * distY > threshold * threshold;
+
+      if (!moved) {
+        // Still treated as a click until movement exceeds threshold
+        state.mouse.lastX = x;
+        state.mouse.lastY = y;
+        return;
+      }
+
+      const [lon2, lat2] = screenToWorld(x, y);
+      const [wx1, wy1] = lonLatToWorld(t.startLonLat[0], t.startLonLat[1]);
+      const [wx2, wy2] = lonLatToWorld(lon2, lat2);
+
+      const minX = Math.min(wx1, wx2);
+      const maxX = Math.max(wx1, wx2);
+      const minY = Math.min(wy1, wy2);
+      const maxY = Math.max(wy1, wy2);
+
+      const cornersWorld = [
+        [minX, minY],
+        [maxX, minY],
+        [maxX, maxY],
+        [minX, maxY]
+      ];
+      const cornersLonLat = cornersWorld.map(([wx, wy]) => worldToLonLat(wx, wy));
+
+      // If rectangle not yet created, create a new draft room
+      if (!t.hasRect) {
+        pushHistory();
+        const newRoom = {
+          id: state.roomIdCounter++,
+          name: "",
+          color: "#007aff",
+          points: cornersLonLat,
+          closed: true
+        };
+        state.rooms.push(newRoom);
+        const idx = state.rooms.length - 1;
+        state.activeRoomIndex = idx;
+        t.rectRoomIndex = idx;
+        t.hasRect = true;
+      } else if (t.rectRoomIndex != null && t.rectRoomIndex >= 0 && t.rectRoomIndex < state.rooms.length) {
+        const room = state.rooms[t.rectRoomIndex];
+        if (room) {
+          room.points = cornersLonLat;
+        }
+      }
+
+      refreshDraftList();
+      draw();
+
+      state.mouse.lastX = x;
+      state.mouse.lastY = y;
+      return;
+    }
     if (t.type === "img-pan") {
       // translate image in world space based on mouse movement
       const [lon1, lat1] = screenToWorld(state.mouse.lastX, state.mouse.lastY);
@@ -247,6 +310,22 @@ export function onMouseMove(e) {
   state.mouse.lastY = y;
 }
 export function onMouseUp() {
+  if (state.mouse.dragTarget && state.mouse.dragTarget.type === "mod-add") {
+    const t = state.mouse.dragTarget;
+
+    // If no rectangle was created, treat as a simple point-add click
+    if (!t.hasRect && t.startLonLat) {
+      pushHistory();
+      const room = getOrCreateActiveOpenDraft();
+      room.points.push(t.startLonLat);
+      refreshDraftList();
+      draw();
+    }
+
+    state.mouse.dragTarget = null;
+    state.mouse.isDown = false;
+    return;
+  }
   if (state.mouse.dragTarget &&
     state.mouse.dragTarget.list === "saved" &&
     state.mouse.savedChanged &&
