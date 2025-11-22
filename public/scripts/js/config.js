@@ -16,11 +16,16 @@ export const CONFIG = {
         roomThickness: 2,
         floorGap: 3,
         levelThick: 6,
-        colorPalette: ["#ff0000", "#ff4400", "#ff8800", "#ffcc00", "#ffff00", "#ccff00", "#88ff00", "#44ff00", "#00ff00", "#00ff44", "#00ff88", "#00ffcc", "#00ffff", "#00ccff", "#0088ff", "#0044ff", "#0000ff"],
-        basementPalette: ["#4400ff", "#8800ff", "#cc00ff", "#ff00ff"],
         clickedFloorColor: "#888888",
-        taseTheRainbow: (i, fi, bi, bmLevel, colorJump) => {return i >= bmLevel ? this.colorPalette[fi * colorJump] : this.basementPalette[bi - 1]},
-        oreoCake: (i, fi, bmLevel) => {return i >= bmLevel ? fi%2 == 0? "#FFFFFF": "#000000" : "#4400FF"}
+        taseTheRainbow: (i, fi, bi, bmLevel, flLevel) => {
+            const colorPalette = ["#ff0000", "#ff4400", "#ff8800", "#ffcc00", "#ffff00", "#ccff00", "#88ff00", "#44ff00", "#00ff00", "#00ff44", "#00ff88", "#00ffcc", "#00ffff", "#00ccff", "#0088ff", "#0044ff", "#0000ff"];
+            const basementPalette = ["#4400ff", "#8800ff", "#cc00ff", "#ff00ff"];
+            const colorJump = parseInt(colorPalette.length / flLevel)
+            return i >= bmLevel ? colorPalette[fi * colorJump] : basementPalette[bi - 1];
+        },
+        oreoCake: (i, fi, bmLevel) => {
+            return i >= bmLevel ? fi%2 == 0? "#FFFFFF": "#000000" : "#4400FF";
+        }
         // basementPalette: ["#ff00ff", "#cc00ff", "#8800ff", "#4400ff"]
     },
     defaultFloorCount: 3,

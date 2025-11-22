@@ -250,14 +250,13 @@ export function setRooms(map, bid, level, lvI, fInfo) {
 //층 생성하는 함수
 function generateFloors(map, fInfo) {
     const bid = fInfo.bid;
-    const { floorThickness, floorGap, colorPalette, basementPalette } = CONFIG.buildingDefaults;
+    const { floorThickness, floorGap } = CONFIG.buildingDefaults;
 
     //층 모양(폴리곤이랑 높이 등)이랑 각종 정보들 floorSpec에 저장
     let floorsSpec = []
     fInfo.flList.forEach((flVarNum, i) => {
         let fi = i - fInfo.bmLevel;
         let bi = fInfo.bmLevel - i;
-        const colorJump = parseInt(colorPalette.length / fInfo.flLevel);
         const base = i * (floorThickness + floorGap);
         const level = CONFIG.idRules.level(fInfo.bmLevel, i);
 
@@ -268,7 +267,7 @@ function generateFloors(map, fInfo) {
                 base,
                 height: base + floorThickness,
                 // color: i >= fInfo.bmLevel ? colorPalette[fi * colorJump] : basementPalette[bi - 1],
-                color: CONFIG.buildingDefaults.oreoCake(i, fi, fInfo.bmLevel),
+                color: CONFIG.buildingDefaults.taseTheRainbow(i, fi, bi, fInfo.bmLevel, fInfo.flLevel),
                 level: level,
                 anchor: "left",
                 // offset: info.offset,
@@ -313,7 +312,7 @@ async function generateRooms(map, fInfo, fid, level) {
                 name: room.name,
                 base: base + baseThickness,
                 height: base + baseThickness + roomThickness,
-                color: room.color ? room.color : colorPalette[i],
+                color: room.color ? room.color : "#0088ff",// 임시 컬러
                 anchor: "bottom",
                 // offset: 0,
                 layerId: CONFIG.idRules.rid(bid, level, i + 1)
