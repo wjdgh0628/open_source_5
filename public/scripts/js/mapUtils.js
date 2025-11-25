@@ -273,7 +273,7 @@ function generateFloors(map, fInfo) {
                 // offset: info.offset,
                 layerId: CONFIG.idRules.fid(bid, level)
             },
-            geometry: { type: "Polygon", coordinates: [fInfo.flVars[flVarNum]] }
+            geometry: { type: "Polygon", coordinates: fInfo.flVars[flVarNum] }
         })
     })
 
@@ -303,7 +303,7 @@ async function generateRooms(map, fInfo, fid, level) {
             // offset: 0,
             layerId: CONFIG.idRules.clickedFloor(bid, level)
         },
-        geometry: { type: "Polygon", coordinates: [fInfo.flVars[fInfo.flList[lvI]]] }
+        geometry: { type: "Polygon", coordinates: fInfo.flVars[fInfo.flList[lvI]] }
     })
     rooms.forEach((room, i) => {
         roomsSpec.push({
@@ -317,7 +317,7 @@ async function generateRooms(map, fInfo, fid, level) {
                 // offset: 0,
                 layerId: CONFIG.idRules.rid(bid, level, i + 1)
             },
-            geometry: { type: "Polygon", coordinates: [room.polygon] }
+            geometry: { type: "Polygon", coordinates: room.polygon }
         })
     })
 

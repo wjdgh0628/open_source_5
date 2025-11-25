@@ -37,13 +37,29 @@ export function loadSavedRoomsForCurrent() {
   stateRef.saved = [];
   if (!stateRef.roomsDB || !stateRef.building || stateRef.floorIndex == null) return;
   const arr = stateRef.roomsDB[stateRef.building]?.[stateRef.floorIndex] || [];
-  stateRef.saved = arr.map((r, idx) => ({
-    id: `s${idx + 1}`,
-    name: r.name || "",
-    color: r.color || "#ff9500",
-    points: Array.isArray(r.polygon) ? r.polygon : [],
-    closed: true
-  }));
+  stateRef.saved = arr.map((r, idx) => {
+    let pts = [];
+    if (Array.isArray(r.polygon)) {
+      // Handle [[lon,lat], ...] or [[[lon,lat], ...], ...] (GeoJSON Polygon)
+      if (
+        r.polygon.length &&
+        Array.isArray(r.polygon[0]) &&
+        Array.isArray(r.polygon[0][0])
+      ) {
+        // Outer ring
+        pts = r.polygon[0];
+      } else {
+        pts = r.polygon;
+      }
+    }
+    return {
+      id: `s${idx + 1}`,
+      name: r.name || "",
+      color: r.color || "#ff9500",
+      points: pts,
+      closed: true
+    };
+  });
 }
 
 export function writeSavedBackToDB() {
@@ -51,7 +67,8 @@ export function writeSavedBackToDB() {
   stateRef.roomsDB[stateRef.building][stateRef.floorIndex] = stateRef.saved.map((r) => ({
     name: r.name || "",
     color: r.color || "#ff9500",
-    polygon: r.points
+    // Store as GeoJSON-style Polygon coordinates: [ [ [lon,lat], ... ] ]
+    polygon: Array.isArray(r.points) && r.points.length ? [r.points] : []
   }));
 }
 

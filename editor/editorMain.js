@@ -208,7 +208,18 @@ async function onFloorChange() {
   state.floorIndex = idx;
   const { flList, flVars } = state.floorInfo;
   const flVarIndex = flList[idx];
-  state.floorPolygon = flVars[flVarIndex];
+  let poly = flVars[flVarIndex];
+  // Allow either [[lon,lat], ...] or [[[lon,lat], ...], ...] (GeoJSON Polygon)
+  if (
+    Array.isArray(poly) &&
+    poly.length &&
+    Array.isArray(poly[0]) &&
+    Array.isArray(poly[0][0])
+  ) {
+    // Take outer ring
+    poly = poly[0];
+  }
+  state.floorPolygon = poly;
   loadFloorImage();
   fitViewToFloor();
 
