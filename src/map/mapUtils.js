@@ -1,4 +1,4 @@
-import { CONFIG, cache } from './config.js';
+import { CONFIG, cache } from './map.config.js';
 import { handleFloorClick } from './onClick.js';
 
 //카메라 이동 함수

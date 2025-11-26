@@ -1,10 +1,10 @@
-import { CONFIG } from './config.js';
+import { CONFIG } from './map.config.js';
 import { setHandler } from './mapUtils.js';
 import { handleBuildingClick, handleBackgroundClick } from './onClick.js';
-import { rerenderLists, showMenu, setupCollapseMenu } from './sideBar.js';
-/*global mapboxgl*/ //eslint mapboxgl 비선언 오류 숨기기
+import mapboxgl from 'mapbox-gl';
 
-export function initMap() {
+function initMap() {
+    mapboxgl.accessToken = "pk.eyJ1IjoibGF6eWRldjEwMjQiLCJhIjoiY21mdW91NnNyMTVkZDJtcHd4dHNtNHU0ayJ9.mLzbdcCPq_-BeA8DlHu1KA";
     // 맵 초기화 (기존과 동일)
     const map = new mapboxgl.Map({
         container: "map",
@@ -41,12 +41,14 @@ export function initMap() {
     return map;
 }
 
-export function start() {
+function start() {
     const map = initMap();
 
-    rerenderLists(map); // 건물 리스트 렌더링
+    /* rerenderLists(map); // 건물 리스트 렌더링
 
     showMenu('nav-toggle', 'navbar', 'body-pd');
     const linkCollapse = document.getElementsByClassName('collapse__link')
-    setupCollapseMenu(linkCollapse);
+    setupCollapseMenu(linkCollapse); */
 }
+
+export default start;

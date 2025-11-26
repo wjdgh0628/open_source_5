@@ -1,6 +1,6 @@
-import { CONFIG } from './config.js';
-import { handleBuildingListClick } from './onClick.js';
-import { searchBasicInfoByBid } from './mapUtils.js';
+import { CONFIG } from './map/map.config.js';
+import { handleBuildingListClick } from './map/onClick.js';
+import { searchBasicInfoByBid } from './map/mapUtils.js';
 
 // 목록 새로고침 함수
 export function rerenderLists(map) {

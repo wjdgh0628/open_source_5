@@ -1,4 +1,4 @@
-import { CONFIG, current } from './config.js';
+import { CONFIG, current } from './map.config.js';
 import {
     showLayer, hideLayer, hideFloorsByBid, hideAllRooms,setFloors,
     flyCamera, searchBasicInfoByBid, searchFloorInfoByBid, setRooms
