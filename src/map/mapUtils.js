@@ -1,5 +1,5 @@
 import { MC, SC } from './map.config.js';
-import { handleFloorClick } from './onClick.js';
+import { handleFloorClick } from './events.js';
 import {searchFloorInfoByBid, requestRoomsByBid } from './request.js';
 
 //카메라 이동 함수

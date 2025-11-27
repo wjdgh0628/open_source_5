@@ -1,6 +1,6 @@
 import { MC, SC } from './map.config.js';
 import { setHandler } from './mapUtils.js';
-import { handleBuildingClick, handleBackgroundClick } from './onClick.js';
+import { handleBuildingClick, handleBackgroundClick } from './events.js';
 import mapboxgl from 'mapbox-gl';
 
 let mapInstance = null;

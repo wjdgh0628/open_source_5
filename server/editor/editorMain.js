@@ -1,5 +1,5 @@
-import { CONFIG } from "../scripts/js/config.js";
-import { searchBasicInfoByBid, searchFloorInfoByBid } from "../scripts/js/mapUtils.js";
+import { SC, EC } from "./editor.config.js";
+import { searchBasicInfoByBid, searchFloorInfoByBid } from "./editorRequest.js";
 import {
   initDraw,
   draw,
@@ -102,8 +102,8 @@ function fitViewToFloor() {
 
 function computeFidForCurrent() {
   if (!state.floorInfo || state.floorIndex == null) return null;
-  const levelNum = CONFIG.idRules.level(state.floorInfo.bmLevel, state.floorIndex);
-  return CONFIG.idRules.fid(state.building, levelNum);
+  const levelNum = EC.idRules.level(state.floorInfo.bmLevel, state.floorIndex);
+  return EC.idRules.fid(state.building, levelNum);
 }
 
 function loadFloorImage() {
@@ -168,15 +168,15 @@ export function undo() {
 // ==== Loading =======================================================================
 async function initBuildings() {
   buildingSelect.innerHTML = "";
-  for (const bid of CONFIG.bidList) {
+  for (const bid of SC.bidList) {
     const info = await searchBasicInfoByBid(bid);
     const opt = document.createElement("option");
     opt.value = bid;
     opt.textContent = info?.name ? `${info.name} (${bid})` : bid;
     buildingSelect.appendChild(opt);
   }
-  if (CONFIG.bidList.length) {
-    buildingSelect.value = CONFIG.bidList[0];
+  if (SC.bidList.length) {
+    buildingSelect.value = SC.bidList[0];
     await onBuildingChange();
   }
 }
@@ -189,7 +189,7 @@ async function onBuildingChange() {
   floorSelect.innerHTML = "";
   if (!state.floorInfo) return;
   for (let i = 0; i < state.floorInfo.totLevel; i++) {
-    const levelNum = CONFIG.idRules.level(state.floorInfo.bmLevel, i);
+    const levelNum = EC.idRules.level(state.floorInfo.bmLevel, i);
     const opt = document.createElement("option");
     opt.value = String(i);
     opt.textContent = levelNum > 0 ? `${levelNum}F` : `B${-levelNum}`;

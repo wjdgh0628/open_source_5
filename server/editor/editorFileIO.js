@@ -1,5 +1,4 @@
-// fileIO.js: rooms.json 입출력 및 서버 저장 관련 모듈
-import { CONFIG } from "../scripts/js/config.js";
+import { SC } from "./editor.config.js";
 
 let stateRef = null;
 let refreshSavedList = () => {};
@@ -17,7 +16,7 @@ export function initFileIO(state, callbacks) {
 
 export async function loadRoomsDB() {
   try {
-    const res = await fetch(CONFIG.campus.roomsUrl);
+    const res = await fetch(SC.roomsUrl);
     const data = await res.json();
     stateRef.roomsDB = data || {};
   } catch (e) {
@@ -82,7 +81,7 @@ export function requestSaveRoomsToServer() {
 async function saveRoomsToServer() {
   try {
     writeSavedBackToDB(); // state.saved → state.roomsDB 반영
-    const res = await fetch(CONFIG.campus.roomsUrl, {
+    const res = await fetch(SC.roomsUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(stateRef.roomsDB)

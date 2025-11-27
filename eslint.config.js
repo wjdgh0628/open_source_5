@@ -27,7 +27,7 @@ export default defineConfig([
     },
   },
   {
-    files: ["/server"],
+    files: ["server/server.js"],
     env: {
       node: true
     }

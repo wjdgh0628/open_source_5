@@ -30,7 +30,7 @@ export const SC = {
         "theology",
         "vision"
     ],
-    idRules: {
+    /* idRules: {
         buildings: "campus-3d",
         fid: (bid, level) => { return `${bid}_${level}` },
         floorSid: (bid) => { return `${bid}_floors` },
@@ -40,5 +40,5 @@ export const SC = {
         lid: (pid) => { return `${pid}_label` },
         level: (bmLevel, lvI) => {return lvI >= bmLevel ? (lvI - bmLevel) + 1 : (bmLevel - lvI) * -1;},
         lvI: (bmLevel, level) => {return level < 0 ? level + bmLevel : level + bmLevel - 1;}
-    }
+    } */
 };
