@@ -1,22 +1,23 @@
+import {api} from './api.js';
+import {__dirname, PORT, baseUrl, SC} from './server.config.js';
 import express from 'express';
-import api from './api.js';
-
+// import fs from 'fs';
+import path from 'path';
+// import cors from 'cors';
+// import readline from 'readline';
+import {exec} from 'child_process';
+// const {__dirname, PORT, baseUrl, SC} = CONFIG
+// import { fileURLToPath } from "url";
 const app = express();
-const PORT = 4000;
 
-app.use('/api', api)
+app.use('/api', api);
+app.use('/editor', express.static(path.join(__dirname, 'editor')));
 
-
-/* // Root → redirect to the real static index path so relative URLs work
-app.get("/", (req, res) => {
-  res.redirect("/scripts/index.html");
-});
-// Optional: convenience route for the editor root
 app.get("/editor", (req, res) => {
   res.redirect("/editor/editor.html");
-}); */
+});
 
-/* function openInBrowser(url) {
+function openInBrowser(url) {
   const opener = process.platform === "darwin" ? "open" : process.platform === "win32" ? "start" : "xdg-open";
   const command = process.platform === "win32" ? `${opener} "" "${url}"` : `${opener} "${url}"`;
   exec(command, (err) => {
@@ -24,9 +25,8 @@ app.get("/editor", (req, res) => {
   });
 }
 
-function promptToOpen(port) {
+/* function promptToOpen(port) {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-  const baseUrl = `http://localhost:${port}`;
   const editorUrl = `${baseUrl}/editor`;
 
   console.log("\n브라우저에서 바로 열까요?");
@@ -53,5 +53,5 @@ function promptToOpen(port) {
 
 app.listen(PORT, () => {
   console.log(`Rooms server running at http://localhost:${PORT}`);
-  // promptToOpen(PORT);
+  // openInBrowser(`${baseUrl}/editor`);
 });

@@ -2,19 +2,23 @@ import express from 'express';
 import cors from 'cors';
 import fs from 'fs';
 
-import SC from './server.config.js'
+import {SC} from './server.config.js';
 
 
 // const readline = require("readline");
 // const { exec } = require("child_process");
 
-const api = express();
+export const api = express();
 api.use(cors());                  // file:// 또는 localhost 접근 허용
 api.use(express.json({ limit: "5mb" }));
 
 api.get("/buildings", (req, res) => {
     // res.header("Access-Control-Allow-Origin", "http://localhost:3000");
     res.sendFile(SC.buildings);
+});
+api.get("/config", (req, res) => {
+    // res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+    res.json(SC);
 });
 
 // 읽기: rooms.json 전체
@@ -37,5 +41,3 @@ api.post("/rooms", (req, res) => {
         res.json({ ok: true });
     });
 });
-
-export default api;
