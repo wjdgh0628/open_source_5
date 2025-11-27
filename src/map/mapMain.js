@@ -3,6 +3,8 @@ import { setHandler } from './mapUtils.js';
 import { handleBuildingClick, handleBackgroundClick } from './onClick.js';
 import mapboxgl from 'mapbox-gl';
 
+let mapInstance = null;
+
 function initMap() {
     mapboxgl.accessToken = "pk.eyJ1IjoibGF6eWRldjEwMjQiLCJhIjoiY21mdW91NnNyMTVkZDJtcHd4dHNtNHU0ayJ9.mLzbdcCPq_-BeA8DlHu1KA";
     // 맵 초기화 (기존과 동일)
@@ -41,14 +43,6 @@ function initMap() {
     return map;
 }
 
-function start() {
-    const map = initMap();
-
-    /* rerenderLists(map); // 건물 리스트 렌더링
-
-    showMenu('nav-toggle', 'navbar', 'body-pd');
-    const linkCollapse = document.getElementsByClassName('collapse__link')
-    setupCollapseMenu(linkCollapse); */
+export function start() {
+    return mapInstance ? mapInstance : mapInstance = initMap();
 }
-
-export default start;
