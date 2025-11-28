@@ -23,7 +23,7 @@ function openInBrowser(url) {
 	});
 }
 
-function initList() {
+export function initList() {
 	let data = fetchAllRooms();
 	for (const bid in data) {
 		data[bid].forEach((floor, lvI) => {

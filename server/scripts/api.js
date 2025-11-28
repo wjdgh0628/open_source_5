@@ -2,8 +2,9 @@ import express from 'express';
 import cors from 'cors';
 import fs from 'fs';
 
-import {SC} from './server.config.js';
-import {fetchBuildingInfo, fetchRoomsByLvI} from './fileIO.js';
+import { SC } from './server.config.js';
+import { fetchBuildingInfo, fetchRoomsByLvI } from './fileIO.js';
+import { initList } from '../server.js';
 
 
 // const readline = require("readline");
@@ -46,8 +47,20 @@ api.post("/json/rooms", (req, res) => {
 	if (!body || typeof body !== "object") {
 		return res.status(400).json({ error: "invalid_body" });
 	}
+
 	fs.writeFile(SC.rooms, JSON.stringify(body, null, 4), "utf8", (err) => {
-		if (err) return res.status(500).json({ error: "write_failed" });
-		res.json({ ok: true });
+		if (err) {
+			return res.status(500).json({ error: "write_failed" });
+		}
+
+		// 파일이 제대로 저장된 뒤에 목록 다시 로드
+		try {
+			initList();
+		} catch (e) {
+			console.error("initList error:", e);
+			return res.status(500).json({ error: "init_failed" });
+		}
+
+		return res.json({ ok: true });
 	});
 });

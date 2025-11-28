@@ -22,19 +22,20 @@ export async function handleBuildingClick(map, e) {
 	current.bid = bid;
 }
 //리스트 클릭 시 실행
-export async function handleRoomListClick(map, bid, floorIndex, rid) {
-	// const bInfo = await searchBasicInfoByBid(bid);
-	// const fInfo = await searchFloorInfoByBid(bid);
+export async function handleRoomListClick(map, bid, lvI, rid) {
 	console.log(`리스트에서 건물 클릭됨: [${rid}]`);
 
-	// 건물 숨김, 층 생성, 카메라 이동
-	// if(current.bid) await hideFloorsByBid(map, current.bid);
-	// hideLayer(map, idRules.buildings);
-	// setFloors(map, fInfo);
-	// flyCamera(map, MC.camera.building, bInfo.center, bInfo.bearing);
+	const info = await reqBuildingByBid(bid, req);
 
-	// current.mode = 1;
-	// current.bid = bid;
+	if (current.bid) await hideFloorsByBid(map, current.bid);
+	hideLayer(map, idRules.buildings);
+	setRooms(map, bid, lvI, info);
+	showLayer(map, idRules.clickedFloor(bid, lvI));
+	flyCamera(map, MC.camera.room, info.center, info.floorBearing);
+
+	current.mode = 2;
+	current.bid = bid;
+	current.lvI = lvI;
 }
 // 층 클릭시 실행할 코드 (수정됨)
 export async function handleFloorClick(map, bid, fid, lvI) {

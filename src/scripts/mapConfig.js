@@ -9,8 +9,10 @@ export const MC = {
 	camera: {
 		building: "around",
 		floor: "above",
+		room: "above2",
 		around: { zoom: 18, pitch: 60, bearing: -45, speed: 0.8, curve: 1.25 },
-		above: { zoom: 19, pitch: 0, speed: 0.4 }
+		above: { zoom: 19, pitch: 0, speed: 0.4 },
+		above2: { zoom: 19.5, pitch: 0, speed: 0.6 }
 	},
 	layerProps: {
 		floorThickness: 3,
