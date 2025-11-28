@@ -44,5 +44,7 @@ function initMap() {
 }
 
 export function start() {
-    return mapInstance ? mapInstance : mapInstance = initMap();
+    const map =  mapInstance ? mapInstance : mapInstance = initMap();
+
+    return map;
 }
