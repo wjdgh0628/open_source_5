@@ -7,6 +7,7 @@ import React, { useState } from 'react';
  * - favorites: string[] (rid[])
  * - onToggleFavorite: (rid) => void
  * - onRoomClick: (bid, floorIndex, rid) => void
+ * - onFloorToggle: (bid: string, floorIndex: number, isOpen: boolean) => void
  */
 export default function FloorList({
 	bid,
@@ -14,16 +15,27 @@ export default function FloorList({
 	favorites,
 	onToggleFavorite,
 	onRoomClick,
+	onFloorToggle,
 }) {
 	const [openFloors, setOpenFloors] = useState(() => new Set());
 
 	const toggleFloor = (idx) => {
+		const wasOpen = openFloors.has(idx);
+		const isOpen = !wasOpen;
+
 		setOpenFloors((prev) => {
 			const next = new Set(prev);
-			if (next.has(idx)) next.delete(idx);
-			else next.add(idx);
+			if (wasOpen) {
+				next.delete(idx);
+			} else {
+				next.add(idx);
+			}
 			return next;
 		});
+
+		if (typeof onFloorToggle === 'function') {
+			onFloorToggle(bid, idx, isOpen);
+		}
 	};
 
 	return (
@@ -38,10 +50,7 @@ export default function FloorList({
 						>
 							<ion-icon name="layers-outline" class="nav__icon" />
 							<span className="nav_name">{floorIndex}층</span>
-							<ion-icon
-								name="chevron-down-outline"
-								class={`collapse__link ${isOpen ? 'rotate' : ''}`}
-							/>
+							<span className={`collapse__link ${isOpen ? 'rotate' : ''}`}>▼</span>
 						</div>
 
 						<ul className={`collapse__menu ${isOpen ? 'showCollapse' : ''}`}>

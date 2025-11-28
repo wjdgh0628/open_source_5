@@ -9,6 +9,8 @@ import FloorList from './FloorList.jsx';
  * - favorites: string[] (rid[])
  * - onToggleFavorite: (rid) => void
  * - onRoomClick: (bid, floorIndex, rid) => void
+ * - onFloorToggle: (bid: string, floorIndex: number, isOpen: boolean) => void
+ * - ensureExpanded: () => void
  */
 export default function BuildingList({
 	roomList,
@@ -16,8 +18,10 @@ export default function BuildingList({
 	favorites,
 	onToggleFavorite,
 	onRoomClick,
+	onFloorToggle,
+	ensureExpanded,
 }) {
-// 펼침 상태
+	// 펼침 상태
 	const [openBids, setOpenBids] = useState(() => new Set());
 
 	const bids = useMemo(() => {
@@ -29,6 +33,7 @@ export default function BuildingList({
 	}, [buildingNames, roomList]);
 
 	const toggleBid = (bid) => {
+		if (typeof ensureExpanded === 'function') ensureExpanded();
 		setOpenBids((prev) => {
 			const next = new Set(prev);
 			if (next.has(bid)) next.delete(bid);
@@ -52,10 +57,7 @@ export default function BuildingList({
 						>
 							<ion-icon name="home-outline" class="nav__icon" />
 							<span className="nav_name">{bName}</span>
-							<ion-icon
-								name="chevron-down-outline"
-								class={`collapse__link ${openBids.has(bid) ? 'rotate' : ''}`}
-							/>
+							<span className={`collapse__link ${openBids.has(bid) ? 'rotate' : ''}`}>▼</span>
 						</div>
 
 						<ul className={`collapse__menu ${openBids.has(bid) ? 'showCollapse' : ''}`}>
@@ -65,6 +67,7 @@ export default function BuildingList({
 								favorites={favorites}
 								onToggleFavorite={onToggleFavorite}
 								onRoomClick={onRoomClick}
+								onFloorToggle={onFloorToggle}
 							/>
 						</ul>
 					</li>

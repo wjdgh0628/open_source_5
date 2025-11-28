@@ -16,19 +16,18 @@ import Favorites from './Favorites.jsx';
 import BuildingList from './BuildingList.jsx';
 import { handleRoomListClick } from '../scripts/mapHandlers.js';
 
-
-
 export default function SideBar({ map }) {
-// UI 상태
+	// UI 상태
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [favOpen, setFavOpen] = useState(true);
 	const [allOpen, setAllOpen] = useState(true);
+	const [openFloors, setOpenFloors] = useState(() => new Set()); // `${bid}:${floorIndex}` 키
 
 	// 데이터 상태
 	const [favorites, setFavorites] = useState(() => loadRoomFavorites()); // [rid, rid, ...]
 	const [buildings, setBuildings] = useState([]); // [{ bid, name }]
 
-	// 사이드바 몸통 패딩 동기화
+	// 사이드바 몸통 패딩 동기화 (사이드바가 확장 상태일 때만 패딩 적용)
 	useEffect(() => {
 		if (isExpanded) {
 			document.body.classList.add('body-pd');
@@ -73,12 +72,29 @@ export default function SideBar({ map }) {
 		});
 	};
 
+	// 층 열림/닫힘 정보 갱신 + 층이 열릴 때는 자동 확장
+	const handleFloorToggle = (bid, floorIndex, isOpen) => {
+		setOpenFloors((prev) => {
+			const next = new Set(prev);
+			const key = `${bid}:${floorIndex}`;
+			if (isOpen) {
+				next.add(key);
+				setIsExpanded(true);
+			} else {
+				next.delete(key);
+			}
+			return next;
+		});
+	};
+
 	// 방 클릭 핸들러 (옵션 A)
 	const onRoomClick = (bid, floorIndex, rid) => {
 		if (!map) return;
 		handleRoomListClick(map, bid, floorIndex, rid);
 	};
 
+
+	const ensureExpanded = () => setIsExpanded(true);
 	return (
 		<div className={`l-navbar ${isExpanded ? 'expander' : ''}`} id="navbar">
 			<nav className="nav">
@@ -103,14 +119,14 @@ export default function SideBar({ map }) {
 						{/* 즐겨찾기 (방 전용) */}
 						<div
 							className="nav__link collapse showCollapse"
-							onClick={() => setFavOpen((v) => !v)}
+							onClick={() => {
+								setIsExpanded(true);
+								setFavOpen((v) => !v);
+							}}
 						>
 							<ion-icon name="star-outline" class="nav__icon" />
 							<span className="nav_name">즐겨찾기</span>
-							<ion-icon
-								name="chevron-down-outline"
-								class={`collapse__link ${favOpen ? 'rotate' : ''}`}
-							/>
+							<span className={`collapse__link ${favOpen ? 'rotate' : ''}`}>▼</span>
 						</div>
 						<ul className={`collapse__menu ${favOpen ? 'showCollapse' : ''}`} id="favorites-list">
 							<Favorites
@@ -125,14 +141,14 @@ export default function SideBar({ map }) {
 						{/* 전체 리스트 (건물/층/방) */}
 						<div
 							className="nav__link collapse showCollapse"
-							onClick={() => setAllOpen((v) => !v)}
+							onClick={() => {
+								setIsExpanded(true);
+								setAllOpen((v) => !v);
+							}}
 						>
 							<ion-icon name="business-outline" class="nav__icon" />
 							<span className="nav_name">전체 리스트</span>
-							<ion-icon
-								name="chevron-down-outline"
-								class={`collapse__link ${allOpen ? 'rotate' : ''}`}
-							/>
+							<span className={`collapse__link ${allOpen ? 'rotate' : ''}`}>▼</span>
 						</div>
 						<ul className={`collapse__menu ${allOpen ? 'showCollapse' : ''}`} id="all-list">
 							<BuildingList
@@ -141,6 +157,8 @@ export default function SideBar({ map }) {
 								favorites={favorites}
 								onToggleFavorite={toggleFavoriteRoom}
 								onRoomClick={onRoomClick}
+								onFloorToggle={handleFloorToggle}
+								ensureExpanded={ensureExpanded}
 							/>
 						</ul>
 					</div>
