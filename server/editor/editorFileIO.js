@@ -1,4 +1,4 @@
-import { SC } from "./editor.config.js";
+import { SC } from "./editorConfig.js";
 
 let stateRef = null;
 let refreshSavedList = () => {};

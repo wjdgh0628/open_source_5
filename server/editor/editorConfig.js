@@ -13,3 +13,15 @@ export const idRules = {
 	level: (bmLevel, lvI) => { return lvI >= bmLevel ? (lvI - bmLevel) + 1 : (bmLevel - lvI) * -1; },
 	lvI: (bmLevel, level) => { return level < 0 ? level + bmLevel : level + bmLevel - 1; }
 };
+export const req = [
+	{
+		name: "name"
+	},
+	{
+		bmLevel: "bmLevel",
+		flLevel: "flLevel",
+		flList: "flList",
+		flVars: "flVars"
+	},
+	{}
+];

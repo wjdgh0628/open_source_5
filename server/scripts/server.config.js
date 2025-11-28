@@ -2,11 +2,12 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
-export const __dirname = path.dirname(__filename);
+const __scriptsname = path.dirname(__filename);
+export const __dirname = path.dirname(__scriptsname);
 export const PORT = 4000;
 export const baseUrl = `http://localhost:${PORT}`;
 export const SC = {
-	config: __dirname + "/server.config.js",
+	config: __dirname + "/scripts/server.config.js",
 	rooms: __dirname + "/data/rooms.json",
 	buildings: __dirname + "/data/buildings.geojson",
 	configUrl: baseUrl + "/api/config",

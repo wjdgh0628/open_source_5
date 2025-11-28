@@ -1,5 +1,5 @@
-import { SC, EC } from "./editor.config.js";
-import { searchBasicInfoByBid, searchFloorInfoByBid } from "./editorRequest.js";
+import { SC, req, idRules } from "./editorConfig.js";
+import { reqBuildingByBid } from "./editorRequests.js";
 import {
 	initDraw,
 	draw,
@@ -102,8 +102,8 @@ function fitViewToFloor() {
 
 function computeFidForCurrent() {
 	if (!state.floorInfo || state.floorIndex == null) return null;
-	const levelNum = EC.idRules.level(state.floorInfo.bmLevel, state.floorIndex);
-	return EC.idRules.fid(state.building, levelNum);
+	const levelNum = idRules.level(state.floorInfo.bmLevel, state.floorIndex);
+	return idRules.fid(state.building, levelNum);
 }
 
 function loadFloorImage() {
@@ -169,7 +169,7 @@ export function undo() {
 async function initBuildings() {
 	buildingSelect.innerHTML = "";
 	for (const bid of SC.bidList) {
-		const info = await searchBasicInfoByBid(bid);
+		const info = await reqBuildingByBid(bid, req);
 		const opt = document.createElement("option");
 		opt.value = bid;
 		opt.textContent = info?.name ? `${info.name} (${bid})` : bid;
@@ -185,18 +185,19 @@ async function onBuildingChange() {
 	const bid = buildingSelect.value;
 	if (!bid) return;
 	state.building = bid;
-	state.floorInfo = await searchFloorInfoByBid(bid);
+	state.floorInfo = await reqBuildingByBid(bid, req);
+	state.floorInfo.lvCount = state.floorInfo.flLevel + state.floorInfo.bmLevel;
 	floorSelect.innerHTML = "";
 	if (!state.floorInfo) return;
-	for (let i = 0; i < state.floorInfo.totLevel; i++) {
-		const levelNum = EC.idRules.level(state.floorInfo.bmLevel, i);
+	for (let i = 0; i < state.floorInfo.lvCount; i++) {
+		const levelNum = idRules.level(state.floorInfo.bmLevel, i);
 		const opt = document.createElement("option");
 		opt.value = String(i);
 		opt.textContent = levelNum > 0 ? `${levelNum}F` : `B${-levelNum}`;
 		floorSelect.appendChild(opt);
 	}
 	// rooms.json 보장 및 로드
-	ensureRoomsArrayForBuilding(bid, state.floorInfo.totLevel);
+	ensureRoomsArrayForBuilding(bid, state.floorInfo.lvCount);
 	floorSelect.value = "0";
 	await onFloorChange();
 }
@@ -212,9 +213,9 @@ async function onFloorChange() {
 	// Allow either [[lon,lat], ...] or [[[lon,lat], ...], ...] (GeoJSON Polygon)
 	if (
 		Array.isArray(poly) &&
-poly.length &&
-Array.isArray(poly[0]) &&
-Array.isArray(poly[0][0])
+		poly.length &&
+		Array.isArray(poly[0]) &&
+		Array.isArray(poly[0][0])
 	) {
 		// Take outer ring
 		poly = poly[0];

@@ -1,4 +1,3 @@
-// src/sidebar/FloorList.jsx
 import React, { useState } from 'react';
 
 /**

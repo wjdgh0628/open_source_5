@@ -53,6 +53,21 @@ export const idRules = {
 	lvI: (bmLevel, level) => { return level < 0 ? level + bmLevel : level + bmLevel - 1; }
 };
 
+export const req = [
+	{
+		bid: "@id",
+		center: "center",
+		bearing: "bearing",
+		floorBearing: "floorBearing"
+	},
+	{
+		flList: "flList",
+		flVars: "flVars",
+		flLevel: "flLevel",
+		bmLevel: "bmLevel"
+	}, {}
+];
+
 export const current = {
 	mode: 0,
 	bid: null,

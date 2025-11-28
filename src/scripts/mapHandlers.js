@@ -1,4 +1,4 @@
-import { MC, SC, current, idRules } from './map.config.js';
+import { MC, SC, current, idRules, req } from './mapConfig.js';
 import { showLayer, hideLayer, hideFloorsByBid, hideAllRooms, setFloors, flyCamera, setRooms } from './mapUtils.js';
 import { reqBuildingByBid } from './mapRequests.js';
 
@@ -10,19 +10,6 @@ export async function handleBuildingClick(map, e) {
 	console.log(`건물 클릭됨: ${properties?.[SC.jsonProp.id]}`);
 
 	// 층 배열 생성 (지하층/지상층 정보 활용)
-	const req = [
-		{
-			bid: "@id",
-			center: "center",
-			bearing: "bearing"
-		},
-		{
-			flList: "flList",
-			flVars: "flVars",
-			flLevel: "flLevel",
-			bmLevel: "bmLevel"
-		}, {}
-	];
 	const info = await reqBuildingByBid(bid, req);
 
 	// 건물 숨김, 층 생성, 카메라 이동
@@ -52,17 +39,6 @@ export async function handleRoomListClick(map, bid, floorIndex, rid) {
 // 층 클릭시 실행할 코드 (수정됨)
 export async function handleFloorClick(map, bid, fid, lvI) {
 	console.log(`층 클릭됨: ${fid}`);
-	const req = [
-		{
-			bid: "@id",
-			center: "center",
-			floorBearing: "floorBearing"
-		},
-		{
-			flList: "flList",
-			flVars: "flVars"
-		}, {}
-	];
 	const info = await reqBuildingByBid(bid, req);
 
 	if (current.bid) await hideFloorsByBid(map, current.bid);
@@ -84,19 +60,6 @@ export async function handleBackgroundClick(map, e) {
 	if (isBackground) {
 		console.log("배경 클릭됨");
 		if (current.mode == 2) {
-			const req = [
-				{
-					bid: "@id",
-					center: "center",
-					bearing: "bearing"
-				},
-				{
-					flList: "flList",
-					flVars: "flVars",
-					flLevel: "flLevel",
-					bmLevel: "bmLevel"
-				}, {}
-			];
 			const info = await reqBuildingByBid(current.bid, req);
 
 			// 건물 숨김, 층 생성, 카메라 이동

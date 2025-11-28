@@ -1,6 +1,6 @@
 // src/map/sideBarUtils.js
-import { SC } from '../map/map.config.js';
-import { searchBasicInfoByBid } from '../map/mapRequests.js';
+import { SC } from './mapConfig.js';
+import { reqBuildingByBid } from './mapRequests.js';
 
 /**
  * ===== 즐겨찾기(방 rid 전용) ====
@@ -68,7 +68,8 @@ export async function fetchBuildings() {
 	const results = await Promise.all(
 		(bids || []).map(async (bid) => {
 			try {
-				const info = await searchBasicInfoByBid(bid);
+				const req = [{name: "name"},{},{}];
+				const info = await reqBuildingByBid(bid,req);
 				const name = info?.name || bid;
 				return { bid, name };
 			} catch {

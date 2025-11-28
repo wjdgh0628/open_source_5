@@ -1,4 +1,4 @@
-import { MC, SC, idRules } from './map.config.js';
+import { MC, SC, idRules } from './mapConfig.js';
 import { setHandler } from './mapUtils.js';
 import { handleBuildingClick, handleBackgroundClick } from './mapHandlers.js';
 import mapboxgl from 'mapbox-gl';

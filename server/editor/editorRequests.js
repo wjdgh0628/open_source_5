@@ -1,4 +1,4 @@
-import { SC } from './map.config.js';
+import { SC } from './editorConfig.js';
 
 //geojson bid로 건물 데이터 요청
 export async function reqBuildingByBid(bid, opt) {

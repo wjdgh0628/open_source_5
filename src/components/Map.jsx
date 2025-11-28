@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import {start} from './map/mapMain.js';
+import {start} from '../scripts/map.js';
+
 import './Map.css';
 import 'mapbox-gl/dist/mapbox-gl.css';
 

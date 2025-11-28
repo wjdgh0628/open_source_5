@@ -2,9 +2,9 @@ import express from 'express';
 import path from 'path';
 import { exec } from 'child_process';
 
-import { __dirname, PORT, idRules, SC } from './server.config.js';
-import { api } from './api.js';
-import { fetchAllRooms } from './fileIO.js';
+import { __dirname, PORT, idRules, SC } from './scripts/server.config.js';
+import { api } from './scripts/api.js';
+import { fetchAllRooms } from './scripts/fileIO.js';
 const app = express();
 
 app.use('/api', api);
@@ -38,6 +38,6 @@ function initList() {
 
 app.listen(PORT, () => {
 	initList();
-	console.log(SC.roomList);
+	// console.log(SC.roomList);
 	console.log(`Rooms server running at http://localhost:${PORT}`);
 });

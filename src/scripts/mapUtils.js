@@ -1,4 +1,4 @@
-import { MC, SC, idRules } from './map.config.js';
+import { MC, SC, idRules } from './mapConfig.js';
 import { handleFloorClick } from './mapHandlers.js';
 import { reqRoomsByLvI } from './mapRequests.js';
 

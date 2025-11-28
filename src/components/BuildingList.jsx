@@ -1,5 +1,5 @@
-// src/sidebar/BuildingList.jsx
 import React, { useMemo, useState } from 'react';
+
 import FloorList from './FloorList.jsx';
 
 /**

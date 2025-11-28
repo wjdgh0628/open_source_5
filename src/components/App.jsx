@@ -1,7 +1,9 @@
 import {useState} from 'react';
+
+import './App.css';
+
 import Map from './Map.jsx';
-// import SideBar from './SideBar.jsx';
-// import './App.css';
+import SideBar from './SideBar.jsx';
 
 export function App() {
 	const [map, setMap] = useState(null);
@@ -9,7 +11,7 @@ export function App() {
 	return (
 		<>
 			<Map onMapInit={setMap} />
-			{/* <SideBar map={map} /> */}
+			<SideBar map={map} />
 		</>
 	);
 }

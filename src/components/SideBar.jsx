@@ -1,8 +1,5 @@
 // src/SideBar.jsx
 import React, { useEffect, useMemo, useState } from 'react';
-import './SideBar.css';
-import LogoImg from './assets/logo2.png';
-
 import {
 	loadRoomFavorites,
 	saveRoomFavorites,
@@ -10,11 +7,16 @@ import {
 	fetchBuildings,
 	getRoomList,
 	indexRoomList,
-} from './sideBar/sideBarUtils.js';
+} from '../scripts/sideBarUtils.js';
 
-import Favorites from './sidebar/Favorites.jsx';
-import BuildingList from './sidebar/BuildingList.jsx';
-import { handleRoomListClick } from './map/events.js';
+import './SideBar.css';
+import LogoImg from '../assets/logo2.png';
+
+import Favorites from './Favorites.jsx';
+import BuildingList from './BuildingList.jsx';
+import { handleRoomListClick } from '../scripts/mapHandlers.js';
+
+
 
 export default function SideBar({ map }) {
 // UI 상태

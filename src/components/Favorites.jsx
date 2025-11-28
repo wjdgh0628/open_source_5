@@ -1,4 +1,3 @@
-// src/sidebar/Favorites.jsx
 import React, { useMemo } from 'react';
 
 /**
