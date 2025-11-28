@@ -1,59 +1,62 @@
 <!doctype html>
 <html lang="ko">
+
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Polygon Editor</title>
-  <link href="editorStyle.css" rel="stylesheet">
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Polygon Editor</title>
+	<link href="editorStyle.css" rel="stylesheet">
 </head>
+
 <body>
-  <div id="editorRoot">
-    <header id="topPanel">
-      <div class="top-row">
-        <div class="block">
-          <label for="buildingSelect">건물</label>
-          <select id="buildingSelect"></select>
-          <label for="floorSelect">층</label>
-          <select id="floorSelect"></select>
-        </div>
-        <div class="block">
-          <label for="floorCoordsInput">층 폴리곤(수동 입력)</label>
-          <textarea id="floorCoordsInput" placeholder='[[126.95,37.34], ...]'></textarea>
-          <div class="row">
-            <button id="applyFloorCoordsBtn">적용</button>
-            <button id="copyFloorCoordsBtn">층 좌표 복사</button>
-          </div>
-        </div>
-        <div class="block">
-          <label>이미지 조작</label>
-          <div class="row">
-            <label for="imageOpacity" style="margin-left:8px;">투명도</label>
-            <input id="imageOpacity" type="range" min="0" max="100" value="60" />
-          </div>
-        </div>
-      </div>
-    </header>
+	<div id="editorRoot">
+		<header id="topPanel">
+			<div class="top-row">
+				<div class="block">
+					<label for="buildingSelect">건물</label>
+					<select id="buildingSelect"></select>
+					<label for="floorSelect">층</label>
+					<select id="floorSelect"></select>
+				</div>
+				<div class="block">
+					<label for="floorCoordsInput">층 폴리곤(수동 입력)</label>
+					<textarea id="floorCoordsInput" placeholder='[[126.95,37.34], ...]'></textarea>
+					<div class="row">
+						<button id="applyFloorCoordsBtn">적용</button>
+						<button id="copyFloorCoordsBtn">층 좌표 복사</button>
+					</div>
+				</div>
+				<div class="block">
+					<label>이미지 조작</label>
+					<div class="row">
+						<label for="imageOpacity" style="margin-left:8px;">투명도</label>
+						<input id="imageOpacity" type="range" min="0" max="100" value="60" />
+					</div>
+				</div>
+			</div>
+		</header>
 
-    <main id="middlePanel">
-      <div id="canvasContainer">
-        <canvas id="editorCanvas"></canvas>
-      </div>
-    </main>
+		<main id="middlePanel">
+			<div id="canvasContainer">
+				<canvas id="editorCanvas"></canvas>
+			</div>
+		</main>
 
-    <section id="bottomPanel">
-      <h3>방 관리</h3>
-      <div id="roomsPanel">
-        <div class="rooms-col">
-          <h4>저장됨 (rooms.json)</h4>
-          <div id="savedRoomList"></div>
-        </div>
-        <div class="rooms-col">
-          <h4>미저장(작업중)</h4>
-          <div id="draftRoomList"></div>
-        </div>
-      </div>
-    </section>
-  </div>
-  <script type="module" src="editorMain.js"></script>
+		<section id="bottomPanel">
+			<h3>방 관리</h3>
+			<div id="roomsPanel">
+				<div class="rooms-col">
+					<h4>저장됨 (rooms.json)</h4>
+					<div id="savedRoomList"></div>
+				</div>
+				<div class="rooms-col">
+					<h4>미저장(작업중)</h4>
+					<div id="draftRoomList"></div>
+				</div>
+			</div>
+		</section>
+	</div>
+	<script type="module" src="editorMain.js"></script>
 </body>
+
 </html>

@@ -1,15 +1,15 @@
-export const EC = {
-    idRules: {
-        buildings: "campus-3d",
-        fid: (bid, level) => { return `${bid}_${level}` },
-        floorSid: (bid) => { return `${bid}_floors` },
-        rid: (bid, level, index) => { return `${bid}_${level}0${index}` },
-        roomSid: (fid) => {return `${fid}_rooms`},
-        clickedFloor: (bid, level) => { return `${bid}_${level}_base` },
-        lid: (pid) => { return `${pid}_label` },
-        level: (bmLevel, lvI) => {return lvI >= bmLevel ? (lvI - bmLevel) + 1 : (bmLevel - lvI) * -1;},
-        lvI: (bmLevel, level) => {return level < 0 ? level + bmLevel : level + bmLevel - 1;}
-    }
-}
+export const EC = {};
 const res = await fetch("../api/config");
-export const SC  = await res.json();
+export const SC = await res.json();
+
+export const idRules = {
+	buildings: "campus-3d",
+	fid: (bid, lvI) => { return `${bid}_${lvI}`; },
+	floorSid: (bid) => { return `${bid}_floors`; },
+	rid: (bid, lvI, index) => { return `${bid}_${lvI}_${index}`; },
+	roomSid: (fid) => { return `${fid}_rooms`; },
+	clickedFloor: (bid, lvI) => { return `${bid}_${lvI}_base`; },
+	lid: (pid) => { return `${pid}_label`; },
+	level: (bmLevel, lvI) => { return lvI >= bmLevel ? (lvI - bmLevel) + 1 : (bmLevel - lvI) * -1; },
+	lvI: (bmLevel, level) => { return level < 0 ? level + bmLevel : level + bmLevel - 1; }
+};

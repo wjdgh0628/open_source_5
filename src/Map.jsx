@@ -4,16 +4,16 @@ import './Map.css';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 function Map({ onMapInit }) {
-  const mapId = 'map';
+	const mapId = 'map';
 
-  useEffect(() => {
-    const map = start();
-    if (onMapInit) {
-      onMapInit(map);
-    }
-  }, [onMapInit]);
+	useEffect(() => {
+		const map = start();
+		if (onMapInit) {
+			onMapInit(map);
+		}
+	}, [onMapInit]);
 
-  return <div id={mapId} />;
+	return <div id={mapId} />;
 }
 
 export default Map;

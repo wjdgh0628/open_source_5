@@ -6,39 +6,54 @@ export const __dirname = path.dirname(__filename);
 export const PORT = 4000;
 export const baseUrl = `http://localhost:${PORT}`;
 export const SC = {
-    rooms:  __dirname + "/data/rooms.json",
-    roomsUrl:  baseUrl + "/api/rooms",
-    config:  __dirname + "/server.config.js",
-    configUrl:  baseUrl + "/api/config",
-    buildings:  __dirname + "/data/buildings.geojson",
-    buildingsUrl:  baseUrl + "/api/buildings",
+	config: __dirname + "/server.config.js",
+	rooms: __dirname + "/data/rooms.json",
+	buildings: __dirname + "/data/buildings.geojson",
+	configUrl: baseUrl + "/api/config",
+	roomsUrl: baseUrl + "/api/json/rooms",
+	buildingsUrl: baseUrl + "/api/json/buildings",
+	reqRooms: baseUrl + "/api/request/rooms",
+	reqBuildings: baseUrl + "/api/request/buildings",
 
-    jsonProp: {
-        id: "@id",
-        name: "name",
-    },
-    bidList: [
-        "main",
-        "grad",
-        "design",
-        "gemi",
-        "music",
-        "rodem",
-        "visionCentre",
-        "stem",
-        "council",
-        "theology",
-        "vision"
-    ],
-    /* idRules: {
-        buildings: "campus-3d",
-        fid: (bid, level) => { return `${bid}_${level}` },
-        floorSid: (bid) => { return `${bid}_floors` },
-        rid: (bid, level, index) => { return `${bid}_${level}0${index}` },
-        roomSid: (fid) => {return `${fid}_rooms`},
-        clickedFloor: (bid, level) => { return `${bid}_${level}_base` },
-        lid: (pid) => { return `${pid}_label` },
-        level: (bmLevel, lvI) => {return lvI >= bmLevel ? (lvI - bmLevel) + 1 : (bmLevel - lvI) * -1;},
-        lvI: (bmLevel, level) => {return level < 0 ? level + bmLevel : level + bmLevel - 1;}
-    } */
+	jsonProp: {
+		id: "@id",
+		name: "name",
+	},
+	bidList: [
+		"main",
+		"grad",
+		"design",
+		"gemi",
+		"music",
+		"rodem",
+		"visionCentre",
+		"stem",
+		"council",
+		"theology",
+		"vision"
+	],
+	roomList: {
+		main: [[],[],[],[],[],[],[],[],[],[]],
+		grad: [[],[],[],[],[],[],[]],
+		design: [[],[],[],[],[],[],[]],
+		gemi: [[],[],[],[],[],[]],
+		music: [[],[],[],[],[],[],[]],
+		rodem: [[],[]],
+		visionCentre: [[],[],[],[],[],[],[],[],[],[]],
+		stem: [[],[],[],[]],
+		council: [[],[],[],[]],
+		theology: [[],[],[],[],[],[]],
+		vision: [[],[],[],[],[],[]]
+	}
+};
+export const idRules = {
+	buildings: "campus-3d",
+	fid: (bid, lvI) => { return `${bid}_${lvI}`; },
+	floorSid: (bid) => { return `${bid}_floors`; },
+	rid: (bid, lvI, index) => { return `${bid}_${lvI}_${index}`; },
+	roomSid: (fid) => { return `${fid}_rooms`; },
+	clickedFloor: (bid, lvI) => { return `${bid}_${lvI}_base`; },
+	lid: (pid) => { return `${pid}_label`; },
+	level: (bmLevel, lvI) => { return lvI >= bmLevel ? (lvI - bmLevel) + 1 : (bmLevel - lvI) * -1; },
+	lvI: (bmLevel, level) => { return level < 0 ? level + bmLevel : level + bmLevel - 1; }
 };
