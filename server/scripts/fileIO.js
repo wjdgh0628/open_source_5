@@ -23,21 +23,22 @@ function filterBuilidingProps(feature, opt){
 	const prop = feature.properties;
 	const geo = feature.geometry;
 	const foors = prop.floors;
+	const [pOpt, fOpt, gOpt] = opt.map(o => ({ ...o }));
 
-	for(const key in opt[0]){
-		const propKey = opt[0][key];
-		opt[0][key] = prop[propKey];
+	for(const key in pOpt){
+		const propKey = pOpt[key];
+		pOpt[key] = prop[propKey];
 	}
-	for(const key in opt[1]){
-		const propKey = opt[1][key];
-		opt[1][key] = foors[propKey];
+	for(const key in fOpt){
+		const propKey = fOpt[key];
+		fOpt[key] = foors[propKey];
 	}
-	for(const key in opt[2]){
-		const propKey = opt[2][key];
-		opt[2][key] = geo[propKey];
+	for(const key in gOpt){
+		const propKey = gOpt[key];
+		gOpt[key] = geo[propKey];
 	}
 	
-	return {...opt[0], ...opt[1], ...opt[2]};
+	return {...pOpt, ...fOpt, ...gOpt};
 }
 export function fetchBuildingInfo(bid, opt){
 	const feature = fetchBuildingByBid(bid);
@@ -55,10 +56,11 @@ export function fetchBuildingsInfo(bids, opt) {
 	data.forEach(feature => {
 		const id = feature.properties[SC.jsonProp.id]; // "@id" 같은 키
 		if (bidSet.has(id)) {
-			features.push(filterBuilidingProps(feature, opt));
+			features[id] = (filterBuilidingProps(feature, opt));
 		}
 	});
-
+	/* console.log(data);
+	console.log(features); */
 	return features;
 }
 

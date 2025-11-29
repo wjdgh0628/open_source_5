@@ -44,7 +44,8 @@ export function getRoomList() {
 export function indexRoomList() {
 	const roomList = getRoomList();
 	const idx = {};
-	for (const [bid, floors] of Object.entries(roomList)) {
+	for (const [bid, f] of Object.entries(roomList)) {
+		const floors = f.rooms;
 		(floors || []).forEach((rooms, floorIndex) => {
 			(rooms || []).forEach((r) => {
 				if (r && r.rid) {
@@ -66,11 +67,11 @@ export function indexRoomList() {
 // 예시 이름: reqBuildingsByBidList(bids, req)
 // 리턴은 { [bid]: { name: ... } } 또는 [{ bid, name }, ...] 같은 구조라고 가정
 
-export async function fetchBuildings() {
+async function fetchBuildings() {
 	const bids = SC?.bidList || Object.keys(getRoomList());
 	if (!bids || !bids.length) return [];
 
-	const req = [{ name: 'name' }, {}, {}];
+	const req = [{ name: 'name' }, {bmLevel: "bmLevel"}, {}];
 
 	// 여기서 한 번만 호출
 	const infoMap = await reqBuildingsInfo(bids, req);

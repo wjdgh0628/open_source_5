@@ -4,7 +4,7 @@ import FloorList from './FloorList.jsx';
 
 /**
  * props:
- * - roomList: { [bid]: [ [ { rid, name }, ... ]  floor0 , [ ... ]  floor1 , ... ] }
+ * - roomList: { [bid]: { name: string, bmLevel: number, rooms: Array<Array<{ rid: string, name: string }>> } }
  * - buildingNames: { [bid]: string }
  * - favorites: string[] (rid[])
  * - onToggleFavorite: (rid) => void
@@ -45,8 +45,10 @@ export default function BuildingList({
 	return (
 		<>
 			{bids.map((bid) => {
-				const floors = roomList?.[bid] || [];
-				const bName = buildingNames?.[bid] || bid;
+				const buildingData = roomList?.[bid] || {};
+				const floors = buildingData.rooms || [];
+				const bName = buildingData.name || buildingNames?.[bid] || bid;
+				const bmLevel = buildingData.bmLevel;
 
 				return (
 					<li key={bid} style={{ marginBottom: '0.25rem' }}>
@@ -63,6 +65,7 @@ export default function BuildingList({
 						<ul className={`collapse__menu ${openBids.has(bid) ? 'showCollapse' : ''}`}>
 							<FloorList
 								bid={bid}
+								bmLevel={bmLevel}
 								floors={floors}
 								favorites={favorites}
 								onToggleFavorite={onToggleFavorite}

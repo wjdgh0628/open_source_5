@@ -4,7 +4,7 @@ import {
 	loadRoomFavorites,
 	saveRoomFavorites,
 	toggleRoomFavoriteInList,
-	fetchBuildings,
+	// fetchBuildings,
 	getRoomList,
 	indexRoomList,
 } from '../scripts/sideBarUtils.js';
@@ -25,7 +25,6 @@ export default function SideBar({ map }) {
 
 	// 데이터 상태
 	const [favorites, setFavorites] = useState(() => loadRoomFavorites()); // [rid, rid, ...]
-	const [buildings, setBuildings] = useState([]); // [{ bid, name }]
 
 	// 사이드바 몸통 패딩 동기화 (사이드바가 확장 상태일 때만 패딩 적용)
 	useEffect(() => {
@@ -36,21 +35,6 @@ export default function SideBar({ map }) {
 		}
 	}, [isExpanded]);
 
-	// 건물 명칭 로딩
-	useEffect(() => {
-		let cancelled = false;
-		(async () => {
-			try {
-				const list = await fetchBuildings();
-				if (!cancelled) setBuildings(list);
-			} catch (e) {
-				console.error('Failed to load building list', e);
-			}
-		})();
-		return () => {
-			cancelled = true;
-		};
-	}, []);
 
 	// SC.roomList 및 rid 인덱스
 	const roomList = useMemo(() => getRoomList(), []);
@@ -59,9 +43,11 @@ export default function SideBar({ map }) {
 	// bid -> building name 매핑
 	const buildingNameMap = useMemo(() => {
 		const m = {};
-		for (const b of buildings) m[b.bid] = b.name;
+		for (const [bid, data] of Object.entries(roomList || {})) {
+			if (data && data.name) m[bid] = data.name;
+		}
 		return m;
-	}, [buildings]);
+	}, [roomList]);
 
 	// 즐겨찾기 토글(방 rid 기준)
 	const toggleFavoriteRoom = (rid) => {

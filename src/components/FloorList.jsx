@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { idRules } from '../scripts/mapConfig.js';
 
 /**
  * props:
  * - bid: string
+ * - bmLevel: number
  * - floors: Array<Array<{ rid: string, name: string }>>
  * - favorites: string[] (rid[])
  * - onToggleFavorite: (rid) => void
@@ -11,6 +13,7 @@ import React, { useState } from 'react';
  */
 export default function FloorList({
 	bid,
+	bmLevel,
 	floors,
 	favorites,
 	onToggleFavorite,
@@ -49,7 +52,11 @@ export default function FloorList({
 							onClick={() => toggleFloor(floorIndex)}
 						>
 							<ion-icon name="layers-outline" class="nav__icon" />
-							<span className="nav_name">{floorIndex}층</span>
+							<span className="nav_name">
+								{typeof bmLevel === 'number'
+									? idRules.lvChar(bmLevel, floorIndex)
+									: `${floorIndex}층`}
+							</span>
 							<span className={`collapse__link ${isOpen ? 'rotate' : ''}`}>▼</span>
 						</div>
 
@@ -81,7 +88,7 @@ export default function FloorList({
 							})}
 							{(!rooms || rooms.length === 0) && (
 								<li style={{ padding: '8px', fontSize: '0.9rem', color: '#888' }}>
-									방 없음
+									강의실 정보 없음
 								</li>
 							)}
 						</ul>

@@ -96,7 +96,7 @@ export function hideLayer(map, id) {
 }
 /**특정 건물의 층들 숨기기*/
 export async function hideFloorsByBid(map, bid) {
-	const lvCount = (SC.roomList[bid].length);
+	const lvCount = (SC.roomList[bid].rooms.length);
 	allFloors(map, lvCount ,bid, (map, fid, lvI) => {
 		hideLayer(map, fid);
 		hideAllRooms(map, bid, lvI);
@@ -175,7 +175,7 @@ function generateFloors(map, fInfo) {
 		floorsSpec.push({
 			type: "Feature",
 			properties: {
-				name: lvI >= fInfo.bmLevel ? `${fi + 1}F` : `B${bi}`,
+				name: idRules.lvChar(fInfo.bmLevel, lvI),
 				base,
 				height: base + floorThickness,
 				// color: i >= fInfo.bmLevel ? colorPalette[fi * colorJump] : basementPalette[bi - 1],

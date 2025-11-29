@@ -4,7 +4,8 @@ import { exec } from 'child_process';
 
 import { __dirname, PORT, idRules, SC } from './scripts/server.config.js';
 import { api } from './scripts/api.js';
-import { fetchAllRooms } from './scripts/fileIO.js';
+import { fetchAllRooms, fetchBuildingsInfo } from './scripts/fileIO.js';
+// import { fetchBuildings } from '../src/scripts/sideBarUtils.js';
 const app = express();
 
 app.use('/api', api);
@@ -24,16 +25,51 @@ function openInBrowser(url) {
 }
 
 export function initList() {
-	let data = fetchAllRooms();
-	for (const bid in data) {
-		data[bid].forEach((floor, lvI) => {
-			floor.forEach((room, i) => {
-				data[bid][lvI][i] = { name: room.name, rid: idRules.rid(bid, lvI, i) };
-				// console.log(room);
+	// 원본 방 데이터: { [bid]: Array<Array<{ name: string, ... }>> }
+	const rData = fetchAllRooms();
+
+	// 건물 정보(name, bmLevel 등) 요청
+	const req = [{ bid: SC.jsonProp.id, name: 'name' }, { bmLevel: 'bmLevel' }, {}];
+	const bData = fetchBuildingsInfo(SC.bidList, req); // { [bid]: { name, bmLevel, ... } }
+
+	const res = {};
+
+	for (const bid of Object.keys(rData || {})) {
+		const buildingRooms = rData[bid] || [];
+		const info = (bData && bData[bid]) || {};
+
+		const bmLevel = typeof info.bmLevel === 'number' ? info.bmLevel : 0;
+		const name = info.name || bid;
+
+		const floorsArr = [];
+
+		buildingRooms.forEach((floor, lvI) => {
+			const roomsArr = [];
+			(floor || []).forEach((room, i) => {
+				if (!room) return;
+				const roomName = room.name || '';
+				const rid = idRules.rid(bid, lvI, i);
+				roomsArr.push({ name: roomName, rid });
 			});
-		})
+			floorsArr[lvI] = roomsArr;
+		});
+
+		res[bid] = {
+			name,
+			bmLevel,
+			rooms: floorsArr,
+		};
 	}
-	SC.roomList = data;
+
+	// 최종 roomList 구조:
+	// {
+	//   [bid]: {
+	//     name: string,
+	//     bmLevel: number,
+	//     rooms: Array<Array<{ name: string, rid: string }>>
+	//   }
+	// }
+	SC.roomList = res;
 }
 
 app.listen(PORT, () => {
