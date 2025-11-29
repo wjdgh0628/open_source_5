@@ -124,7 +124,7 @@ function allFloors(map, lvCount ,bid, cb) {
 }
 /**층 내 전체 방에 대해 콜백*/
 async function allRooms(map, bid, lvI, cb) {
-	const rooms = SC.roomList[bid][lvI];
+	const rooms = SC.roomList[bid].rooms[lvI];
 	rooms.forEach((r) => cb(map, r.rid));
 }
 
