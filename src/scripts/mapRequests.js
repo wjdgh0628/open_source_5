@@ -13,7 +13,24 @@ export async function reqBuildingByBid(bid, opt) {
 	return await fetch(SC.reqBuildings, req)
 		.then(response => response.json())
 		.then(data => {
-			// console.log(data);
+			console.log(++requested);
+			return data;
+		})
+		.catch(err => { console.error("파일 불러오기 실패:", err); return false; });
+}
+export async function reqBuildingsInfo(bids, opt) {
+	const req = {
+		method: 'POST',
+  		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({
+			bids: bids,
+			opt: opt
+		})
+	};
+	return await fetch(SC.reqBuildings, req)
+		.then(response => response.json())
+		.then(data => {
+			console.log(++requested);
 			return data;
 		})
 		.catch(err => { console.error("파일 불러오기 실패:", err); return false; });
@@ -30,7 +47,7 @@ export async function reqRoomsByLvI(bid, lvI) {
 	return await fetch(SC.reqRooms, req)
 		.then(response => response.json())
 		.then(data => {
-			// console.log(data);
+			console.log(++requested);
 			return data;
 		})
 		.catch(err => { console.error("파일 불러오기 실패:", err); return false; });
@@ -108,3 +125,5 @@ export async function searchBasicInfoByBid(bid) {
 	}
 	return f;
 } */
+
+let requested = 0;

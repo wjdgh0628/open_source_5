@@ -3,6 +3,7 @@ import fs from 'fs';
 
 function fetchBuildings() {
 	// console.log(fs.existsSync(SC.buildings));
+	console.log(++fetched);
 	return JSON.parse(fs.readFileSync(SC.buildings, 'utf-8'));
 }
 function fetchBuildingByBid(bid) {
@@ -18,8 +19,7 @@ function fetchBuildingByBid(bid) {
 		return false;
 	}
 }
-export function fetchBuildingInfo(bid, opt){
-	const feature = fetchBuildingByBid(bid);
+function filterBuilidingProps(feature, opt){
 	const prop = feature.properties;
 	const geo = feature.geometry;
 	const foors = prop.floors;
@@ -39,8 +39,31 @@ export function fetchBuildingInfo(bid, opt){
 	
 	return {...opt[0], ...opt[1], ...opt[2]};
 }
+export function fetchBuildingInfo(bid, opt){
+	const feature = fetchBuildingByBid(bid);
+	return filterBuilidingProps(feature, opt);
+}
+export function fetchBuildingsInfo(bids, opt) {
+	if (!Array.isArray(bids)) {
+		bids = [bids];          // 문자열 하나 들어와도 대응
+	}
+
+	const bidSet = new Set(bids);           // 빠른 포함 검사용
+	const data = fetchBuildings().features; // 전체 feature
+	const features = [];
+
+	data.forEach(feature => {
+		const id = feature.properties[SC.jsonProp.id]; // "@id" 같은 키
+		if (bidSet.has(id)) {
+			features.push(filterBuilidingProps(feature, opt));
+		}
+	});
+
+	return features;
+}
 
 export function fetchAllRooms() {
+	console.log(++fetched);
 	// console.log(fs.existsSync(SC.buildings));
 	return JSON.parse(fs.readFileSync(SC.rooms, 'utf-8'));
 }
@@ -57,3 +80,5 @@ export function fetchRoomsByLvI(bid, lvI) {
 		return false;
 	}
 }
+
+let fetched = 0;

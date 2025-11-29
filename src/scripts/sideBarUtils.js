@@ -1,6 +1,6 @@
 // src/map/sideBarUtils.js
 import { SC } from './mapConfig.js';
-import { reqBuildingByBid } from './mapRequests.js';
+import { reqBuildingsInfo } from './mapRequests.js';
 
 /**
  * ===== 즐겨찾기(방 rid 전용) ====
@@ -63,20 +63,24 @@ export function indexRoomList() {
 /**
  * 건물 기본 정보 로딩: [{ bid, name }]
  */
+// 예시 이름: reqBuildingsByBidList(bids, req)
+// 리턴은 { [bid]: { name: ... } } 또는 [{ bid, name }, ...] 같은 구조라고 가정
+
 export async function fetchBuildings() {
 	const bids = SC?.bidList || Object.keys(getRoomList());
-	const results = await Promise.all(
-		(bids || []).map(async (bid) => {
-			try {
-				const req = [{name: "name"},{},{}];
-				const info = await reqBuildingByBid(bid,req);
-				const name = info?.name || bid;
-				return { bid, name };
-			} catch {
-				return { bid, name: bid };
-			}
-		})
-	);
-	// 유효한 항목만
+	if (!bids || !bids.length) return [];
+
+	const req = [{ name: 'name' }, {}, {}];
+
+	// 여기서 한 번만 호출
+	const infoMap = await reqBuildingsInfo(bids, req);
+	// ↑ 네가 만든 "배열로 통째로 받는 함수" 이름/리턴 구조에 맞게 수정
+
+	const results = bids.map((bid) => {
+		const info = infoMap?.[bid]; // or infoMap.find(...) 등, 실제 리턴 형태에 맞게
+		const name = info?.name || bid;
+		return { bid, name };
+	});
+
 	return results.filter((b) => b?.bid && b?.name);
 }

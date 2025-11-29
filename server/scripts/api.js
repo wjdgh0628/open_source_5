@@ -3,7 +3,7 @@ import cors from 'cors';
 import fs from 'fs';
 
 import { SC } from './server.config.js';
-import { fetchBuildingInfo, fetchRoomsByLvI } from './fileIO.js';
+import { fetchBuildingInfo, fetchBuildingsInfo, fetchRoomsByLvI } from './fileIO.js';
 import { initList } from '../server.js';
 
 
@@ -17,7 +17,11 @@ api.use(express.json({ limit: "5mb" }));
 api.post("/request/buildings", (req, res) => {
 	// res.header("Access-Control-Allow-Origin", "http://localhost:3000");
 	// console.log("requested", req.body.bid, req.body.opt);
-	const data = fetchBuildingInfo(req.body.bid, req.body.opt);
+	let data = null;
+	if(req.body.bids)
+		data = fetchBuildingsInfo(req.body.bids, req.body.opt);
+	else
+		data = fetchBuildingInfo(req.body.bid, req.body.opt);
 	// console.log("sent",data);
 	res.json(data);
 });
