@@ -1,3 +1,4 @@
+/* global mapboxgl */
 import { CONFIG, cache } from './config.js';
 import { handleFloorClick } from './onClick.js';
 
@@ -305,21 +306,45 @@ async function generateRooms(map, fInfo, fid, level) {
         },
         geometry: { type: "Polygon", coordinates: fInfo.flVars[fInfo.flList[lvI]] }
     })
+
+    // !!원본!! 혹시나 해서 남겨둡니당...
+    // rooms.forEach((room, i) => {
+    //     roomsSpec.push({
+    //         type: "Feature",
+    //         properties: {
+    //             name: room.name,
+    //             base: base + baseThickness,
+    //             height: base + baseThickness + roomThickness,
+    //             color: room.color ? room.color : "#0088ff",// 임시 컬러
+    //             anchor: "bottom",
+    //             // offset: 0,
+    //             layerId: CONFIG.idRules.rid(bid, level, i + 1)
+    //         },
+    //         geometry: { type: "Polygon", coordinates: room.polygon }
+    //     })
+    // })
+
+    // 수정한 부분
     rooms.forEach((room, i) => {
-        roomsSpec.push({
-            type: "Feature",
-            properties: {
-                name: room.name,
-                base: base + baseThickness,
-                height: base + baseThickness + roomThickness,
-                color: room.color ? room.color : "#0088ff",// 임시 컬러
-                anchor: "bottom",
-                // offset: 0,
-                layerId: CONFIG.idRules.rid(bid, level, i + 1)
-            },
-            geometry: { type: "Polygon", coordinates: room.polygon }
-        })
-    })
+    const roomFeature = {
+        type: "Feature",
+        properties: {
+            name: room.name,
+            base: base + baseThickness,
+            height: base + baseThickness + roomThickness,
+            color: room.color ? room.color : "#0088ff",
+            anchor: "bottom",
+            layerId: CONFIG.idRules.rid(bid, level, i + 1)
+        },
+        geometry: { type: "Polygon", coordinates: room.polygon }
+    };
+    roomsSpec.push(roomFeature);
+
+    // 방 이름으로 마커 생성
+    createRoomMarker(map, roomFeature, `<strong>${room.name}</strong>`);
+    });
+    // 여기까지
+
 
     setLayers(map, CONFIG.idRules.roomSid(fid), roomsSpec);
     // 핸들러 지정
@@ -327,4 +352,34 @@ async function generateRooms(map, fInfo, fid, level) {
         if (i === 0) return; // 클릭된 층 베이스는 핸들러 지정 안함
         const rid = r.properties.layerId;
     });
+}
+
+
+// 추가 : center값 계산함수 (좌표 배열의 중심값을 계산)
+function getPolygonCenter(coords) {
+    if (!coords || !coords.length || !coords[0].length) return null;
+    const ring = coords[0];
+    const sum = ring.reduce((acc, cur) => {
+        const [lng, lat] = cur;
+        return [acc[0] + lng, acc[1] + lat];
+    }, [0, 0]);
+    return [sum[0] / ring.length, sum[1] / ring.length];
+}
+
+// 추가 : 방 중앙에 마커 생성
+export function createRoomMarker(map, roomFeature, labelHtml = "") {
+    if (!roomFeature?.geometry?.coordinates) return null;
+    const center = getPolygonCenter(roomFeature.geometry.coordinates);
+    if (!center) return null;
+
+    const altitude = (roomFeature.properties?.height ?? 0) + 3.5;
+    const el = document.createElement("div");
+    el.className = "floating-marker";
+    el.innerHTML = labelHtml || roomFeature.properties?.name || "";
+
+    return new mapboxgl.Marker({
+        element: el,
+        anchor: "bottom",
+        altitude : altitude
+    }).setLngLat(center).addTo(map);
 }
