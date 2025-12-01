@@ -1,13 +1,15 @@
-import { MC, SC, current, idRules, req } from './mapConfig.js';
+import { idRules, jsonProp } from '../../shared/rules.js';
+import { MC, req } from './mapConfig.js';
+import { current } from './map.js';
 import { showLayer, hideLayer, hideFloorsByBid, hideAllRooms, setFloors, flyCamera, setRooms } from './mapUtils.js';
 import { reqBuildingByBid } from './mapRequests.js';
 
 //건물 클릭 시 실행
 export async function handleBuildingClick(map, e) {
 	const properties = e.properties;
-	const bid = properties?.["origin"] ? properties?.["origin"] : properties?.[SC.jsonProp.id];
+	const bid = properties?.["origin"] ? properties?.["origin"] : properties?.[jsonProp.id];
 
-	console.log(`건물 클릭됨: ${properties?.[SC.jsonProp.id]}`);
+	console.log(`건물 클릭됨: ${properties?.[jsonProp.id]}`);
 
 	// 층 배열 생성 (지하층/지상층 정보 활용)
 	const info = await reqBuildingByBid(bid, req);
@@ -23,7 +25,7 @@ export async function handleBuildingClick(map, e) {
 }
 //리스트 클릭 시 실행
 export async function handleRoomListClick(map, bid, lvI, rid) {
-	console.log(`리스트에서 건물 클릭됨: [${rid}]`);
+	console.log(`리스트에서 방 클릭됨: [${rid}]`);
 
 	const info = await reqBuildingByBid(bid, req);
 

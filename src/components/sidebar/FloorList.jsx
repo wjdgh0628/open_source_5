@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { idRules } from '../../scripts/mapConfig.js';
+import { idRules } from '../../../shared/rules.js';
 
 /**
  * props:

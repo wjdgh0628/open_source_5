@@ -1,21 +1,8 @@
-import { SC, req, idRules } from "./editorConfig.js";
-import { reqBuildingByBid } from "./editorRequests.js";
-import {
-	initDraw,
-	draw,
-	COORD_DECIMALS,
-	bboxOfWorld,
-	formatCoords,
-	fitViewTo
-} from "./editorDraw.js";
-import {
-	initFileIO,
-	loadRoomsDB,
-	ensureRoomsArrayForBuilding,
-	loadSavedRoomsForCurrent,
-	writeSavedBackToDB,
-	requestSaveRoomsToServer
-} from "./editorFileIO.js";
+import { req, COORD_DECIMALS } from "./editorConfig.js";
+import { idRules } from "../shared/rules.js";
+import { reqBuildingByBid, reqBuildingsByBid, reqBasicInfos } from "./editorRequests.js";
+import { initDraw, draw, bboxOfWorld, formatCoords, fitViewTo } from "./editorDraw.js";
+import { initFileIO, loadRoomsDB, ensureRoomsArrayForBuilding, loadSavedRoomsForCurrent, writeSavedBackToDB, requestSaveRoomsToServer } from "./editorFileIO.js";
 import { onMouseDown, onMouseMove, onWheel, onMouseUp, onKeyDown, onKeyUp } from "./editorEvents.js";
 
 const floorplanUrl = "floorplans/";
@@ -167,16 +154,18 @@ export function undo() {
 
 // ==== Loading =======================================================================
 async function initBuildings() {
+	const basicInfos = await reqBasicInfos();
+	const bidList = basicInfos ? Object.keys(basicInfos) : [];
 	buildingSelect.innerHTML = "";
-	for (const bid of SC.bidList) {
-		const info = await reqBuildingByBid(bid, req);
+	const infos = await reqBuildingsByBid(bidList, req);
+	for (const bid of bidList) {
 		const opt = document.createElement("option");
 		opt.value = bid;
-		opt.textContent = info?.name ? `${info.name} (${bid})` : bid;
+		opt.textContent = infos[bid]?.name ? `${infos[bid].name} (${bid})` : bid;
 		buildingSelect.appendChild(opt);
 	}
-	if (SC.bidList.length) {
-		buildingSelect.value = SC.bidList[0];
+	if (bidList.length) {
+		buildingSelect.value = bidList[0];
 		await onBuildingChange();
 	}
 }

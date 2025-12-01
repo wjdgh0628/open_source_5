@@ -1,5 +1,4 @@
 export const MC = {
-	server: `http://localhost:4000`,
 	map: {
 		center: [126.95336, 37.34524],
 		zoom: 17,
@@ -39,21 +38,6 @@ export const MC = {
 		"road",
 		"building"
 	]
-};
-const res = await fetch(MC.server + "/api/config");
-export const SC = await res.json();
-
-export const idRules = {
-	buildings: "campus-3d",
-	fid: (bid, lvI) => { return `${bid}_${lvI}`; },
-	floorSid: (bid) => { return `${bid}_floors`; },
-	rid: (bid, lvI, index) => { return `${bid}_${lvI}_${index}`; },
-	roomSid: (fid) => { return `${fid}_rooms`; },
-	clickedFloor: (bid, lvI) => { return `${bid}_${lvI}_base`; },
-	lid: (pid) => { return `${pid}_label`; },
-	level: (bmLevel, lvI) => { return lvI >= bmLevel ? (lvI - bmLevel) + 1 : (bmLevel - lvI) * -1; },
-	lvChar: (bmLevel, lvI) => { return lvI >= bmLevel ? `${lvI - bmLevel + 1}F` : `B${bmLevel - lvI}`; },
-	lvI: (bmLevel, level) => { return level < 0 ? level + bmLevel : level + bmLevel - 1; }
 };
 
 export const req = [

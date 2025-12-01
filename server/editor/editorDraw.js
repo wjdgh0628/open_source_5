@@ -1,17 +1,4 @@
-// draw.js: 좌표 변환, 폴리곤 그리기/히트테스트 모듈
-
-export const COORD_DECIMALS = 8;
-const EARTH_RADIUS = 6378137;
-const DEG2RAD = Math.PI / 180;
-const RAD2DEG = 180 / Math.PI;
-
-// Local reference point (lon, lat) to keep world coordinates small and Mapbox-like
-const REF_LON = 126.95336;
-const REF_LAT = 37.34524;
-const REF_LAMBDA = REF_LON * DEG2RAD;
-const REF_PHI = REF_LAT * DEG2RAD;
-const REF_MX = EARTH_RADIUS * REF_LAMBDA;
-const REF_MY = EARTH_RADIUS * Math.log(Math.tan(Math.PI / 4 + REF_PHI / 2));
+import { DEG2RAD, RAD2DEG, EARTH_RADIUS, REF_MX, REF_MY, COORD_DECIMALS } from "./editorConfig.js";
 
 let canvasRef = null;
 let ctxRef = null;

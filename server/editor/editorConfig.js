@@ -1,18 +1,20 @@
 export const EC = {};
-const res = await fetch("../api/config");
-export const SC = await res.json();
 
-export const idRules = {
-	buildings: "campus-3d",
-	fid: (bid, lvI) => { return `${bid}_${lvI}`; },
-	floorSid: (bid) => { return `${bid}_floors`; },
-	rid: (bid, lvI, index) => { return `${bid}_${lvI}_${index}`; },
-	roomSid: (fid) => { return `${fid}_rooms`; },
-	clickedFloor: (bid, lvI) => { return `${bid}_${lvI}_base`; },
-	lid: (pid) => { return `${pid}_label`; },
-	level: (bmLevel, lvI) => { return lvI >= bmLevel ? (lvI - bmLevel) + 1 : (bmLevel - lvI) * -1; },
-	lvI: (bmLevel, level) => { return level < 0 ? level + bmLevel : level + bmLevel - 1; }
-};
+// draw.js: 좌표 변환, 폴리곤 그리기/히트테스트 모듈
+
+export const COORD_DECIMALS = 8;
+export const EARTH_RADIUS = 6378137;
+export const DEG2RAD = Math.PI / 180;
+export const RAD2DEG = 180 / Math.PI;
+
+// Local reference point (lon, lat) to keep world coordinates small and Mapbox-like
+export const REF_LON = 126.95336;
+export const REF_LAT = 37.34524;
+export const REF_LAMBDA = REF_LON * DEG2RAD;
+export const REF_PHI = REF_LAT * DEG2RAD;
+export const REF_MX = EARTH_RADIUS * REF_LAMBDA;
+export const REF_MY = EARTH_RADIUS * Math.log(Math.tan(Math.PI / 4 + REF_PHI / 2));
+
 export const req = [
 	{
 		name: "name"

@@ -1,5 +1,4 @@
-// src/map/sideBarUtils.js
-import { SC } from './mapConfig.js';
+import { basicInfos } from './mapRequests.js';
 import { reqBuildingsInfo } from './mapRequests.js';
 
 /**
@@ -31,18 +30,10 @@ export function toggleRoomFavoriteInList(favorites, rid) {
 }
 
 /**
- * ===== 데이터 소스 =====
- */
-export function getRoomList() {
-	// { [bid]: [ [ {rid, name}, ... ] /* floor0 */, [ ... ] /* floor1 */, ... ] }
-	return SC?.roomList || {};
-}
-
-/**
  * rid 인덱스: rid -> { bid, floorIndex, name }
  */
 export function indexRoomList() {
-	const roomList = getRoomList();
+	const roomList = basicInfos;
 	const idx = {};
 	for (const [bid, f] of Object.entries(roomList)) {
 		const floors = f.rooms;
@@ -68,7 +59,7 @@ export function indexRoomList() {
 // 리턴은 { [bid]: { name: ... } } 또는 [{ bid, name }, ...] 같은 구조라고 가정
 
 async function fetchBuildings() {
-	const bids = SC?.bidList || Object.keys(getRoomList());
+	const bids = Object.keys(basicInfos);
 	if (!bids || !bids.length) return [];
 
 	const req = [{ name: 'name' }, {bmLevel: "bmLevel"}, {}];
