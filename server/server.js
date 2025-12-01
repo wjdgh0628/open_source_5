@@ -1,6 +1,7 @@
 import express from 'express';
 import path from 'path';
 import { exec } from 'child_process';
+import readline from 'readline';
 
 import { __dirname, PORT, idRules, SC } from './scripts/server.config.js';
 import { api } from './scripts/api.js';
@@ -72,8 +73,65 @@ export function initList() {
 	SC.roomList = res;
 }
 
-app.listen(PORT, () => {
-	initList();
-	// console.log(SC.roomList);
-	console.log(`Rooms server running at http://localhost:${PORT}`);
-});
+let server;
+
+function startServer() {
+	server = app.listen(PORT, () => {
+		initList();
+		console.log(`Rooms server running at http://localhost:${PORT}`);
+		console.log('Controls: press r to restart, q to quit');
+	});
+}
+
+function restartServer() {
+	if (!server) return startServer();
+	console.log('Restarting server...');
+	server.close(() => {
+		// 재시작 시 필요한 초기화가 있으면 여기서 수행
+		startServer();
+	});
+}
+
+function shutdownServer(code = 0) {
+	if (!server) process.exit(code);
+	console.log('Shutting down server...');
+	server.close(() => {
+		process.exit(code);
+	});
+}
+
+// 터미널에서 줄 단위 입력 처리 (엔터로 확정)
+if (process.stdin.isTTY) {
+	const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+	const prompt = () => rl.setPrompt('> [r]estart, [q]uit, [o]pen editor: ');
+	prompt();
+	rl.prompt();
+	rl.on('line', (line) => {
+		const k = (line || '').trim().toLowerCase();
+		if (k === 'r') {
+			restartServer();
+		} else if (k === 'q') {
+			rl.close();
+			shutdownServer(0);
+			return;
+		} else if (k === 'o') {
+			const url = `http://localhost:${PORT}/editor/editor.html`;
+			console.log(`Opening editor: ${url}`);
+			openInBrowser(url);
+		} else if (k) {
+			console.log('Unknown command:', k);
+		}
+		prompt();
+		rl.prompt();
+	});
+	rl.on('SIGINT', () => {
+		rl.close();
+		shutdownServer(0);
+	});
+}
+
+// 일반 시그널 처리
+process.on('SIGINT', () => shutdownServer(0));
+process.on('SIGTERM', () => shutdownServer(0));
+
+startServer();
