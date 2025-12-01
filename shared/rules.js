@@ -5,7 +5,8 @@ export const idRules = {
 	rid: (bid, lvI, index) => { return `${bid}_${lvI}_${index}`; },
 	roomSid: (fid) => { return `${fid}_rooms`; },
 	clickedFloor: (bid, lvI) => { return `${bid}_${lvI}_base`; },
-	lid: (pid) => { return `${pid}_label`; },
+	lid: (id) => { return `${id}_label`; },
+	pid: (rid) => { return `${rid}_marker`; },
 	level: (bmLevel, lvI) => { return lvI >= bmLevel ? (lvI - bmLevel) + 1 : (bmLevel - lvI) * -1; },
 	lvChar: (bmLevel, lvI) => { return lvI >= bmLevel ? `${lvI - bmLevel + 1}F` : `B${bmLevel - lvI}`; },
 	lvI: (bmLevel, level) => { return level < 0 ? level + bmLevel : level + bmLevel - 1; }

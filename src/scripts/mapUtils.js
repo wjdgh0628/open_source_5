@@ -1,14 +1,37 @@
+import mapboxgl from 'mapbox-gl';
+
 import { idRules } from '../../shared/rules.js';
 import { MC } from './mapConfig.js';
 import { reqBasicInfos } from './mapRequests.js';
 import { handleFloorClick } from './mapHandlers.js';
 import { reqRoomsByLvI } from './mapRequests.js';
 
+//팝업 관련 전역 변수
+let hoverPopup = null;
+let hoverPopupLayerId = null;
+
 /**카메라 이동 함수*/
 export function flyCamera(map, mode, center, bearing = null) {
 	if (bearing == null)
 		bearing = MC.camera[mode].bearing;
-	map.flyTo({ center, ...MC.camera[mode], bearing: bearing, ssential: true });
+	map.flyTo({ center, ...MC.camera[mode], bearing: bearing, essential: true });
+}
+/**폴리곤 무게중심 계산 함수*/
+function calCenter(polygon) {
+	const pts = polygon[0];
+	let minX = pts[0][0], maxX = pts[0][0];
+	let minY = pts[0][1], maxY = pts[0][1];
+
+	for (let i = 1; i < pts.length; i++) {
+		const x = pts[i][0];
+		const y = pts[i][1];
+		if (x < minX) minX = x;
+		if (x > maxX) maxX = x;
+		if (y < minY) minY = y;
+		if (y > maxY) maxY = y;
+	}
+
+	return [(minX + maxX) / 2, (minY + maxY) / 2];
 }
 
 
@@ -39,32 +62,51 @@ function setLayers(map, sourceId, features) {
 				"fill-extrusion-opacity": 1
 			}
 		});
-		if (!f.properties.name) return; //이름이 없으면 라벨 생성 안함
-		map.addLayer({
-			id: idRules.lid(layerId),
-			type: 'symbol',
-			source: sourceId,
-			filter: ["==", ["get", "layerId"], layerId],
-			layout: {
-				'text-field': ["get", "name"],
-				'text-size': 14,
-				'text-anchor': ["get", "anchor"],
-				'text-allow-overlap': true,
-				'symbol-placement': 'point',
-				'symbol-z-order': "source"
-			},
-			paint: {
-				'symbol-z-offset': f.properties.base,
-				'text-color': '#000000',
-				'text-halo-color': '#ffffff',
-				'text-halo-width': 2
-			}
-		});
+		if (f.properties.name) { //이름이 없으면 라벨 생성 안함
+			map.addLayer({
+				id: idRules.lid(layerId),
+				type: 'symbol',
+				source: sourceId,
+				filter: ["==", ["get", "layerId"], layerId],
+				layout: {
+					'text-field': ["get", "name"],
+					'text-size': 14,
+					'text-anchor': ["get", "anchor"],
+					'text-allow-overlap': true,
+					'symbol-placement': 'point',
+					'symbol-z-order': "source"
+				},
+				paint: {
+					'symbol-z-offset': f.properties.base,
+					'text-color': '#000000',
+					'text-halo-color': '#ffffff',
+					'text-halo-width': 2
+				}
+			});
+		}
+		if (f.properties.popup) { //팝업 정보가 있으면 팝업 레이어 생성
+			let popup = null;
+			map.on('mouseenter', layerId, () => {
+				popup = new mapboxgl.Popup({ altitude: f.properties.base + MC.layerProps.roomThickness, closeButton: false, closeOnClick: true })
+					.setLngLat(f.properties.center)
+					.setHTML(f.properties.popup)
+					.setMaxWidth("300px")
+					.addTo(map);
+				// console.log(f.properties.center);
+			});
+			map.on('mouseleave', layerId, () => {
+				if (popup) {
+					popup.remove();
+					popup = null;
+					// console.log("팝업 제거");
+				}
+			});
+		}
 		// console.log(CONFIG.idRules.lid(layerId));
 	});
 }
 /**핸들러 적용 함수*/
-export function setHandler(map, type , id, callback) {
+export function setHandler(map, type, id, callback) {
 	const handler = e => {
 		const features = map.queryRenderedFeatures(e.point);
 		if (!features.length) { return; }
@@ -92,9 +134,9 @@ export function hideLayer(map, id) {
 }
 /**특정 건물의 층들 숨기기*/
 export async function hideFloorsByBid(map, bid, basicInfos) {
-	if(!basicInfos) basicInfos = await reqBasicInfos();
+	if (!basicInfos) basicInfos = await reqBasicInfos();
 	const lvCount = (basicInfos[bid].rooms.length);
-	allFloors(map, lvCount ,bid, (map, fid, lvI) => {
+	allFloors(map, lvCount, bid, (map, fid, lvI) => {
 		hideLayer(map, fid);
 		hideAllRooms(map, bid, lvI, basicInfos);
 	});
@@ -114,7 +156,7 @@ export async function hideAllRooms(map, bid, lvI, basicInfos) {
 
 
 /**건물 내 전체 층에 대해 콜백*/
-function allFloors(map, lvCount ,bid, cb) {
+function allFloors(map, lvCount, bid, cb) {
 	for (let i = 0; i < lvCount; i++) {
 		const fid = idRules.fid(bid, i);
 		cb(map, fid, i);
@@ -122,7 +164,7 @@ function allFloors(map, lvCount ,bid, cb) {
 }
 /**층 내 전체 방에 대해 콜백*/
 async function allRooms(map, bid, lvI, cb, basicInfos) {
-	if(!basicInfos) basicInfos = await reqBasicInfos();
+	if (!basicInfos) basicInfos = await reqBasicInfos();
 	const rooms = basicInfos[bid].rooms[lvI];
 	rooms.forEach((r) => cb(map, r.rid));
 }
@@ -135,7 +177,7 @@ export function setFloors(map, fInfo) {
 	const bid = fInfo.bid;
 	const lvCount = fInfo.flLevel + fInfo.bmLevel;
 	if (map.getSource(idRules.floorSid(bid))) {
-		allFloors(map, lvCount, bid, (map, fid) => {showLayer(map, fid);});
+		allFloors(map, lvCount, bid, (map, fid) => { showLayer(map, fid); });
 	}
 	else {
 		generateFloors(map, fInfo);
@@ -228,7 +270,9 @@ async function generateRooms(map, fInfo, fid, lvI) {
 				color: room.color ? room.color : "#0088ff",// 임시 컬러
 				anchor: "bottom",
 				// offset: 0,
-				layerId: idRules.rid(bid, lvI, i)
+				layerId: idRules.rid(bid, lvI, i),
+				popup: room.describe ? room.describe : "상세설명 없음",
+				center: calCenter(room.polygon)
 			},
 			geometry: { type: "Polygon", coordinates: room.polygon }
 		});
