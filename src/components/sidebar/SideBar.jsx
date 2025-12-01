@@ -7,14 +7,14 @@ import {
 	// fetchBuildings,
 	getRoomList,
 	indexRoomList,
-} from '../scripts/sideBarUtils.js';
+} from '../../scripts/sideBarUtils.js';
 
 import './SideBar.css';
-import LogoImg from '../assets/logo2.png';
+import LogoImg from '../../assets/logo2.png';
 
 import Favorites from './Favorites.jsx';
 import BuildingList from './BuildingList.jsx';
-import { handleRoomListClick } from '../scripts/mapHandlers.js';
+import { handleRoomListClick } from '../../scripts/mapHandlers.js';
 
 export default function SideBar({ map }) {
 	// UI 상태
