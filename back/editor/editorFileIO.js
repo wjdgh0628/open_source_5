@@ -1,5 +1,6 @@
-import { url } from "../../shared/rules.js";
+import { setApiUrl } from "../shared/rules.js";
 
+const url = setApiUrl("../");
 let stateRef = null;
 let refreshSavedList = () => { };
 let refreshDraftList = () => { };
