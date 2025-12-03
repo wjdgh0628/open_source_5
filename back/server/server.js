@@ -3,10 +3,10 @@ import path from 'path';
 import { exec } from 'child_process';
 import readline from 'readline';
 
-import { __dirname, SC, basicInfos } from './scripts/serverConfig.js';
-import { api } from './scripts/api.js';
-import { fetchAllRooms, fetchBuildingsInfo } from './scripts/fileIO.js';
-import { idRules, jsonProp, serverPort as PORT } from '../shared/rules.js';
+import { __dirname, SC, basicInfos } from '#scripts/serverConfig.js';
+import { api } from '#scripts/api.js';
+import { fetchAllRooms, fetchBuildingsInfo } from '#scripts/fileIO.js';
+import { idRules, jsonProp, serverPort as PORT } from '#shared/rules.js';
 
 const app = express();
 let server;

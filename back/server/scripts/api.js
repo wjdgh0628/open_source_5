@@ -4,7 +4,7 @@ import fs from 'fs';
 
 import { basicInfos, SC } from './serverConfig.js';
 import { fetchBuildingInfo, fetchBuildingsInfo, fetchRoomsByLvI } from './fileIO.js';
-import { initList } from '../server.js';
+import { initList } from '#server/server.js';
 
 let requested = 0; // 요청 횟수 카운트
 let jsonRequested = 0; // JSON 요청 횟수 카운트
