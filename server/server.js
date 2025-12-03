@@ -3,37 +3,40 @@ import path from 'path';
 import { exec } from 'child_process';
 import readline from 'readline';
 
-import { __dirname, PORT, idRules, SC } from './scripts/server.config.js';
+import { __dirname, SC, basicInfos } from './scripts/serverConfig.js';
 import { api } from './scripts/api.js';
 import { fetchAllRooms, fetchBuildingsInfo } from './scripts/fileIO.js';
-// import { fetchBuildings } from '../src/scripts/sideBarUtils.js';
-const app = express();
+import { idRules, jsonProp, serverPort as PORT } from '../shared/rules.js';
 
+const app = express();
+let server;
+
+// app.use('/', express.static(path.join(__dirname)));
 app.use('/api', api);
 app.use('/editor', express.static(path.join(__dirname, 'editor')));
-// app.use('/', express.static(path.join(__dirname)));
+app.use('/shared', express.static(path.resolve(__dirname, '../shared')));
 
 app.get("/editor", (req, res) => {
 	res.redirect("/editor/editor.html");
 });
-
-function openInBrowser(url) {
-	const opener = process.platform === "darwin" ? "open" : process.platform === "win32" ? "start" : "xdg-open";
-	const command = process.platform === "win32" ? `${opener} "" "${url}"` : `${opener} "${url}"`;
-	exec(command, (err) => {
-		if (err) console.error(`Failed to open ${url}: ${err.message}`);
-	});
-}
-
+/** 
+ *	console.log('Initialized basicInfos:', basicInfos);
+ *	최종 roomList 구조:
+ *	{
+ *		[bid]: {
+ *	    	name: string,
+ *	    	bmLevel: number,
+ *	    	rooms: Array<Array<{ name: string, rid: string }>>
+ *		}
+ *	}
+ */
 export function initList() {
 	// 원본 방 데이터: { [bid]: Array<Array<{ name: string, ... }>> }
 	const rData = fetchAllRooms();
 
 	// 건물 정보(name, bmLevel 등) 요청
-	const req = [{ bid: SC.jsonProp.id, name: 'name' }, { bmLevel: 'bmLevel' }, {}];
+	const req = [{ bid: jsonProp.id, name: 'name' }, { bmLevel: 'bmLevel' }, {}];
 	const bData = fetchBuildingsInfo(SC.bidList, req); // { [bid]: { name, bmLevel, ... } }
-
-	const res = {};
 
 	for (const bid of Object.keys(rData || {})) {
 		const buildingRooms = rData[bid] || [];
@@ -55,25 +58,22 @@ export function initList() {
 			floorsArr[lvI] = roomsArr;
 		});
 
-		res[bid] = {
+		basicInfos[bid] = {
 			name,
 			bmLevel,
 			rooms: floorsArr,
 		};
 	}
-
-	// 최종 roomList 구조:
-	// {
-	//   [bid]: {
-	//     name: string,
-	//     bmLevel: number,
-	//     rooms: Array<Array<{ name: string, rid: string }>>
-	//   }
-	// }
-	SC.roomList = res;
+}
+function openInBrowser(url) {
+	const opener = process.platform === "darwin" ? "open" : process.platform === "win32" ? "start" : "xdg-open";
+	const command = process.platform === "win32" ? `${opener} "" "${url}"` : `${opener} "${url}"`;
+	exec(command, (err) => {
+		if (err) console.error(`Failed to open ${url}: ${err.message}`);
+	});
 }
 
-let server;
+
 
 function startServer() {
 	server = app.listen(PORT, () => {
@@ -100,38 +100,40 @@ function shutdownServer(code = 0) {
 	});
 }
 
-// 터미널에서 줄 단위 입력 처리 (엔터로 확정)
-if (process.stdin.isTTY) {
-	const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-	const prompt = () => rl.setPrompt('> [r]estart, [q]uit, [o]pen editor: ');
-	prompt();
-	rl.prompt();
-	rl.on('line', (line) => {
-		const k = (line || '').trim().toLowerCase();
-		if (k === 'r') {
-			restartServer();
-		} else if (k === 'q') {
+function readlinePrompt() {
+	if (process.stdin.isTTY) {
+		const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+		const prompt = () => rl.setPrompt('> [r]estart, [q]uit, [o]pen editor: ');
+		// prompt();
+		// rl.prompt();
+		rl.on('line', (line) => {
+			const k = (line || '').trim().toLowerCase();
+			if (k === 'r') {
+				restartServer();
+			} else if (k === 'q') {
+				rl.close();
+				shutdownServer(0);
+				return;
+			} else if (k === 'o') {
+				const url = `http://localhost:${PORT}/editor/editor.html`;
+				console.log(`Opening editor: ${url}`);
+				openInBrowser(url);
+			} else if (k) {
+				console.log('Unknown command:', k);
+			}
+			prompt();
+			rl.prompt();
+		});
+		rl.on('SIGINT', () => {
 			rl.close();
 			shutdownServer(0);
-			return;
-		} else if (k === 'o') {
-			const url = `http://localhost:${PORT}/editor/editor.html`;
-			console.log(`Opening editor: ${url}`);
-			openInBrowser(url);
-		} else if (k) {
-			console.log('Unknown command:', k);
-		}
-		prompt();
-		rl.prompt();
-	});
-	rl.on('SIGINT', () => {
-		rl.close();
-		shutdownServer(0);
-	});
+		});
+	}
 }
 
+startServer();
 // 일반 시그널 처리
 process.on('SIGINT', () => shutdownServer(0));
 process.on('SIGTERM', () => shutdownServer(0));
+readlinePrompt();
 
-startServer();

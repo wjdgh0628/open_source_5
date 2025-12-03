@@ -1,16 +1,14 @@
-import { SC } from './server.config.js';
+import { SC } from './serverConfig.js';
+import { jsonProp } from '../../shared/rules.js';
 import fs from 'fs';
 
 function fetchBuildings() {
-	// console.log(fs.existsSync(SC.buildings));
-	console.log(++fetched);
 	return JSON.parse(fs.readFileSync(SC.buildings, 'utf-8'));
 }
 function fetchBuildingByBid(bid) {
-	// console.log(fs.existsSync(SC.buildings));
 	const data = fetchBuildings();
 
-	const feature = data.features.find(f => f.properties[SC.jsonProp.id] === bid);
+	const feature = data.features.find(f => f.properties[jsonProp.id] === bid);
 	if (feature){
 		return feature;
 	}
@@ -54,23 +52,18 @@ export function fetchBuildingsInfo(bids, opt) {
 	const features = [];
 
 	data.forEach(feature => {
-		const id = feature.properties[SC.jsonProp.id]; // "@id" 같은 키
+		const id = feature.properties[jsonProp.id]; // "@id" 같은 키
 		if (bidSet.has(id)) {
 			features[id] = (filterBuilidingProps(feature, opt));
 		}
 	});
-	/* console.log(data);
-	console.log(features); */
 	return features;
 }
 
 export function fetchAllRooms() {
-	console.log(++fetched);
-	// console.log(fs.existsSync(SC.buildings));
 	return JSON.parse(fs.readFileSync(SC.rooms, 'utf-8'));
 }
 export function fetchRoomsByLvI(bid, lvI) {
-	// console.log(fs.existsSync(SC.buildings));
 	const data = fetchAllRooms();
 	const rooms = data[bid][lvI];
 	
@@ -82,5 +75,3 @@ export function fetchRoomsByLvI(bid, lvI) {
 		return false;
 	}
 }
-
-let fetched = 0;

@@ -1,22 +1,22 @@
-import { SC } from "./editorConfig.js";
+import { url } from "../shared/rules.js";
 
 let stateRef = null;
-let refreshSavedList = () => {};
-let refreshDraftList = () => {};
-let drawRef = () => {};
+let refreshSavedList = () => { };
+let refreshDraftList = () => { };
+let drawRef = () => { };
 
 let roomsSaveTimer = null;
 
 export function initFileIO(state, callbacks) {
 	stateRef = state;
-	refreshSavedList = callbacks.refreshSavedList || (() => {});
-	refreshDraftList = callbacks.refreshDraftList || (() => {});
-	drawRef = callbacks.draw || (() => {});
+	refreshSavedList = callbacks.refreshSavedList || (() => { });
+	refreshDraftList = callbacks.refreshDraftList || (() => { });
+	drawRef = callbacks.draw || (() => { });
 }
 
 export async function loadRoomsDB() {
 	try {
-		const res = await fetch(SC.roomsUrl);
+		const res = await fetch(url.roomsUrl);
 		const data = await res.json();
 		stateRef.roomsDB = data || {};
 	} catch (e) {
@@ -42,8 +42,8 @@ export function loadSavedRoomsForCurrent() {
 			// Handle [[lon,lat], ...] or [[[lon,lat], ...], ...] (GeoJSON Polygon)
 			if (
 				r.polygon.length &&
-Array.isArray(r.polygon[0]) &&
-Array.isArray(r.polygon[0][0])
+				Array.isArray(r.polygon[0]) &&
+				Array.isArray(r.polygon[0][0])
 			) {
 				// Outer ring
 				pts = r.polygon[0];
@@ -81,7 +81,7 @@ export function requestSaveRoomsToServer() {
 async function saveRoomsToServer() {
 	try {
 		writeSavedBackToDB(); // state.saved → state.roomsDB 반영
-		const res = await fetch(SC.roomsUrl, {
+		const res = await fetch(url.roomsUrl, {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify(stateRef.roomsDB)

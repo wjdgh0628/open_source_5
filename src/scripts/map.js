@@ -1,9 +1,16 @@
-import { MC, SC, idRules } from './mapConfig.js';
-import { setHandler } from './mapUtils.js';
-import { handleBuildingClick, handleBackgroundClick } from './mapHandlers.js';
 import mapboxgl from 'mapbox-gl';
 
-let mapInstance = null;
+import { idRules, url } from '../../shared/rules.js';
+import { MC } from './mapConfig.js';
+import { setHandler } from './mapUtils.js';
+import { handleBuildingClick, handleBackgroundClick } from './mapHandlers.js';
+
+export const current = {
+	mapInstance: null,
+	mode: 0,
+	bid: null,
+	lvI: null
+};
 
 function initMap() {
 	mapboxgl.accessToken = MC.map.key;
@@ -23,7 +30,7 @@ function initMap() {
 				"sky-atmosphere-sun-intensity": 15
 			}
 		});
-		map.addSource("campus", { type: "geojson", data: SC.buildingsUrl });
+		map.addSource("campus", { type: "geojson", data: url.buildingsUrl });
 		map.addLayer({
 			id: idRules.buildings,
 			type: "fill-extrusion",
@@ -44,7 +51,7 @@ function initMap() {
 }
 
 export function start() {
-	const map =  mapInstance ? mapInstance : mapInstance = initMap();
+	const map =  current.mapInstance ? current.mapInstance : current.mapInstance = initMap();
 
 	return map;
 }

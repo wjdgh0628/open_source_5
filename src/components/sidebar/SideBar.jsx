@@ -1,13 +1,5 @@
 // src/SideBar.jsx
 import React, { useEffect, useMemo, useState } from 'react';
-import {
-	loadRoomFavorites,
-	saveRoomFavorites,
-	toggleRoomFavoriteInList,
-	// fetchBuildings,
-	getRoomList,
-	indexRoomList,
-} from '../../scripts/sideBarUtils.js';
 
 import './SideBar.css';
 import LogoImg from '../../assets/logo2.png';
@@ -15,6 +7,10 @@ import LogoImg from '../../assets/logo2.png';
 import Favorites from './Favorites.jsx';
 import BuildingList from './BuildingList.jsx';
 import { handleRoomListClick } from '../../scripts/mapHandlers.js';
+import { loadRoomFavorites, saveRoomFavorites, toggleRoomFavoriteInList, indexRoomList } from '../../scripts/sideBarUtils.js';
+
+import { url } from '../../../shared/rules.js';
+const basicInfos = await (await fetch(url.bInfoUrl)).json();
 
 export default function SideBar({ map }) {
 	// UI 상태
@@ -37,17 +33,17 @@ export default function SideBar({ map }) {
 
 
 	// SC.roomList 및 rid 인덱스
-	const roomList = useMemo(() => getRoomList(), []);
+	const roomList = useMemo(() => basicInfos, []);
 	const ridIndex = useMemo(() => indexRoomList(), []);
 
 	// bid -> building name 매핑
 	const buildingNameMap = useMemo(() => {
 		const m = {};
-		for (const [bid, data] of Object.entries(roomList || {})) {
+		for (const [bid, data] of Object.entries(basicInfos || {})) {
 			if (data && data.name) m[bid] = data.name;
 		}
 		return m;
-	}, [roomList]);
+	}, []);
 
 	// 즐겨찾기 토글(방 rid 기준)
 	const toggleFavoriteRoom = (rid) => {

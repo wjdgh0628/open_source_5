@@ -1,4 +1,6 @@
-import { MC, SC, idRules } from './mapConfig.js';
+import { idRules } from '../../shared/rules.js';
+import { MC } from './mapConfig.js';
+import { reqBasicInfos } from './mapRequests.js';
 import { handleFloorClick } from './mapHandlers.js';
 import { reqRoomsByLvI } from './mapRequests.js';
 
@@ -49,19 +51,13 @@ function setLayers(map, sourceId, features) {
 				'text-anchor': ["get", "anchor"],
 				'text-allow-overlap': true,
 				'symbol-placement': 'point',
-				'symbol-z-order': "source",
-				// 'symbol-spacing': 1,
-				// 'text-radial-offset': ["get", "offset"],
-				// 'symbol-avoid-edges': true
-				// 'symbol-z-elevate': true
+				'symbol-z-order': "source"
 			},
 			paint: {
 				'symbol-z-offset': f.properties.base,
 				'text-color': '#000000',
 				'text-halo-color': '#ffffff',
-				'text-halo-width': 2,
-				// "text-translate": [0, 0],
-				// "text-translate-anchor": "viewport"
+				'text-halo-width': 2
 			}
 		});
 		// console.log(CONFIG.idRules.lid(layerId));
@@ -95,23 +91,25 @@ export function hideLayer(map, id) {
 	map.getLayer(idRules.lid(id)) && map.setLayoutProperty(idRules.lid(id), "visibility", "none");
 }
 /**특정 건물의 층들 숨기기*/
-export async function hideFloorsByBid(map, bid) {
-	const lvCount = (SC.roomList[bid].rooms.length);
+export async function hideFloorsByBid(map, bid, basicInfos) {
+	if(!basicInfos) basicInfos = await reqBasicInfos();
+	const lvCount = (basicInfos[bid].rooms.length);
 	allFloors(map, lvCount ,bid, (map, fid, lvI) => {
 		hideLayer(map, fid);
-		hideAllRooms(map, bid, lvI);
+		hideAllRooms(map, bid, lvI, basicInfos);
 	});
 }
 /**전체 건물들 층 숨기기*/
 async function hideAllFloors(map) {
-	for (const bid of SC.bidList) {
+	const bidList = Object.keys(await reqBasicInfos());
+	for (const bid of bidList) {
 		await hideFloorsByBid(map, bid);
 	}
 }
 /**층 내 전체 방 숨기기*/
-export async function hideAllRooms(map, bid, lvI) {
+export async function hideAllRooms(map, bid, lvI, basicInfos) {
 	hideLayer(map, idRules.clickedFloor(bid, lvI));
-	await allRooms(map, bid, lvI, (map, rid) => hideLayer(map, rid));
+	await allRooms(map, bid, lvI, (map, rid) => hideLayer(map, rid), basicInfos);
 }
 
 
@@ -123,8 +121,9 @@ function allFloors(map, lvCount ,bid, cb) {
 	}
 }
 /**층 내 전체 방에 대해 콜백*/
-async function allRooms(map, bid, lvI, cb) {
-	const rooms = SC.roomList[bid].rooms[lvI];
+async function allRooms(map, bid, lvI, cb, basicInfos) {
+	if(!basicInfos) basicInfos = await reqBasicInfos();
+	const rooms = basicInfos[bid].rooms[lvI];
 	rooms.forEach((r) => cb(map, r.rid));
 }
 
