@@ -1,4 +1,4 @@
-import { idRules, jsonProp } from '../../shared/rules.js';
+import { idRules, jsonProp } from '@shared/rules.js';
 import { MC, req } from './mapConfig.js';
 import { current } from './map.js';
 import { showLayer, hideLayer, hideFloorsByBid, hideAllRooms, setFloors, flyCamera, setRooms } from './mapUtils.js';

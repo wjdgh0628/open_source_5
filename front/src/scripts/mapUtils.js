@@ -1,4 +1,4 @@
-import { idRules } from '../../shared/rules.js';
+import { idRules } from '@shared/rules.js';
 import { MC } from './mapConfig.js';
 import { reqBasicInfos } from './mapRequests.js';
 import { handleFloorClick } from './mapHandlers.js';

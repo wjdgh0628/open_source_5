@@ -1,5 +1,4 @@
-import { basicInfos } from './mapRequests.js';
-import { reqBuildingsInfo } from './mapRequests.js';
+import { basicInfos, reqBuildingsInfo } from './mapRequests.js';
 
 /**
  * ===== 즐겨찾기(방 rid 전용) ====

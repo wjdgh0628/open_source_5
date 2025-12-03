@@ -1,4 +1,4 @@
-import { url } from "../shared/rules.js";
+import { url } from "../../shared/rules.js";
 
 let stateRef = null;
 let refreshSavedList = () => { };

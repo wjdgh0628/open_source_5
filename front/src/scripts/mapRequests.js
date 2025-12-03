@@ -1,5 +1,5 @@
-import { url } from '../../shared/rules.js';
-export const basicInfos = reqBasicInfos();
+import { url } from '@shared/rules.js';
+export const basicInfos = await reqBasicInfos();
 export async function reqBasicInfos() {
 	return await (await fetch(url.bInfoUrl)).json();
 }

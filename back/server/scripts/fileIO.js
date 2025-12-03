@@ -1,5 +1,5 @@
 import { SC } from './serverConfig.js';
-import { jsonProp } from '../../../shared/rules.js';
+import { jsonProp } from '../../shared/rules.js';
 import fs from 'fs';
 
 function fetchBuildings() {

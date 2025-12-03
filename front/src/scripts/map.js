@@ -1,6 +1,6 @@
 import mapboxgl from 'mapbox-gl';
 
-import { idRules, url } from '../../shared/rules.js';
+import { idRules, url } from '@shared/rules.js';
 import { MC } from './mapConfig.js';
 import { setHandler } from './mapUtils.js';
 import { handleBuildingClick, handleBackgroundClick } from './mapHandlers.js';

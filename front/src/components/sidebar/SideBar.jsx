@@ -2,14 +2,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
 import './SideBar.css';
-import LogoImg from '../../assets/logo2.png';
+import LogoImg from '@assets/logo2.png';
 
 import Favorites from './Favorites.jsx';
 import BuildingList from './BuildingList.jsx';
-import { handleRoomListClick } from '../../scripts/mapHandlers.js';
-import { loadRoomFavorites, saveRoomFavorites, toggleRoomFavoriteInList, indexRoomList } from '../../scripts/sideBarUtils.js';
+import { handleRoomListClick } from '@scripts/mapHandlers.js';
+import { loadRoomFavorites, saveRoomFavorites, toggleRoomFavoriteInList, indexRoomList } from '@scripts/sideBarUtils.js';
 
-import { url } from '../../../shared/rules.js';
+import { url } from '@shared/rules.js';
 const basicInfos = await (await fetch(url.bInfoUrl)).json();
 
 export default function SideBar({ map }) {
