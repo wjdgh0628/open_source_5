@@ -15,15 +15,16 @@ export const jsonProp = {
 	name: "name",
 };
 
-export const serverPort = 4000;
-export const server = `http://localhost:${serverPort}`;
+export const PORT = 4000;
+export const server = `http://localhost:${PORT}`;
 
-export const url = {
-	roomsUrl: server + "/api/json/rooms",
-	buildingsUrl: server + "/api/json/buildings",
-	
-	reqRooms: server + "/api/request/rooms",
-	reqBuildings: server + "/api/request/buildings",
+export const setApiUrl = (base) => (
+	{
+		roomsUrl: base + "/api/json/rooms",
+		buildingsUrl: base + "/api/json/buildings",
 
-	bInfoUrl: server + "/api/basicInfos",
-};
+		reqRooms: base + "/api/request/rooms",
+		reqBuildings: base + "/api/request/buildings",
+		bInfoUrl: base + "/api/basicInfos",
+	}
+);

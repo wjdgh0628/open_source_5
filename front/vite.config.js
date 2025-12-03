@@ -4,7 +4,8 @@ import path from 'path';
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
-	return {
+	const isDev = mode === 'development';
+	const basicSettings = {
 		plugins: [react()],
 		server: {
 			fs: {
@@ -16,11 +17,17 @@ export default defineConfig(({ mode }) => {
 		},
 		resolve: {
 			alias: [
-				{ find: '@shared', replacement: path.resolve(__dirname, '../back/shared') },
+				{ find: '@shared', replacement: path.resolve(__dirname, isDev? '../back/shared' : '../back/shared') },
 				{ find: '@scripts', replacement: path.resolve(__dirname, 'src/scripts') },
 				{ find: '@components', replacement: path.resolve(__dirname, 'src/components') },
 				{ find: '@assets', replacement: path.resolve(__dirname, 'src/assets') }
 			]
-		}
+		},
+		define: {
+			__API_BASE__: JSON.stringify(
+				isDev ? 'http://localhost:4000' : '../'
+			)
+		},
 	};
+	return basicSettings;
 });

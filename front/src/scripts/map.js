@@ -1,6 +1,6 @@
 import mapboxgl from 'mapbox-gl';
 
-import { idRules, url } from '@shared/rules.js';
+import { idRules, setApiUrl } from '@shared/rules.js';
 import { MC } from './mapConfig.js';
 import { setHandler } from './mapUtils.js';
 import { handleBuildingClick, handleBackgroundClick } from './mapHandlers.js';
@@ -11,6 +11,8 @@ export const current = {
 	bid: null,
 	lvI: null
 };
+
+const url = setApiUrl(__API_BASE__);
 
 function initMap() {
 	mapboxgl.accessToken = MC.map.key;

@@ -1,4 +1,6 @@
-import { url } from '@shared/rules.js';
+import { setApiUrl } from '@shared/rules.js';
+
+const url = setApiUrl(__API_BASE__);
 export const basicInfos = await reqBasicInfos();
 export async function reqBasicInfos() {
 	return await (await fetch(url.bInfoUrl)).json();

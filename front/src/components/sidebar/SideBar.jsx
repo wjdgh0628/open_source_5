@@ -9,7 +9,9 @@ import BuildingList from './BuildingList.jsx';
 import { handleRoomListClick } from '@scripts/mapHandlers.js';
 import { loadRoomFavorites, saveRoomFavorites, toggleRoomFavoriteInList, indexRoomList } from '@scripts/sideBarUtils.js';
 
-import { url } from '@shared/rules.js';
+import { setApiUrl } from '@shared/rules.js';
+
+const url = setApiUrl(__API_BASE__);
 const basicInfos = await (await fetch(url.bInfoUrl)).json();
 
 export default function SideBar({ map }) {
