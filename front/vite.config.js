@@ -23,6 +23,7 @@ export default defineConfig(({ mode }) => {
 				{ find: '@assets', replacement: path.resolve(__dirname, 'src/assets') }
 			]
 		},
+		base: isDev ? '/' : '/map/',
 		define: {
 			__API_BASE__: JSON.stringify(
 				isDev ? 'http://localhost:4000' : '../'

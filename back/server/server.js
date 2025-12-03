@@ -13,11 +13,15 @@ let server;
 
 // app.use('/', express.static(path.join(__dirname)));
 app.use('/api', api);
-app.use('/editor', express.static(path.join(__dirname, 'editor')));
+app.use('/editor', express.static(path.join(__dirname, '../editor')));
+app.use('/map', express.static(path.join(__dirname, '../map/dist')));
 app.use('/shared', express.static(path.resolve(__dirname, '../shared')));
 
 app.get("/editor", (req, res) => {
 	res.redirect("/editor/editor.html");
+});
+app.get("/", (req, res) => {
+	res.redirect("/map/index.html");
 });
 /** 
  *	console.log('Initialized basicInfos:', basicInfos);

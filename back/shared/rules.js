@@ -20,11 +20,11 @@ export const server = `http://localhost:${PORT}`;
 
 export const setApiUrl = (base) => (
 	{
-		roomsUrl: base + "/api/json/rooms",
-		buildingsUrl: base + "/api/json/buildings",
+		roomsUrl: base + "api/json/rooms",
+		buildingsUrl: base + "api/json/buildings",
 
-		reqRooms: base + "/api/request/rooms",
-		reqBuildings: base + "/api/request/buildings",
-		bInfoUrl: base + "/api/basicInfos",
+		reqRooms: base + "api/request/rooms",
+		reqBuildings: base + "api/request/buildings",
+		bInfoUrl: base + "api/basicInfos",
 	}
 );
