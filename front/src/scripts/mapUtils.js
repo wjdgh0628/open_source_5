@@ -1,14 +1,13 @@
 import { idRules } from '@shared/rules.js';
+// import { cache } from '@components/App.jsx';
 import { MC } from './mapConfig.js';
-import { reqBasicInfos } from './mapRequests.js';
 import { handleFloorClick } from './mapHandlers.js';
-import { reqRoomsByLvI } from './mapRequests.js';
 
 /**카메라 이동 함수*/
 export function flyCamera(map, mode, center, bearing = null) {
 	if (bearing == null)
 		bearing = MC.camera[mode].bearing;
-	map.flyTo({ center, ...MC.camera[mode], bearing: bearing, ssential: true });
+	map.flyTo({ center, ...MC.camera[mode], bearing: bearing, essential: true });
 }
 
 
@@ -91,25 +90,24 @@ export function hideLayer(map, id) {
 	map.getLayer(idRules.lid(id)) && map.setLayoutProperty(idRules.lid(id), "visibility", "none");
 }
 /**특정 건물의 층들 숨기기*/
-export async function hideFloorsByBid(map, bid, basicInfos) {
-	if(!basicInfos) basicInfos = await reqBasicInfos();
-	const lvCount = (basicInfos[bid].rooms.length);
+export async function hideFloorsByBid(map, bid) {
+	const lvCount = (cache.buildingsInfo[bid].rooms.length);
 	allFloors(map, lvCount ,bid, (map, fid, lvI) => {
 		hideLayer(map, fid);
-		hideAllRooms(map, bid, lvI, basicInfos);
+		hideAllRooms(map, bid, lvI);
 	});
 }
 /**전체 건물들 층 숨기기*/
-async function hideAllFloors(map) {
-	const bidList = Object.keys(await reqBasicInfos());
+/* async function hideAllFloors(map) {
+	const bidList = Object.keys(await reqBasicInfos(urls));
 	for (const bid of bidList) {
 		await hideFloorsByBid(map, bid);
 	}
-}
+} */
 /**층 내 전체 방 숨기기*/
-export async function hideAllRooms(map, bid, lvI, basicInfos) {
+export async function hideAllRooms(map, bid, lvI) {
 	hideLayer(map, idRules.clickedFloor(bid, lvI));
-	await allRooms(map, bid, lvI, (map, rid) => hideLayer(map, rid), basicInfos);
+	await allRooms(map, bid, lvI, (map, rid) => hideLayer(map, rid));
 }
 
 
@@ -121,9 +119,8 @@ function allFloors(map, lvCount ,bid, cb) {
 	}
 }
 /**층 내 전체 방에 대해 콜백*/
-async function allRooms(map, bid, lvI, cb, basicInfos) {
-	if(!basicInfos) basicInfos = await reqBasicInfos();
-	const rooms = basicInfos[bid].rooms[lvI];
+async function allRooms(map, bid, lvI, cb) {
+	const rooms = cache.buildingsInfo[bid].rooms[lvI];
 	rooms.forEach((r) => cb(map, r.rid));
 }
 
@@ -204,7 +201,7 @@ async function generateRooms(map, fInfo, fid, lvI) {
 	const bid = fInfo.bid;
 	const { floorThickness, floorGap, colorPalette, baseThickness, roomThickness } = MC.layerProps;
 	const base = (lvI * (floorThickness + floorGap));
-	const rooms = await reqRoomsByLvI(bid, lvI);
+	const rooms = cache.buildingsInfo[bid].rooms[lvI];
 	let roomsSpec = [];
 
 	roomsSpec.push({

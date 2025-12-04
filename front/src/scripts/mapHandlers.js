@@ -1,18 +1,16 @@
 import { idRules, jsonProp } from '@shared/rules.js';
-import { MC, req } from './mapConfig.js';
-import { current } from './map.js';
+import { MC } from './mapConfig.js';
 import { showLayer, hideLayer, hideFloorsByBid, hideAllRooms, setFloors, flyCamera, setRooms } from './mapUtils.js';
-import { reqBuildingByBid } from './mapRequests.js';
 
 //건물 클릭 시 실행
-export async function handleBuildingClick(map, e) {
+export async function handleBuildingClick(map, e, getBInfo, current) {
 	const properties = e.properties;
 	const bid = properties?.["origin"] ? properties?.["origin"] : properties?.[jsonProp.id];
 
 	console.log(`건물 클릭됨: ${properties?.[jsonProp.id]}`);
 
 	// 층 배열 생성 (지하층/지상층 정보 활용)
-	const info = await reqBuildingByBid(bid, req);
+	const info = await getBInfo();
 
 	// 건물 숨김, 층 생성, 카메라 이동
 	if (current.bid) await hideFloorsByBid(map, current.bid);
@@ -24,10 +22,10 @@ export async function handleBuildingClick(map, e) {
 	current.bid = bid;
 }
 //리스트 클릭 시 실행
-export async function handleRoomListClick(map, bid, lvI, rid) {
+export async function handleRoomListClick(map, bid, lvI, rid, getBInfo, current) {
 	console.log(`리스트에서 방 클릭됨: [${rid}]`);
 
-	const info = await reqBuildingByBid(bid, req);
+	const info = await getBInfo();
 
 	if (current.bid) await hideFloorsByBid(map, current.bid);
 	hideLayer(map, idRules.buildings);
@@ -40,9 +38,9 @@ export async function handleRoomListClick(map, bid, lvI, rid) {
 	current.lvI = lvI;
 }
 // 층 클릭시 실행할 코드 (수정됨)
-export async function handleFloorClick(map, bid, fid, lvI) {
+export async function handleFloorClick(map, bid, fid, lvI, getBInfo, current) {
 	console.log(`층 클릭됨: ${fid}`);
-	const info = await reqBuildingByBid(bid, req);
+	const info = await getBInfo();
 
 	if (current.bid) await hideFloorsByBid(map, current.bid);
 	setRooms(map, bid, lvI, info);
@@ -53,7 +51,7 @@ export async function handleFloorClick(map, bid, fid, lvI) {
 	current.lvI = lvI;
 }
 //배경 클릭시 실행할 코드
-export async function handleBackgroundClick(map, e) {
+export async function handleBackgroundClick(map, e, getBInfo, current) {
 	const features = map.queryRenderedFeatures(e.point);
 	const topFeature = features[0];
 	let isBackground = false;
@@ -63,7 +61,7 @@ export async function handleBackgroundClick(map, e) {
 	if (isBackground) {
 		console.log("배경 클릭됨");
 		if (current.mode == 2) {
-			const info = await reqBuildingByBid(current.bid, req);
+			const info = await getBInfo();
 
 			// 건물 숨김, 층 생성, 카메라 이동
 			await hideAllRooms(map, current.bid, current.lvI);

@@ -13,6 +13,16 @@ export const idRules = {
 export const jsonProp = {
 	id: "@id",
 	name: "name",
+	center: "center",
+	bearing: "bearing",
+	floorBearing: "floorBearing",
+	floors: "floors",
+	flProps: {
+		flLevel: "flLevel",
+		bmLevel: "bmLevel",
+		flList: "flList",
+		flVars: "flVars"
+	}
 };
 
 export const PORT = 4000;

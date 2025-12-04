@@ -4,36 +4,25 @@ import FloorList from './FloorList.jsx';
 
 /**
  * props:
- * - roomList: { [bid]: { name: string, bmLevel: number, rooms: Array<Array<{ rid: string, name: string }>> } }
- * - buildingNames: { [bid]: string }
+ * - buildingsInfo: { [bid]: { name: string, bmLevel: number, rooms: Array<Array<{ rid: string, name: string }>> } }
  * - favorites: string[] (rid[])
  * - onToggleFavorite: (rid) => void
  * - onRoomClick: (bid, floorIndex, rid) => void
- * - onFloorToggle: (bid: string, floorIndex: number, isOpen: boolean) => void
- * - ensureExpanded: () => void
  */
 export default function BuildingList({
-	roomList,
-	buildingNames,
+	buildingsInfo,
 	favorites,
 	onToggleFavorite,
-	onRoomClick,
-	onFloorToggle,
-	ensureExpanded,
+	onRoomClick
 }) {
 	// 펼침 상태
 	const [openBids, setOpenBids] = useState(() => new Set());
 
 	const bids = useMemo(() => {
-		// 표시 순서: buildingNames에 있는 순서 우선, 없으면 roomList 키
-		const named = Object.keys(buildingNames || {});
-		const withRooms = Object.keys(roomList || {});
-		const set = new Set([...named, ...withRooms]);
-		return Array.from(set);
-	}, [buildingNames, roomList]);
-
+		return Object.keys(buildingsInfo || {});
+	}, [buildingsInfo]);
+	
 	const toggleBid = (bid) => {
-		if (typeof ensureExpanded === 'function') ensureExpanded();
 		setOpenBids((prev) => {
 			const next = new Set(prev);
 			if (next.has(bid)) next.delete(bid);
@@ -45,7 +34,7 @@ export default function BuildingList({
 	return (
 		<>
 			{bids.map((bid) => {
-				const buildingData = roomList?.[bid] || {};
+				const buildingData = buildingsInfo?.[bid] || {};
 				const floors = buildingData.rooms || [];
 				const bName = buildingData.name || buildingNames?.[bid] || bid;
 				const bmLevel = buildingData.bmLevel;
@@ -70,7 +59,6 @@ export default function BuildingList({
 								favorites={favorites}
 								onToggleFavorite={onToggleFavorite}
 								onRoomClick={onRoomClick}
-								onFloorToggle={onFloorToggle}
 							/>
 						</ul>
 					</li>

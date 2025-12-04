@@ -1,25 +1,18 @@
 // src/SideBar.jsx
 import React, { useEffect, useMemo, useState } from 'react';
-
-import './SideBar.css';
-import LogoImg from '@assets/logo2.png';
-
-import Favorites from './Favorites.jsx';
-import BuildingList from './BuildingList.jsx';
 import { handleRoomListClick } from '@scripts/mapHandlers.js';
 import { loadRoomFavorites, saveRoomFavorites, toggleRoomFavoriteInList, indexRoomList } from '@scripts/sideBarUtils.js';
 
-import { setApiUrl } from '@shared/rules.js';
+import './SideBar.css';
+import LogoImg from '@assets/logo2.png';
+import BuildingList from './BuildingList.jsx';
+import Favorites from './Favorites.jsx';
 
-const url = setApiUrl(__API_BASE__);
-const basicInfos = await (await fetch(url.bInfoUrl)).json();
-
-export default function SideBar({ map }) {
+export default function SideBar({ map, buildingsInfo }) {
 	// UI 상태
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [favOpen, setFavOpen] = useState(true);
 	const [allOpen, setAllOpen] = useState(true);
-	const [openFloors, setOpenFloors] = useState(() => new Set()); // `${bid}:${floorIndex}` 키
 
 	// 데이터 상태
 	const [favorites, setFavorites] = useState(() => loadRoomFavorites()); // [rid, rid, ...]
@@ -33,19 +26,7 @@ export default function SideBar({ map }) {
 		}
 	}, [isExpanded]);
 
-
-	// SC.roomList 및 rid 인덱스
-	const roomList = useMemo(() => basicInfos, []);
-	const ridIndex = useMemo(() => indexRoomList(), []);
-
-	// bid -> building name 매핑
-	const buildingNameMap = useMemo(() => {
-		const m = {};
-		for (const [bid, data] of Object.entries(basicInfos || {})) {
-			if (data && data.name) m[bid] = data.name;
-		}
-		return m;
-	}, []);
+	const roomsList = useMemo(() => indexRoomList(buildingsInfo), [buildingsInfo]);
 
 	// 즐겨찾기 토글(방 rid 기준)
 	const toggleFavoriteRoom = (rid) => {
@@ -56,29 +37,14 @@ export default function SideBar({ map }) {
 		});
 	};
 
-	// 층 열림/닫힘 정보 갱신 + 층이 열릴 때는 자동 확장
-	const handleFloorToggle = (bid, floorIndex, isOpen) => {
-		setOpenFloors((prev) => {
-			const next = new Set(prev);
-			const key = `${bid}:${floorIndex}`;
-			if (isOpen) {
-				next.add(key);
-				setIsExpanded(true);
-			} else {
-				next.delete(key);
-			}
-			return next;
-		});
-	};
-
-	// 방 클릭 핸들러 (옵션 A)
+	// 방 클릭 핸들러
 	const onRoomClick = (bid, floorIndex, rid) => {
 		if (!map) return;
 		handleRoomListClick(map, bid, floorIndex, rid);
 	};
 
 
-	const ensureExpanded = () => setIsExpanded(true);
+	// const ensureExpanded = () => setIsExpanded(true);
 	return (
 		<div className={`l-navbar ${isExpanded ? 'expander' : ''}`} id="navbar">
 			<nav className="nav">
@@ -115,8 +81,7 @@ export default function SideBar({ map }) {
 						<ul className={`collapse__menu ${favOpen ? 'showCollapse' : ''}`} id="favorites-list">
 							<Favorites
 								favorites={favorites}
-								ridIndex={ridIndex}
-								buildingNames={buildingNameMap}
+								roomList={roomsList}
 								onToggleFavorite={toggleFavoriteRoom}
 								onRoomClick={onRoomClick}
 							/>
@@ -136,13 +101,10 @@ export default function SideBar({ map }) {
 						</div>
 						<ul className={`collapse__menu ${allOpen ? 'showCollapse' : ''}`} id="all-list">
 							<BuildingList
-								roomList={roomList}
-								buildingNames={buildingNameMap}
+								buildingsInfo={buildingsInfo}
 								favorites={favorites}
 								onToggleFavorite={toggleFavoriteRoom}
 								onRoomClick={onRoomClick}
-								onFloorToggle={handleFloorToggle}
-								ensureExpanded={ensureExpanded}
 							/>
 						</ul>
 					</div>

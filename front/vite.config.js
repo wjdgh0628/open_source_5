@@ -26,7 +26,7 @@ export default defineConfig(({ mode }) => {
 		base: isDev ? '/' : '/map/',
 		define: {
 			__API_BASE__: JSON.stringify(
-				isDev ? 'http://localhost:4000' : '../'
+				isDev ? 'http://localhost:4000/' : '../'
 			)
 		},
 	};

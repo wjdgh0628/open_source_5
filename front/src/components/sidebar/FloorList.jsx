@@ -9,7 +9,6 @@ import { idRules } from '@shared/rules.js';
  * - favorites: string[] (rid[])
  * - onToggleFavorite: (rid) => void
  * - onRoomClick: (bid, floorIndex, rid) => void
- * - onFloorToggle: (bid: string, floorIndex: number, isOpen: boolean) => void
  */
 export default function FloorList({
 	bid,
@@ -18,7 +17,6 @@ export default function FloorList({
 	favorites,
 	onToggleFavorite,
 	onRoomClick,
-	onFloorToggle,
 }) {
 	const [openFloors, setOpenFloors] = useState(() => new Set());
 
@@ -35,10 +33,6 @@ export default function FloorList({
 			}
 			return next;
 		});
-
-		if (typeof onFloorToggle === 'function') {
-			onFloorToggle(bid, idx, isOpen);
-		}
 	};
 
 	return (
