@@ -5,12 +5,10 @@ import { handleFloorClick } from './mapHandlers.js';
 
 /**카메라 이동 함수*/
 export function flyCamera(mode, center, bearing = null, lvI = null) {
-	console.log("이전: ",MC.camera[mode]);
 	const modeConfig = {...MC.camera[mode]};
 	if(bearing) modeConfig.bearing = bearing;
 	if(lvI) modeConfig.zoom -= (lvI * MC.camera.floorZoomStep);
 	Map().flyTo({ center, ...modeConfig, essential: true });
-	console.log("이후: ", MC.camera[mode]);
 }
 
 

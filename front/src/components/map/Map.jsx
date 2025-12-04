@@ -16,7 +16,8 @@ function initMap(urls) {
 		container: "map",
 		style: MC.map.style,
 		center: MC.map.center,
-		zoom: MC.map.zoom
+		zoom: MC.map.zoom,
+		maxBounds: MC.map.maxBounds
 	});
 	map.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), "top-right");
 	map.on("load", () => {

@@ -3,13 +3,23 @@ export const MC = {
 		center: [126.95336, 37.34524],
 		zoom: 17,
 		style: "mapbox://styles/mapbox/streets-v12",
+		maxBounds: [
+			[
+              126.94885855342051,
+              37.34010026501433
+            ],
+			[
+              126.95850903964549,
+              37.349584812158525
+            ]
+		],
 		key: "pk.eyJ1IjoibGF6eWRldjEwMjQiLCJhIjoiY21mdW91NnNyMTVkZDJtcHd4dHNtNHU0ayJ9.mLzbdcCPq_-BeA8DlHu1KA"
 	},
 	camera: {
 		building: "around",
 		floor: "above",
 		room: "above2",
-		around: { zoom: 18, pitch: 60, bearing: -45, speed: 0.6, curve: 1.25 },
+		around: { zoom: 18, pitch: 60, bearing: -45, speed: 0.8, curve: 1.25 },
 		above: { zoom: 19.9, pitch: 0, speed: 0.4 },
 		above2: { zoom: 19.9, pitch: 0, speed: 0.6 },
 		floorZoomStep: 0.07
