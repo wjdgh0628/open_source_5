@@ -1,23 +1,23 @@
 import { idRules } from '@shared/rules.js';
-// import { cache } from '@components/App.jsx';
+import { getInfos as infos, getMap as Map } from '@shared/cache.js';
 import { MC } from './mapConfig.js';
 import { handleFloorClick } from './mapHandlers.js';
 
 /**카메라 이동 함수*/
-export function flyCamera(map, mode, center, bearing = null) {
+export function flyCamera(mode, center, bearing = null) {
 	if (bearing == null)
 		bearing = MC.camera[mode].bearing;
-	map.flyTo({ center, ...MC.camera[mode], bearing: bearing, essential: true });
+	Map().flyTo({ center, ...MC.camera[mode], bearing: bearing, essential: true });
 }
 
 
 /**데이터 배열 받아서 층이나 방 만드는 함수*/
-function setLayers(map, sourceId, features) {
-	if (map.getSource(sourceId)) {
+function setLayers(sourceId, features) {
+	if (Map().getSource(sourceId)) {
 		console.log(`source id: ${sourceId}가 이미 존재`);
 		return;
 	}
-	map.addSource(sourceId, {
+	Map().addSource(sourceId, {
 		type: "geojson",
 		data: ({
 			type: "FeatureCollection",
@@ -26,7 +26,7 @@ function setLayers(map, sourceId, features) {
 	});
 	features.forEach((f, i) => {
 		const layerId = f.properties.layerId;
-		map.addLayer({
+		Map().addLayer({
 			id: layerId,
 			type: "fill-extrusion",
 			source: sourceId,
@@ -39,7 +39,7 @@ function setLayers(map, sourceId, features) {
 			}
 		});
 		if (!f.properties.name) return; //이름이 없으면 라벨 생성 안함
-		map.addLayer({
+		Map().addLayer({
 			id: idRules.lid(layerId),
 			type: 'symbol',
 			source: sourceId,
@@ -63,9 +63,9 @@ function setLayers(map, sourceId, features) {
 	});
 }
 /**핸들러 적용 함수*/
-export function setHandler(map, type , id, callback) {
+export function setHandler(type, id, callback) {
 	const handler = e => {
-		const features = map.queryRenderedFeatures(e.point);
+		const features = Map().queryRenderedFeatures(e.point);
 		if (!features.length) { return; }
 
 		const topFeature = features[0];// z-index 개념은 없지만, queryRenderedFeatures의 배열은 위에서부터 순서대로 정렬됨
@@ -77,131 +77,130 @@ export function setHandler(map, type , id, callback) {
 		// 원하는 이벤트를 topFeature 하나에만 적용
 		if (isTop) { callback(topFeature); }
 	};
-	map.on(type, id, (e) => handler(e));
+	Map().on(type, id, (e) => handler(e));
 }
 
 /**레이어 보이기/숨기기*/
-export function showLayer(map, id) {
-	map.getLayer(id) && map.setLayoutProperty(id, "visibility", "visible");
-	map.getLayer(idRules.lid(id)) && map.setLayoutProperty(idRules.lid(id), "visibility", "visible");
+export function showLayer(id) {
+	Map().getLayer(id) && Map().setLayoutProperty(id, "visibility", "visible");
+	Map().getLayer(idRules.lid(id)) && Map().setLayoutProperty(idRules.lid(id), "visibility", "visible");
 }
-export function hideLayer(map, id) {
-	map.getLayer(id) && map.setLayoutProperty(id, "visibility", "none");
-	map.getLayer(idRules.lid(id)) && map.setLayoutProperty(idRules.lid(id), "visibility", "none");
+export function hideLayer(id) {
+	Map().getLayer(id) && Map().setLayoutProperty(id, "visibility", "none");
+	Map().getLayer(idRules.lid(id)) && Map().setLayoutProperty(idRules.lid(id), "visibility", "none");
 }
 /**특정 건물의 층들 숨기기*/
-export async function hideFloorsByBid(map, bid) {
-	const lvCount = (cache.buildingsInfo[bid].rooms.length);
-	allFloors(map, lvCount ,bid, (map, fid, lvI) => {
-		hideLayer(map, fid);
-		hideAllRooms(map, bid, lvI);
+export async function hideFloorsByBid(bid) {
+	const lvCount = (infos()[bid].rooms.length);
+	allFloors(lvCount, bid, (fid, lvI) => {
+		hideLayer(fid);
+		hideAllRooms(bid, lvI);
 	});
 }
 /**전체 건물들 층 숨기기*/
 /* async function hideAllFloors(map) {
 	const bidList = Object.keys(await reqBasicInfos(urls));
 	for (const bid of bidList) {
-		await hideFloorsByBid(map, bid);
+		await hideFloorsByBid( bid);
 	}
 } */
 /**층 내 전체 방 숨기기*/
-export async function hideAllRooms(map, bid, lvI) {
-	hideLayer(map, idRules.clickedFloor(bid, lvI));
-	await allRooms(map, bid, lvI, (map, rid) => hideLayer(map, rid));
+export async function hideAllRooms(bid, lvI) {
+	hideLayer(idRules.clickedFloor(bid, lvI));
+	await allRooms(bid, lvI, (rid) => hideLayer(rid));
 }
 
 
 /**건물 내 전체 층에 대해 콜백*/
-function allFloors(map, lvCount ,bid, cb) {
+function allFloors(lvCount, bid, cb) {
 	for (let i = 0; i < lvCount; i++) {
 		const fid = idRules.fid(bid, i);
-		cb(map, fid, i);
+		cb(fid, i);
 	}
 }
 /**층 내 전체 방에 대해 콜백*/
-async function allRooms(map, bid, lvI, cb) {
-	const rooms = cache.buildingsInfo[bid].rooms[lvI];
-	rooms.forEach((r) => cb(map, r.rid));
+async function allRooms(bid, lvI, cb) {
+	const rooms = infos()[bid].rooms[lvI];
+	rooms.forEach((r) => cb(r.rid));
 }
 
 /**
  * 층 생성/보이기
- * fInfo: bid, flList, flVars, flLevel, bmLevel
+ * info: bid, flList, flVars, flLevel, bmLevel
  */
-export function setFloors(map, fInfo) {
-	const bid = fInfo.bid;
-	const lvCount = fInfo.flLevel + fInfo.bmLevel;
-	if (map.getSource(idRules.floorSid(bid))) {
-		allFloors(map, lvCount, bid, (map, fid) => {showLayer(map, fid);});
+export function setFloors(info) {
+	const bid = info.bid;
+	const lvCount = info.flLevel + info.bmLevel;
+	if (Map().getSource(idRules.floorSid(bid))) {
+		allFloors(lvCount, bid, (fid) => { showLayer(fid); });
 	}
 	else {
-		generateFloors(map, fInfo);
+		generateFloors(info);
 	}
 }
 /**
  * 방 생성/보이기
- * fInfo: bid, flVars, flList
+ * info: bid, flVars, flList
  */
-export async function setRooms(map, bid, lvI, fInfo) {
+export async function setRooms(bid, lvI, info) {
 	const fid = idRules.fid(bid, lvI);
-	if (map.getSource(idRules.roomSid(fid))) {
-		await allRooms(map, bid, lvI, (map, rid) => showLayer(map, rid));
-		showLayer(map, idRules.clickedFloor(bid, lvI));
+	if (Map().getSource(idRules.roomSid(fid))) {
+		await allRooms(bid, lvI, (rid) => showLayer(rid));
+		showLayer(idRules.clickedFloor(bid, lvI));
 	}
 	else {
-		generateRooms(map, fInfo, fid, lvI);
+		generateRooms(info, fid, lvI);
 	}
 }
 /**
  * 층 생성하는 함수
- * fInfo: bid, flList, flVars,flLevel, bmLevel
+ * info: bid, flList, flVars,flLevel, bmLevel
  */
-function generateFloors(map, fInfo) {
-	const bid = fInfo.bid;
+function generateFloors(info) {
+	const bid = info.bid;
 	const { floorThickness, floorGap } = MC.layerProps;
 
 	//층 모양(폴리곤이랑 높이 등)이랑 각종 정보들 floorSpec에 저장
 	let floorsSpec = [];
-	fInfo.flList.forEach((flVarNum, lvI) => {
-		let fi = lvI - fInfo.bmLevel;
-		let bi = fInfo.bmLevel - lvI;
+	info.flList.forEach((flVarNum, lvI) => {
+		let fi = lvI - info.bmLevel;
+		let bi = info.bmLevel - lvI;
 		const base = lvI * (floorThickness + floorGap);
-		const level = idRules.level(fInfo.bmLevel, lvI);
-
+		const level = idRules.level(info.bmLevel, lvI);
 		floorsSpec.push({
 			type: "Feature",
 			properties: {
-				name: idRules.lvChar(fInfo.bmLevel, lvI),
+				name: idRules.lvChar(info.bmLevel, lvI),
 				base,
 				height: base + floorThickness,
-				// color: i >= fInfo.bmLevel ? colorPalette[fi * colorJump] : basementPalette[bi - 1],
-				color: MC.layerProps.taseTheRainbow(lvI, fi, bi, fInfo.bmLevel, fInfo.flLevel),
+				// color: i >= info.bmLevel ? colorPalette[fi * colorJump] : basementPalette[bi - 1],
+				color: MC.layerProps.taseTheRainbow(lvI, fi, bi, info.bmLevel, info.flLevel),
 				level: level,
 				anchor: "left",
 				// offset: info.offset,
 				layerId: idRules.fid(bid, lvI)
 			},
-			geometry: { type: "Polygon", coordinates: fInfo.flVars[flVarNum] }
+			geometry: { type: "Polygon", coordinates: info.flVars[flVarNum] }
 		});
 	});
 
 	// floorSpec 기반으로 source로 저장
-	setLayers(map, idRules.floorSid(bid), floorsSpec);
+	setLayers(idRules.floorSid(bid), floorsSpec);
 	// 핸들러 지정
 	floorsSpec.forEach((f, i) => {
 		const fid = f.properties.layerId;
-		setHandler(map, "click", fid, e => handleFloorClick(map, bid, fid, i));
+		setHandler("click", fid, e => handleFloorClick(fid, i, info));
 	});
 }
 /**
  * 방 생성하는 함수
- * fInfo: bid, flVars, flList
+ * info: bid, flVars, flList
  */
-async function generateRooms(map, fInfo, fid, lvI) {
-	const bid = fInfo.bid;
+async function generateRooms(info, fid, lvI) {
+	const bid = info.bid;
 	const { floorThickness, floorGap, colorPalette, baseThickness, roomThickness } = MC.layerProps;
 	const base = (lvI * (floorThickness + floorGap));
-	const rooms = cache.buildingsInfo[bid].rooms[lvI];
+	const rooms = infos()[bid].rooms[lvI];
 	let roomsSpec = [];
 
 	roomsSpec.push({
@@ -213,7 +212,7 @@ async function generateRooms(map, fInfo, fid, lvI) {
 			// offset: 0,
 			layerId: idRules.clickedFloor(bid, lvI)
 		},
-		geometry: { type: "Polygon", coordinates: fInfo.flVars[fInfo.flList[lvI]] }
+		geometry: { type: "Polygon", coordinates: info.flVars[info.flList[lvI]] }
 	});
 	rooms.forEach((room, i) => {
 		roomsSpec.push({
@@ -231,7 +230,7 @@ async function generateRooms(map, fInfo, fid, lvI) {
 		});
 	});
 
-	setLayers(map, idRules.roomSid(fid), roomsSpec);
+	setLayers(idRules.roomSid(fid), roomsSpec);
 	// 핸들러 지정
 	roomsSpec.forEach((r, i) => {
 		if (i === 0) return; // 클릭된 층 베이스는 핸들러 지정 안함

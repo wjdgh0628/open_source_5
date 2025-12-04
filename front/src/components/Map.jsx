@@ -1,14 +1,15 @@
 import { useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { idRules } from '@shared/rules.js';
-import { MC } from './mapConfig.js';
-import { setHandler } from './mapUtils.js';
-import { handleBuildingClick, handleBackgroundClick } from './mapHandlers.js';
+import { getMap, setMap } from '@shared/cache.js';
+import { MC } from '@scripts/mapConfig.js';
+import { setHandler } from '@scripts/mapUtils.js';
+import { handleBuildingClick, handleBackgroundClick } from '@scripts/mapHandlers.js';
 
 import './Map.css';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-function initMap() {
+function initMap(urls) {
 	mapboxgl.accessToken = MC.map.key;
 	// 맵 초기화 (기존과 동일)
 	const map = new mapboxgl.Map({
@@ -33,28 +34,28 @@ function initMap() {
 			source: "campus",
 			paint: {
 				"fill-extrusion-color": ["coalesce", ["get", "color"], "#aaaaaa"],
-				"fill-extrusion-base": ["coalesce", ["*", ["get", "base"],MC.layerProps.levelThick], 0],
-				"fill-extrusion-height": ["*", ["get", "building:levels"],MC.layerProps.levelThick],
+				"fill-extrusion-base": ["coalesce", ["*", ["get", "base"], MC.layerProps.levelThick], 0],
+				"fill-extrusion-height": ["*", ["get", "building:levels"], MC.layerProps.levelThick],
 				"fill-extrusion-opacity": 1
 			}
 		});
-		//건물, 배경 클릭시 실행할 코드 지정
-		setHandler(map, "click",idRules.buildings, e => handleBuildingClick(map, e));
-		map.on('click', (e) => handleBackgroundClick(map, e));
-		// map.on('click', (e) =>{console.log(map.queryRenderedFeatures(e.point))});
+
 	});
 	return map;
 }
 
-function Map({ onMapInit }) {
+function Map({urls}) {
 	const mapId = 'map';
-	
+
 	useEffect(() => {
-		const map =  current.mapInstance ? current.mapInstance : current.mapInstance = initMap();
-		if (onMapInit) {
-			onMapInit(map);
+		if (!getMap()) {
+			setMap(initMap(urls));
+			//건물, 배경 클릭시 실행할 코드 지정
+			setHandler("click", idRules.buildings, e => handleBuildingClick(e));
+			getMap().on('click', (e) => handleBackgroundClick(e));
+			// getMap().on('click', (e) =>{console.log(getMap().queryRenderedFeatures(e.point))});
 		}
-	}, [onMapInit]);
+	}, []);
 
 	return <div id={mapId} />;
 }

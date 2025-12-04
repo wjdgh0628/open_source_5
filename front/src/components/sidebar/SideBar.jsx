@@ -1,6 +1,6 @@
 // src/SideBar.jsx
 import React, { useEffect, useMemo, useState } from 'react';
-import { handleRoomListClick } from '@scripts/mapHandlers.js';
+import { handleRoomListClick as onRoomClick } from '@scripts/mapHandlers.js';
 import { loadRoomFavorites, saveRoomFavorites, toggleRoomFavoriteInList, indexRoomList } from '@scripts/sideBarUtils.js';
 
 import './SideBar.css';
@@ -8,7 +8,7 @@ import LogoImg from '@assets/logo2.png';
 import BuildingList from './BuildingList.jsx';
 import Favorites from './Favorites.jsx';
 
-export default function SideBar({ map, buildingsInfo }) {
+export default function SideBar({ infos }) {
 	// UI 상태
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [favOpen, setFavOpen] = useState(true);
@@ -26,7 +26,7 @@ export default function SideBar({ map, buildingsInfo }) {
 		}
 	}, [isExpanded]);
 
-	const roomsList = useMemo(() => indexRoomList(buildingsInfo), [buildingsInfo]);
+	const roomsList = useMemo(() => indexRoomList(infos), [infos]);
 
 	// 즐겨찾기 토글(방 rid 기준)
 	const toggleFavoriteRoom = (rid) => {
@@ -36,13 +36,6 @@ export default function SideBar({ map, buildingsInfo }) {
 			return next;
 		});
 	};
-
-	// 방 클릭 핸들러
-	const onRoomClick = (bid, floorIndex, rid) => {
-		if (!map) return;
-		handleRoomListClick(map, bid, floorIndex, rid);
-	};
-
 
 	// const ensureExpanded = () => setIsExpanded(true);
 	return (
@@ -101,7 +94,7 @@ export default function SideBar({ map, buildingsInfo }) {
 						</div>
 						<ul className={`collapse__menu ${allOpen ? 'showCollapse' : ''}`} id="all-list">
 							<BuildingList
-								buildingsInfo={buildingsInfo}
+								infos={infos}
 								favorites={favorites}
 								onToggleFavorite={toggleFavoriteRoom}
 								onRoomClick={onRoomClick}

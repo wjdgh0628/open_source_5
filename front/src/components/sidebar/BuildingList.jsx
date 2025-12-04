@@ -10,7 +10,7 @@ import FloorList from './FloorList.jsx';
  * - onRoomClick: (bid, floorIndex, rid) => void
  */
 export default function BuildingList({
-	buildingsInfo,
+	infos,
 	favorites,
 	onToggleFavorite,
 	onRoomClick
@@ -19,8 +19,8 @@ export default function BuildingList({
 	const [openBids, setOpenBids] = useState(() => new Set());
 
 	const bids = useMemo(() => {
-		return Object.keys(buildingsInfo || {});
-	}, [buildingsInfo]);
+		return Object.keys(infos || {});
+	}, [infos]);
 	
 	const toggleBid = (bid) => {
 		setOpenBids((prev) => {
@@ -34,9 +34,9 @@ export default function BuildingList({
 	return (
 		<>
 			{bids.map((bid) => {
-				const buildingData = buildingsInfo?.[bid] || {};
+				const buildingData = infos?.[bid] || {};
 				const floors = buildingData.rooms || [];
-				const bName = buildingData.name || buildingNames?.[bid] || bid;
+				const bName = buildingData.name || bid;
 				const bmLevel = buildingData.bmLevel;
 
 				return (
