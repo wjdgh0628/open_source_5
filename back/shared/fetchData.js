@@ -1,5 +1,4 @@
-
-import { jsonProp, idRules } from '@shared/rules.js';
+import { jsonProp, idRules } from './rules.js';
 async function fetchJson(path) {
 	console.log(`Fetching JSON from: ${path}`);
 	return await fetch(path)
