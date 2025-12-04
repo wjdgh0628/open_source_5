@@ -4,7 +4,7 @@ import { setInfos } from '@shared/cache.js';
 import { fetchBuildingsInfo } from '@shared/fetchData.js';
 
 import './App.css';
-import Map from './Map.jsx';
+import Map from './map/Map.jsx';
 import SideBar from './sidebar/SideBar.jsx';
 
 export function App() {

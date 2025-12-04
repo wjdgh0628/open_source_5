@@ -45,7 +45,8 @@ export function indexRoomList(raw) {
 					idx[r.rid] = {
 						bid,
 						buildingName: buildingName,
-						level: level,
+						lvI: lvI,
+						bmLevel: f.bmLevel,
 						name: r.name || '',
 					};
 				}

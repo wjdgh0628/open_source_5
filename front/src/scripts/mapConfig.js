@@ -9,9 +9,10 @@ export const MC = {
 		building: "around",
 		floor: "above",
 		room: "above2",
-		around: { zoom: 18, pitch: 60, bearing: -45, speed: 0.8, curve: 1.25 },
-		above: { zoom: 19, pitch: 0, speed: 0.4 },
-		above2: { zoom: 19.5, pitch: 0, speed: 0.6 }
+		around: { zoom: 18, pitch: 60, bearing: -45, speed: 0.6, curve: 1.25 },
+		above: { zoom: 20, pitch: 0, speed: 0.4 },
+		above2: { zoom: 20, pitch: 0, speed: 0.6 },
+		floorZoomStep: 0.07
 	},
 	layerProps: {
 		floorThickness: 3,

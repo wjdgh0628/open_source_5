@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { idRules } from '@shared/rules.js';
 
 /**
  * props:
@@ -19,11 +20,12 @@ export default function Favorites({
 		for (const rid of favorites) {
 			const meta = roomList[rid];
 			if (!meta) continue;
-			const { bid, buildingName, level, name } = meta;
+			const { bid, buildingName, lvI, name, bmLevel } = meta;
 			items.push({
 				rid,
 				bid,
-				level: level,
+				lvI: lvI,
+				bmLevel: bmLevel,
 				roomName: name || '방 이름 오류',
 				buildingName: buildingName || '건물 이름 오류',
 			});
@@ -41,11 +43,11 @@ export default function Favorites({
 
 	return (
 		<>
-			{favItems.map(({ rid, bid, level, roomName, buildingName }) => (
+			{favItems.map(({ rid, bid, lvI, roomName, buildingName, bmLevel }) => (
 				<li
 					key={rid}
 					className="building-list-item"
-					onClick={() => onRoomClick(bid, level, rid)}
+					onClick={() => onRoomClick(bid, lvI, rid)}
 				>
 					<button
 						className="favorite-btn favorited"
@@ -58,7 +60,7 @@ export default function Favorites({
 						★
 					</button>
 					<span>
-						{buildingName} / {level}층 / {roomName}
+						{buildingName} / {idRules.lvChar(bmLevel, lvI)} / {roomName}
 					</span>
 				</li>
 			))}

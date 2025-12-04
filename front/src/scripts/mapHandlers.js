@@ -30,7 +30,7 @@ export async function handleRoomListClick(bid, lvI, rid) {
 	hideLayer(idRules.buildings);
 	setRooms(bid, lvI, info);
 	showLayer(idRules.clickedFloor(bid, lvI));
-	flyCamera(MC.camera.room, info.center, info.floorBearing);
+	flyCamera(MC.camera.room, info.center, info.floorBearing, lvI);
 
 	setCurrent(old => ({ ...old, mode: 2, bid: bid, lvI: lvI }));
 }
@@ -43,7 +43,7 @@ export async function handleFloorClick(fid, lvI, info) {
 	if (c.bid) await hideFloorsByBid(c.bid);
 	setRooms(bid, lvI, info);
 	showLayer(idRules.clickedFloor(bid, lvI));
-	flyCamera(MC.camera.floor, info.center, info.floorBearing);
+	flyCamera(MC.camera.floor, info.center, info.floorBearing, lvI);
 
 	setCurrent(old => ({ ...old, mode: 2, lvI: lvI }));
 }
