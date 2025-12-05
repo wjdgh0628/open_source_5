@@ -14,16 +14,3 @@ export const REF_LAMBDA = REF_LON * DEG2RAD;
 export const REF_PHI = REF_LAT * DEG2RAD;
 export const REF_MX = EARTH_RADIUS * REF_LAMBDA;
 export const REF_MY = EARTH_RADIUS * Math.log(Math.tan(Math.PI / 4 + REF_PHI / 2));
-
-export const req = [
-	{
-		name: "name"
-	},
-	{
-		bmLevel: "bmLevel",
-		flLevel: "flLevel",
-		flList: "flList",
-		flVars: "flVars"
-	},
-	{}
-];

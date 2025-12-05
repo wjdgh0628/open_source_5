@@ -1,4 +1,4 @@
-import { req, COORD_DECIMALS } from "./editorConfig.js";
+import { COORD_DECIMALS } from "./editorConfig.js";
 import { idRules } from "../shared/rules.js";
 import { initDraw, draw, bboxOfWorld, formatCoords, fitViewTo } from "./editorDraw.js";
 import { onMouseDown, onMouseMove, onWheel, onMouseUp, onKeyDown, onKeyUp } from "./editorEvents.js";
@@ -114,6 +114,7 @@ export function writeSavedBackToDB() {
 		b.rooms[state.floorIndex] = list;
 		return infos;
 	});
+	requestSaveRoomsToServer();
 }
 
 export function requestSaveRoomsToServer() {
@@ -125,8 +126,6 @@ export function requestSaveRoomsToServer() {
 
 async function saveRoomsToServer() {
 	try {
-		// state.saved → infos[bid].rooms 반영
-		writeSavedBackToDB();
 		const infosMap = getInfos();
 		const res = await saveRoomsJsonFromInfos(infosMap);
 		// if (!res?.ok) throw new Error("save_failed"); // 필요시 활성화
@@ -216,13 +215,16 @@ export function pushHistory() {
 }
 export function undo() {
 	if (!state.history.length) return;
+	const prevSavedJSON = JSON.stringify(state.saved);
 	const snap = state.history.pop();
 	state.rooms = snap.rooms;
 	state.saved = snap.saved || state.saved;
 	state.activeRoomIndex = snap.activeRoomIndex;
 	state.activeSavedIndex = snap.activeSavedIndex;
-	writeSavedBackToDB();
-	requestSaveRoomsToServer();
+	const newSavedJSON = JSON.stringify(state.saved);
+	if (prevSavedJSON !== newSavedJSON) {
+		writeSavedBackToDB();
+	}
 	refreshSavedList();
 	refreshDraftList();
 	draw();
@@ -409,7 +411,6 @@ export function refreshSavedList() {
 		nameInput.addEventListener("change", () => {
 			room.name = nameInput.value.trim();
 			writeSavedBackToDB();
-			requestSaveRoomsToServer();
 		});
 
 		const colorInput = document.createElement("input");
@@ -420,7 +421,6 @@ export function refreshSavedList() {
 			pushHistory();
 			room.color = colorInput.value;
 			writeSavedBackToDB();
-			requestSaveRoomsToServer();
 			draw();
 		});
 
@@ -435,7 +435,6 @@ export function refreshSavedList() {
 		toDraft.onclick = () => {
 			const r = state.saved.splice(idx, 1)[0];
 			writeSavedBackToDB();
-			requestSaveRoomsToServer();
 			const draft = {
 				id: state.roomIdCounter++,
 				name: r.name || "",
@@ -453,7 +452,6 @@ export function refreshSavedList() {
 		del.onclick = () => {
 			state.saved.splice(idx, 1);
 			writeSavedBackToDB();
-			requestSaveRoomsToServer();
 			refreshSavedList();
 			draw();
 		};
@@ -545,7 +543,6 @@ export function refreshDraftList() {
 			};
 			state.saved.push(savedEntry);
 			writeSavedBackToDB();
-			requestSaveRoomsToServer();
 			deleteDraft(idx);
 			refreshSavedList();
 			draw();

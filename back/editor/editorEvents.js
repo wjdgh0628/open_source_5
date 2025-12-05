@@ -1,5 +1,5 @@
 import { hitTestFilledRoom, screenToWorld, findNearestVertex, draw, getWorldCenterFromLonLatPoints, lonLatToWorld, worldToLonLat, applyTransformToLonLatPoints, worldToScreen, bboxOf } from "./editorDraw.js";
-import { canvas, state, pushHistory, setActiveDraft, setActiveRoom, modDown, getOrCreateActiveOpenDraft, refreshDraftList, getRoom, refreshSavedList, undo, deleteDraft, isMac, getActiveOpenRoomOrNull, closeActiveRoom, writeSavedBackToDB, requestSaveRoomsToServer } from "./editorMain.js";
+import { canvas, state, pushHistory, setActiveDraft, setActiveRoom, modDown, getOrCreateActiveOpenDraft, refreshDraftList, getRoom, refreshSavedList, undo, deleteDraft, isMac, getActiveOpenRoomOrNull, closeActiveRoom, writeSavedBackToDB } from "./editorMain.js";
 
 // History: snapshot once per Shift operation
 function ensureHistoryStartForShiftOp(e) {
@@ -337,15 +337,6 @@ export function onMouseUp() {
 		state.mouse.isDown = false;
 		return;
 	}
-	if (state.mouse.dragTarget &&
-		state.mouse.dragTarget.list === "saved" &&
-		state.mouse.savedChanged &&
-		(state.mouse.dragTarget.type === "point" ||
-			state.mouse.dragTarget.type === "room-move" ||
-			state.mouse.dragTarget.type === "room-rotate")) {
-		writeSavedBackToDB();
-		requestSaveRoomsToServer();
-	}
 	state.mouse.isDown = false;
 	state.mouse.dragTarget = null;
 }
@@ -418,7 +409,6 @@ export function onKeyDown(e) {
 				pushHistory();
 				state.saved.splice(idx, 1);
 				writeSavedBackToDB();
-				requestSaveRoomsToServer();
 				state.activeSavedIndex = null;
 				refreshSavedList();
 				draw();
@@ -429,6 +419,10 @@ export function onKeyDown(e) {
 export function onKeyUp(e) {
 	if (e.key === "Shift") {
 		state.mouse._histShiftOp = false;
+		if (state.mouse.savedChanged) {
+			writeSavedBackToDB();
+			state.mouse.savedChanged = false;
+		}
 	}
 	if ((isMac && e.key === "Meta") || (!isMac && e.key === "Control")) {
 		const r = getActiveOpenRoomOrNull();
@@ -455,7 +449,7 @@ export function onWheel(e) {
 	if (e.shiftKey) {
 		const hit = hitTestFilledRoom(x, y);
 		if (hit) {
-						ensureHistoryStartForShiftOp(e);
+			ensureHistoryStartForShiftOp(e);
 			const room = getRoom(hit.list, hit.roomIndex);
 
 			if (room && room.points && room.points.length) {
@@ -465,8 +459,7 @@ export function onWheel(e) {
 					room.points = applyTransformToLonLatPoints(centerInfo.worldPts, centerInfo, zoomRoom, 0);
 
 					if (hit.list === "saved") {
-						writeSavedBackToDB();
-						requestSaveRoomsToServer();
+						state.mouse.savedChanged = true;
 						refreshSavedList();
 					} else {
 						refreshDraftList();
