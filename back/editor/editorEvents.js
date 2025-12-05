@@ -1,6 +1,14 @@
 import { hitTestFilledRoom, screenToWorld, findNearestVertex, draw, getWorldCenterFromLonLatPoints, lonLatToWorld, worldToLonLat, applyTransformToLonLatPoints, worldToScreen, bboxOf } from "./editorDraw.js";
-import { canvas, state, pushHistory, setActiveDraft, setActiveRoom, modDown, getOrCreateActiveOpenDraft, refreshDraftList, getRoom, refreshSavedList, undo, deleteDraft, isMac, getActiveOpenRoomOrNull, closeActiveRoom } from "./editorMain.js";
-import { writeSavedBackToDB, requestSaveRoomsToServer } from "./editorFileIO.js";
+import { canvas, state, pushHistory, setActiveDraft, setActiveRoom, modDown, getOrCreateActiveOpenDraft, refreshDraftList, getRoom, refreshSavedList, undo, deleteDraft, isMac, getActiveOpenRoomOrNull, closeActiveRoom, writeSavedBackToDB, requestSaveRoomsToServer } from "./editorMain.js";
+
+// History: snapshot once per Shift operation
+function ensureHistoryStartForShiftOp(e) {
+	if (!e.shiftKey) return;
+	if (!state.mouse._histShiftOp) {
+		pushHistory();
+		state.mouse._histShiftOp = true;
+	}
+}
 
 // ==== Input (mouse/keyboard) ========================================================
 export function onMouseDown(e) {
@@ -37,7 +45,7 @@ export function onMouseDown(e) {
 		if (shiftHeld) {
 			const hitRoom = hitTestFilledRoom(x, y);
 			if (hitRoom) {
-				pushHistory();
+				ensureHistoryStartForShiftOp(e);
 				const [wx, wy] = screenToWorld(x, y);
 				state.mouse.dragTarget = {
 					type: "room-move",
@@ -73,20 +81,23 @@ export function onMouseDown(e) {
 			state.mouse.savedChanged = false;
 			return;
 		} else if (hit) {
-			// Left on a vertex: drag that vertex (draft or saved)
-			pushHistory();
-			state.mouse.dragTarget = {
-				type: "point",
-				list: hit.list,
-				roomIndex: hit.roomIndex,
-				pointIndex: hit.pointIndex
-			};
-			state.mouse.savedChanged = false;
-
-			if (hit.list === "draft") {
-				setActiveDraft(hit.roomIndex);
-			} else if (hit.list === "saved") {
-				setActiveRoom("saved", hit.roomIndex);
+			if (!e.shiftKey) {
+				// Without Shift, do not modify polygon; fall back to panning
+				state.mouse.dragTarget = { type: "pan" };
+			} else {
+				ensureHistoryStartForShiftOp(e);
+				state.mouse.dragTarget = {
+					type: "point",
+					list: hit.list,
+					roomIndex: hit.roomIndex,
+					pointIndex: hit.pointIndex
+				};
+				state.mouse.savedChanged = false;
+				if (hit.list === "draft") {
+					setActiveDraft(hit.roomIndex);
+				} else if (hit.list === "saved") {
+					setActiveRoom("saved", hit.roomIndex);
+				}
 			}
 		} else {
 			// Left on a filled polygon: select that room but still allow panning
@@ -113,7 +124,7 @@ export function onMouseDown(e) {
 				const room = getRoom(hitRoom.list, hitRoom.roomIndex);
 
 				if (room && room.points && room.points.length >= 3) {
-					pushHistory();
+					ensureHistoryStartForShiftOp(e);
 
 					const centerInfo = getWorldCenterFromLonLatPoints(room.points);
 					if (!centerInfo) return;
@@ -327,11 +338,11 @@ export function onMouseUp() {
 		return;
 	}
 	if (state.mouse.dragTarget &&
-state.mouse.dragTarget.list === "saved" &&
-state.mouse.savedChanged &&
-(state.mouse.dragTarget.type === "point" ||
-state.mouse.dragTarget.type === "room-move" ||
-state.mouse.dragTarget.type === "room-rotate")) {
+		state.mouse.dragTarget.list === "saved" &&
+		state.mouse.savedChanged &&
+		(state.mouse.dragTarget.type === "point" ||
+			state.mouse.dragTarget.type === "room-move" ||
+			state.mouse.dragTarget.type === "room-rotate")) {
 		writeSavedBackToDB();
 		requestSaveRoomsToServer();
 	}
@@ -391,10 +402,10 @@ export function onKeyDown(e) {
 		refreshDraftList();
 		draw();
 	} else if ((e.key === "Backspace" || key === "backspace") &&
-!e.ctrlKey &&
-!e.metaKey &&
-!e.altKey &&
-!e.shiftKey) {
+		!e.ctrlKey &&
+		!e.metaKey &&
+		!e.altKey &&
+		!e.shiftKey) {
 		e.preventDefault();
 		if (state.activeRoomIndex != null) {
 			// Delete currently selected draft room
@@ -416,6 +427,9 @@ export function onKeyDown(e) {
 	}
 }
 export function onKeyUp(e) {
+	if (e.key === "Shift") {
+		state.mouse._histShiftOp = false;
+	}
 	if ((isMac && e.key === "Meta") || (!isMac && e.key === "Control")) {
 		const r = getActiveOpenRoomOrNull();
 		if (r && r.points.length >= 3 && state.activeRoomIndex != null && !state.rooms[state.activeRoomIndex].closed) {
@@ -441,10 +455,10 @@ export function onWheel(e) {
 	if (e.shiftKey) {
 		const hit = hitTestFilledRoom(x, y);
 		if (hit) {
+						ensureHistoryStartForShiftOp(e);
 			const room = getRoom(hit.list, hit.roomIndex);
 
 			if (room && room.points && room.points.length) {
-				pushHistory();
 				const zoomRoom = Math.exp(-e.deltaY * 0.002);
 				const centerInfo = getWorldCenterFromLonLatPoints(room.points);
 				if (centerInfo) {

@@ -1,9 +1,9 @@
 import { req, COORD_DECIMALS } from "./editorConfig.js";
 import { idRules } from "../shared/rules.js";
-import { reqBuildingByBid, reqBuildingsByBid, reqBasicInfos } from "./editorRequests.js";
 import { initDraw, draw, bboxOfWorld, formatCoords, fitViewTo } from "./editorDraw.js";
-import { initFileIO, loadRoomsDB, ensureRoomsArrayForBuilding, loadSavedRoomsForCurrent, writeSavedBackToDB, requestSaveRoomsToServer } from "./editorFileIO.js";
 import { onMouseDown, onMouseMove, onWheel, onMouseUp, onKeyDown, onKeyUp } from "./editorEvents.js";
+import { updateInfos, getInfos, editInfos } from "../shared/cache.js";
+import { saveRoomsJsonFromInfos } from "../shared/fetchData.js";
 
 const floorplanUrl = "floorplans/";
 
@@ -43,10 +43,7 @@ export const state = {
 	// Saved rooms (rooms.json)
 	saved: [], // { id, name, points: [[lon,lat],...], closed:true }
 
-	// Persisted DB (rooms.json content)
-	roomsDB: null,
-
-	mouse: { isDown: false, lastX: 0, lastY: 0, dragTarget: null, savedChanged: false },
+	mouse: { isDown: false, lastX: 0, lastY: 0, dragTarget: null, savedChanged: false, _histShiftOp: false },
 	history: [],
 	clipboard: null,
 	image: { img: null, loaded: false, pos: { x: 0, y: 0 }, scale: 1, rotation: 0, opacity: 0.6 },
@@ -58,6 +55,85 @@ export function getRoom(list, index) {
 	if (list === "draft") return state.rooms[index] || null;
 	if (list === "saved") return state.saved[index] || null;
 	return null;
+}
+
+// --- Rooms/infos bridge helpers & save timer ---
+let roomsSaveTimer = null;
+
+function ensureRoomsArrayForBuilding(bid, totLevel) {
+	editInfos((infos) => {
+		const b = infos[bid];
+		if (!b) return infos;
+		if (!Array.isArray(b.rooms)) b.rooms = [];
+		while (b.rooms.length < totLevel) b.rooms.push([]);
+		return infos;
+	});
+}
+
+function loadSavedRoomsForCurrent() {
+	state.saved = [];
+	if (!state.building || state.floorIndex == null) return;
+	const infosMap = getInfos();
+	const b = infosMap ? infosMap[state.building] : null;
+	const arr = (b && Array.isArray(b.rooms) ? b.rooms[state.floorIndex] : null) || [];
+	state.saved = arr.map((r, idx) => {
+		let pts = [];
+		if (Array.isArray(r.polygon)) {
+			if (
+				r.polygon.length &&
+				Array.isArray(r.polygon[0]) &&
+				Array.isArray(r.polygon[0][0])
+			) {
+				pts = r.polygon[0];
+			} else {
+				pts = r.polygon;
+			}
+		}
+		return {
+			id: `s${idx + 1}`,
+			name: r.name || "",
+			color: r.color || "#ff9500",
+			points: pts,
+			closed: true
+		};
+	});
+}
+
+export function writeSavedBackToDB() {
+	if (!state.building || state.floorIndex == null) return;
+	const list = state.saved.map((r) => ({
+		name: r.name || "",
+		color: r.color || "#ff9500",
+		polygon: Array.isArray(r.points) && r.points.length ? [r.points] : []
+	}));
+	editInfos((infos) => {
+		const b = infos[state.building];
+		if (!b) return infos;
+		if (!Array.isArray(b.rooms)) b.rooms = [];
+		while (b.rooms.length <= state.floorIndex) b.rooms.push([]);
+		b.rooms[state.floorIndex] = list;
+		return infos;
+	});
+}
+
+export function requestSaveRoomsToServer() {
+	if (roomsSaveTimer) clearTimeout(roomsSaveTimer);
+	roomsSaveTimer = setTimeout(() => {
+		saveRoomsToServer();
+	}, 300);
+}
+
+async function saveRoomsToServer() {
+	try {
+		// state.saved → infos[bid].rooms 반영
+		writeSavedBackToDB();
+		const infosMap = getInfos();
+		const res = await saveRoomsJsonFromInfos(infosMap);
+		// if (!res?.ok) throw new Error("save_failed"); // 필요시 활성화
+		console.log("rooms.json 서버 저장 완료");
+	} catch (e) {
+		console.error("rooms.json 서버 저장 실패:", e);
+	}
 }
 
 
@@ -154,19 +230,21 @@ export function undo() {
 
 // ==== Loading =======================================================================
 async function initBuildings() {
-	const basicInfos = await reqBasicInfos();
-	const bidList = basicInfos ? Object.keys(basicInfos) : [];
+	// cache.updateInfos()로 buildings/rooms 통합 정보 로드
+	await updateInfos();
+	const infosMap = getInfos();
+	const bidList = infosMap ? Object.keys(infosMap) : [];
 	buildingSelect.innerHTML = "";
-	const infos = await reqBuildingsByBid(bidList, req);
 	for (const bid of bidList) {
-		const opt = document.createElement("option");
-		opt.value = bid;
-		opt.textContent = infos[bid]?.name ? `${infos[bid].name} (${bid})` : bid;
-		buildingSelect.appendChild(opt);
+	  const opt = document.createElement("option");
+	  opt.value = bid;
+	  const name = infosMap[bid]?.name;
+	  opt.textContent = name ? `${name} (${bid})` : bid;
+	  buildingSelect.appendChild(opt);
 	}
 	if (bidList.length) {
-		buildingSelect.value = bidList[0];
-		await onBuildingChange();
+	  buildingSelect.value = bidList[0];
+	  await onBuildingChange();
 	}
 }
 
@@ -174,10 +252,11 @@ async function onBuildingChange() {
 	const bid = buildingSelect.value;
 	if (!bid) return;
 	state.building = bid;
-	state.floorInfo = await reqBuildingByBid(bid, req);
+	const infosMap = getInfos();
+	state.floorInfo = infosMap ? infosMap[bid] : null;
+	if (!state.floorInfo) return;
 	state.floorInfo.lvCount = state.floorInfo.flLevel + state.floorInfo.bmLevel;
 	floorSelect.innerHTML = "";
-	if (!state.floorInfo) return;
 	for (let i = 0; i < state.floorInfo.lvCount; i++) {
 		const levelNum = idRules.level(state.floorInfo.bmLevel, i);
 		const opt = document.createElement("option");
@@ -529,10 +608,8 @@ function bind() {
 
 async function init() {
 	initDraw(canvas, state);
-	initFileIO(state, { refreshSavedList, refreshDraftList, draw });
 	resizeCanvas();
 	bind();
-	await loadRoomsDB();
 	await initBuildings();
 }
 init();

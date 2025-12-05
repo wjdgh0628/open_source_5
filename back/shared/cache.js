@@ -1,5 +1,5 @@
-import { setApiUrl } from "../shared/rules.js";
-import { fetchBuildingsInfo } from "./fetchData";
+import { setApiUrl } from "./rules.js";
+import { fetchBuildingsInfo } from "./fetchData.js";
 
 let infos = {};
 const infosListeners = new Set();
@@ -22,6 +22,12 @@ export async function updateInfos() {
 export function subInfos(fn) {
 	infosListeners.add(fn);
 	return () => infosListeners.delete(fn);
+}
+
+export function editInfos(mutator) {
+	const next = mutator(infos) || infos;
+	infos = next;
+	infosListeners.forEach((fn) => fn(infos));
 }
 
 let current = {
@@ -48,7 +54,7 @@ export function subCurrent(fn) {
 	return () => currentListeners.delete(fn);
 }
 
-/* let map = null;
+let map = null;
 
 export function getMap() {
 	// if (!map) throw new Error("Map is not initialized yet");
@@ -56,4 +62,4 @@ export function getMap() {
 }
 export function setMap(instance) {
 	map = instance;
-} */
+}
