@@ -37,26 +37,24 @@ export default function FloorList({
 
 	return (
 		<>
-			{floors.map((rooms, floorIndex) => {
-				const isOpen = openFloors.has(floorIndex);
+			{floors.map((rooms, lvI) => {
+				const isOpen = openFloors.has(lvI);
 				return (
-					<li key={`${bid}-${floorIndex}`} style={{ marginBottom: '0.25rem' }}>
+					<li key={`${bid}-${lvI}`} style={{ marginBottom: '0.25rem' }}>
 						<div
 							className="nav__link collapse showCollapse"
-							onClick={() => toggleFloor(floorIndex)}
+							onClick={() => toggleFloor(lvI)}
 						>
 							<ion-icon name="layers-outline" class="nav__icon" />
 							<span className="nav_name">
-								{typeof bmLevel === 'number'
-									? idRules.lvChar(bmLevel, floorIndex)
-									: `${floorIndex}층`}
+								{typeof bmLevel === 'number' ? idRules.lvChar(bmLevel, lvI) : `${lvI}층`}
 							</span>
 							<span className={`collapse__link ${isOpen ? 'rotate' : ''}`}>▼</span>
 						</div>
 
 						<ul className={`collapse__menu ${isOpen ? 'showCollapse' : ''}`}>
-							{(rooms || []).map((room) => {
-								const rid = room?.rid;
+							{(rooms || []).map((room,i) => {
+								const rid = idRules.rid(bid, lvI, i);
 								if (!rid) return null;
 								const isFav = favorites.includes(rid);
 
@@ -64,7 +62,7 @@ export default function FloorList({
 									<li
 										key={rid}
 										className="building-list-item"
-										onClick={() => onRoomClick(bid, floorIndex, rid)}
+										onClick={() => onRoomClick(bid, lvI, rid)}
 									>
 										<button
 											className={`favorite-btn ${isFav ? 'favorited' : ''}`}

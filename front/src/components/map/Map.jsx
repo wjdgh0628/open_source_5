@@ -56,7 +56,7 @@ function Map({urls}) {
 			getMap().on('click', (e) => handleBackgroundClick(e));
 			// getMap().on('click', (e) =>{console.log(getMap().queryRenderedFeatures(e.point))});
 		}
-	}, []);
+	}, [urls]);
 
 	return <div id={mapId} />;
 }

@@ -39,10 +39,10 @@ export function indexRoomList(raw) {
 		const floors = f.rooms;
 		const buildingName = f.name || '';
 		(floors || []).forEach((rooms, lvI) => {
-			const level = idRules.level(f.bmLevel, lvI);
-			(rooms || []).forEach((r) => {
-				if (r && r.rid) {
-					idx[r.rid] = {
+			(rooms || []).forEach((r,i) => {
+				const rid = idRules.rid(bid, lvI, i);
+				if (r && rid) {
+					idx[rid] = {
 						bid,
 						buildingName: buildingName,
 						lvI: lvI,

@@ -5,13 +5,13 @@ export const MC = {
 		style: "mapbox://styles/mapbox/streets-v12",
 		maxBounds: [
 			[
-              126.94885855342051,
-              37.34010026501433
-            ],
+				126.94885855342051,
+				37.34010026501433
+			],
 			[
-              126.95850903964549,
-              37.349584812158525
-            ]
+				126.95850903964549,
+				37.349584812158525
+			]
 		],
 		key: "pk.eyJ1IjoibGF6eWRldjEwMjQiLCJhIjoiY21mdW91NnNyMTVkZDJtcHd4dHNtNHU0ayJ9.mLzbdcCPq_-BeA8DlHu1KA"
 	},

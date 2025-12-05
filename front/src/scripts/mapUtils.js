@@ -122,7 +122,7 @@ function allFloors(lvCount, bid, cb) {
 /**층 내 전체 방에 대해 콜백*/
 async function allRooms(bid, lvI, cb) {
 	const rooms = infos()[bid].rooms[lvI];
-	rooms.forEach((r) => cb(r.rid));
+	rooms.forEach((r,i) => cb(idRules.rid(bid, lvI, i)));
 }
 
 /**

@@ -1,6 +1,6 @@
-import { jsonProp, idRules, setApiUrl } from './rules.js';
+import { jsonProp, setApiUrl } from './rules.js';
 async function fetchJson(path) {
-	console.log(`Fetching JSON from: ${path}`);
+	// console.log(`Fetching JSON from: ${path}`);
 	return await fetch(path)
 		.then(response => response.json())
 		.then(data => {
@@ -38,7 +38,7 @@ export async function fetchBuildingsInfo(buildingsPath, roomsPath) {
 		};
 		res[bid] = props;
 	}
-	console.log("fetchBuildingsInfo result:", res);
+	// console.log("fetchBuildingsInfo result:", res);
 	return res;
 }
 // Rooms DB I/O (unified here for reuse)
