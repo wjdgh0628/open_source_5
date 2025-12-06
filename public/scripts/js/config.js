@@ -75,5 +75,6 @@ export const cache = {
     fetchCount: 0,
     cachingCount: 0,
     buildings: {},
-    rooms: {}
+    rooms: {},
+    roomMarkers: []
 }

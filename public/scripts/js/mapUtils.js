@@ -2,19 +2,19 @@
 import { CONFIG, cache } from './config.js';
 import { handleFloorClick } from './onClick.js';
 
-//ì¹´ë©”ë¼ ì´ë™ í•¨ìˆ˜
+//Ä«¸Ş¶ó ÀÌµ¿ ÇÔ¼ö
 export function flyCamera(map, mode, center, bearing = null) {
     if (bearing == null)
         bearing = CONFIG.camera[mode].bearing;
     map.flyTo({ center, ...CONFIG.camera[mode], bearing: bearing, ssential: true });
 }
 
-//geojson bidë¡œ ê±´ë¬¼ ë°ì´í„° ìš”ì²­
+//geojson bid·Î °Ç¹° µ¥ÀÌÅÍ ¿äÃ»
 async function requestBuildingByBid(bid) {
     let f = null;
     if (cache.buildings[bid]) {
         f = cache.buildings[bid];
-        // console.log(`ìºì‹œì—ì„œ ë¶ˆëŸ¬ì˜´: ${bid}, ${++cache.cachingCount}`);
+        // console.log(`Ä³½Ã¿¡¼­ ºÒ·¯¿È: ${bid}, ${++cache.cachingCount}`);
     }
     else {
         await fetch(CONFIG.campus.geojsonUrl)
@@ -26,17 +26,17 @@ async function requestBuildingByBid(bid) {
                 if (feature) {
                     f = feature;
                     cache.buildings[bid] = f;
-                    // console.log(`íŒŒì¼ì—ì„œ ë¶ˆëŸ¬ì˜´: ${bid}, ${++cache.fetchCount}`);
+                    // console.log(`ÆÄÀÏ¿¡¼­ ºÒ·¯¿È: ${bid}, ${++cache.fetchCount}`);
                 } else {
-                    console.log("í•´ë‹¹ IDë¥¼ ê°€ì§„ ê°ì²´ê°€ ì—†ìŠµë‹ˆë‹¤.:", bid);
+                    console.log("ÇØ´ç ID¸¦ °¡Áø °´Ã¼°¡ ¾ø½À´Ï´Ù.:", bid);
                     f = false;
                 }
             })
-            .catch(err => { console.error("íŒŒì¼ ë¶ˆëŸ¬ì˜¤ê¸° ì‹¤íŒ¨:", err); f = false; });
+            .catch(err => { console.error("ÆÄÀÏ ºÒ·¯¿À±â ½ÇÆĞ:", err); f = false; });
     }
     return f;
 }
-//bidë¡œ ê±´ë¬¼ ê¸°ë³¸ì •ë³´ ê²€ìƒ‰
+//bid·Î °Ç¹° ±âº»Á¤º¸ °Ë»ö
 export async function searchBasicInfoByBid(bid) {
     const f = await requestBuildingByBid(bid);
     return {
@@ -49,7 +49,7 @@ export async function searchBasicInfoByBid(bid) {
         floorBearing: f.properties?.floorBearing
     };
 }
-//bidë¡œ ê±´ë¬¼ ì¸µ ì •ë³´ ê²€ìƒ‰
+//bid·Î °Ç¹° Ãş Á¤º¸ °Ë»ö
 export async function searchFloorInfoByBid(bid) {
     const f = await requestBuildingByBid(bid);
     if (!f) return;
@@ -58,9 +58,9 @@ export async function searchFloorInfoByBid(bid) {
     const totLevel = floors?.flLevel + floors?.bmLevel;
     const flList = floors?.flList;
 
-    //geojsonì— ì €ì¥ëœ ì¸µìˆ˜ë‘ ì¸µ ë°°ì—´ ê¸¸ì´ê°€ ê°™ì€ì§€ ê²€ì‚¬
+    //geojson¿¡ ÀúÀåµÈ Ãş¼ö¶û Ãş ¹è¿­ ±æÀÌ°¡ °°ÀºÁö °Ë»ç
     if (totLevel != flList.length) {
-        console.log(`ì¸µìˆ˜ ì˜¤ë¥˜ | ì§€ìƒ:${floors.bmLevel} + ì§€í•˜:${floors.flLevel}, ë°°ì—´ ê¸¸ì´${flList.length}`);
+        console.log(`Ãş¼ö ¿À·ù | Áö»ó:${floors.bmLevel} + ÁöÇÏ:${floors.flLevel}, ¹è¿­ ±æÀÌ${flList.length}`);
         return;
     }
 
@@ -74,12 +74,12 @@ export async function searchFloorInfoByBid(bid) {
         // offset: f.properties.offset
     };
 }
-//bid, levelIndexë¡œ ë°© ì •ë³´ ìš”ì²­
+//bid, levelIndex·Î ¹æ Á¤º¸ ¿äÃ»
 async function requestRoomsByBid(bid, lvI) {
     let f = null;
     if (cache.rooms[bid]?.[lvI]) {
         f = cache.rooms[bid][lvI];
-        // console.log(`ìºì‹œì—ì„œ ë¶ˆëŸ¬ì˜´: ${bid} lvI: ${lvI}, ${++cache.cachingCount}`);
+        // console.log(`Ä³½Ã¿¡¼­ ºÒ·¯¿È: ${bid} lvI: ${lvI}, ${++cache.cachingCount}`);
     } else {
         await fetch(CONFIG.campus.roomsUrl)
             .then(response => response.json())
@@ -90,21 +90,21 @@ async function requestRoomsByBid(bid, lvI) {
                     f = rooms;
                     if (!cache.rooms[bid]) cache.rooms[bid] = {};
                     cache.rooms[bid][lvI] = f;
-                    // console.log(`íŒŒì¼ì—ì„œ ë¶ˆëŸ¬ì˜´: ${bid} lvI: ${lvI}, ${++cache.fetchCount}`);
+                    // console.log(`ÆÄÀÏ¿¡¼­ ºÒ·¯¿È: ${bid} lvI: ${lvI}, ${++cache.fetchCount}`);
                 } else {
-                    console.log("bid í˜¹ì€ ì¸µìˆ˜ ì˜¤ë¥˜", bid, lvI);
+                    console.log("bid È¤Àº Ãş¼ö ¿À·ù", bid, lvI);
                     f = false;
                 }
             })
-            .catch(err => { console.error("íŒŒì¼ ë¶ˆëŸ¬ì˜¤ê¸° ì‹¤íŒ¨:", err); f = null; });
+            .catch(err => { console.error("ÆÄÀÏ ºÒ·¯¿À±â ½ÇÆĞ:", err); f = null; });
     }
     return f;
 }
 
-//ë°ì´í„° ë°°ì—´ ë°›ì•„ì„œ ì¸µì´ë‚˜ ë°© ë§Œë“œëŠ” í•¨ìˆ˜
+//µ¥ÀÌÅÍ ¹è¿­ ¹Ş¾Æ¼­ ÃşÀÌ³ª ¹æ ¸¸µå´Â ÇÔ¼ö
 function setLayers(map, sourceId, features) {
     if (map.getSource(sourceId)) {
-        console.log(`source id: ${sourceId}ê°€ ì´ë¯¸ ì¡´ì¬`);
+        console.log(`source id: ${sourceId}°¡ ÀÌ¹Ì Á¸Àç`);
         return;
     }
     map.addSource(sourceId, {
@@ -128,7 +128,7 @@ function setLayers(map, sourceId, features) {
                 "fill-extrusion-opacity": 1
             }
         });
-        if (!f.properties.name) return; //ì´ë¦„ì´ ì—†ìœ¼ë©´ ë¼ë²¨ ìƒì„± ì•ˆí•¨
+        if (!f.properties.name) return; //ÀÌ¸§ÀÌ ¾øÀ¸¸é ¶óº§ »ı¼º ¾ÈÇÔ
         map.addLayer({
             id: CONFIG.idRules.lid(layerId),
             type: 'symbol',
@@ -158,25 +158,25 @@ function setLayers(map, sourceId, features) {
         // console.log(CONFIG.idRules.lid(layerId));
     });
 }
-//í•¸ë“¤ëŸ¬ ì ìš© í•¨ìˆ˜
+//ÇÚµé·¯ Àû¿ë ÇÔ¼ö
 export function setHandler(map, type , id, callback) {
     const handler = e => {
         const features = map.queryRenderedFeatures(e.point);
         if (!features.length) { return; }
 
-        const topFeature = features[0];// z-index ê°œë…ì€ ì—†ì§€ë§Œ, queryRenderedFeaturesì˜ ë°°ì—´ì€ ìœ„ì—ì„œë¶€í„° ìˆœì„œëŒ€ë¡œ ì •ë ¬ë¨
-        const cur = e.features[0]; // ì´ ë ˆì´ì–´ í•¸ë“¤ëŸ¬ì— ì „ë‹¬ëœ í”¼ì²˜
+        const topFeature = features[0];// z-index °³³äÀº ¾øÁö¸¸, queryRenderedFeaturesÀÇ ¹è¿­Àº À§¿¡¼­ºÎÅÍ ¼ø¼­´ë·Î Á¤·ÄµÊ
+        const cur = e.features[0]; // ÀÌ ·¹ÀÌ¾î ÇÚµé·¯¿¡ Àü´ŞµÈ ÇÇÃ³
 
-        // feature.idê°€ ìˆë‹¤ë©´ idê¹Œì§€ ë¹„êµ (ì—†ìœ¼ë©´ layer.idë§Œ ë¹„êµ)
+        // feature.id°¡ ÀÖ´Ù¸é id±îÁö ºñ±³ (¾øÀ¸¸é layer.id¸¸ ºñ±³)
         const isTop = (topFeature.layer.id === id) && (topFeature.id == null || topFeature.id === cur.id);
 
-        // ì›í•˜ëŠ” ì´ë²¤íŠ¸ë¥¼ topFeature í•˜ë‚˜ì—ë§Œ ì ìš©
+        // ¿øÇÏ´Â ÀÌº¥Æ®¸¦ topFeature ÇÏ³ª¿¡¸¸ Àû¿ë
         if (isTop) { callback(topFeature); }
     }
     map.on(type, id, (e) => handler(e));
 }
 
-//ë ˆì´ì–´ ë³´ì´ê¸°/ìˆ¨ê¸°ê¸°
+//·¹ÀÌ¾î º¸ÀÌ±â/¼û±â±â
 export function showLayer(map, id) {
     map.getLayer(id) && map.setLayoutProperty(id, "visibility", "visible");
     map.getLayer(CONFIG.idRules.lid(id)) && map.setLayoutProperty(CONFIG.idRules.lid(id), "visibility", "visible");
@@ -185,7 +185,7 @@ export function hideLayer(map, id) {
     map.getLayer(id) && map.setLayoutProperty(id, "visibility", "none");
     map.getLayer(CONFIG.idRules.lid(id)) && map.setLayoutProperty(CONFIG.idRules.lid(id), "visibility", "none");
 }
-//íŠ¹ì • ê±´ë¬¼ì˜ ì¸µë“¤ ìˆ¨ê¸°ê¸°
+//Æ¯Á¤ °Ç¹°ÀÇ Ãşµé ¼û±â±â
 export async function hideFloorsByBid(map, bid) {
     const fInfo = await searchFloorInfoByBid(bid);
     allFloors(map, fInfo, bid, (map, fid, level) => {
@@ -194,20 +194,20 @@ export async function hideFloorsByBid(map, bid) {
         hideAllRooms(map, bid, level, lvI);
     });
 }
-//ì „ì²´ ê±´ë¬¼ë“¤ ì¸µ ìˆ¨ê¸°ê¸°
+//ÀüÃ¼ °Ç¹°µé Ãş ¼û±â±â
 async function hideAllFloors(map) {
     for (const bid of CONFIG.bidList) {
         await hideFloorsByBid(map, bid);
     }
 }
-//ì¸µ ë‚´ ì „ì²´ ë°© ìˆ¨ê¸°ê¸°
+//Ãş ³» ÀüÃ¼ ¹æ ¼û±â±â
 export async function hideAllRooms(map, bid, level, lvI) {
     hideLayer(map, CONFIG.idRules.clickedFloor(bid, level));
     await allRooms(map, bid, level, lvI, (map, rid) => hideLayer(map, rid));
 }
 
 
-//ê±´ë¬¼ ë‚´ ì „ì²´ ì¸µì— ëŒ€í•´ ì½œë°±
+//°Ç¹° ³» ÀüÃ¼ Ãş¿¡ ´ëÇØ Äİ¹é
 function allFloors(map, fInfo, bid, cb) {
     for (let i = fInfo.bmLevel * -1; i < 0; i++) {
         const fid = CONFIG.idRules.fid(bid, i);
@@ -218,7 +218,7 @@ function allFloors(map, fInfo, bid, cb) {
         cb(map, fid, i);
     }
 }
-//ì¸µ ë‚´ ì „ì²´ ë°©ì— ëŒ€í•´ ì½œë°±
+//Ãş ³» ÀüÃ¼ ¹æ¿¡ ´ëÇØ Äİ¹é
 async function allRooms(map, bid, level, lvI, cb) {
     const rooms = await requestRoomsByBid(bid, lvI);
     rooms.forEach((r, i) => {
@@ -227,8 +227,9 @@ async function allRooms(map, bid, level, lvI, cb) {
     });
 }
 
-//ì¸µ ìƒì„±/ë³´ì´ê¸°
+//Ãş »ı¼º/º¸ÀÌ±â
 export function setFloors(map, fInfo) {
+    clearRoomMarkers(); // Ãş/°Ç¹° ºä¿¡¼­´Â ¹æ ¸¶Ä¿°¡ º¸ÀÌÁö ¾Êµµ·Ï ÃÊ±âÈ­
     const bid = fInfo.bid;
     if (map.getSource(CONFIG.idRules.floorSid(bid))) {
         allFloors(map, fInfo, bid, (map, fid) => showLayer(map, fid));
@@ -237,10 +238,18 @@ export function setFloors(map, fInfo) {
         generateFloors(map, fInfo);
     }
 }
-//ë°© ìƒì„±/ë³´ì´ê¸°
+//¹æ »ı¼º/º¸ÀÌ±â
 export function setRooms(map, bid, level, lvI, fInfo) {
+    clearRoomMarkers(); // ÀÌÀü Ãş/¹æ ¸¶Ä¿ Á¦°Å
     const fid = CONFIG.idRules.fid(fInfo.bid, level)
     if (map.getSource(CONFIG.idRules.roomSid(fid))) {
+        // ±âÁ¸ ¼Ò½º È°¿ë ½Ã ¸¶Ä¿ Àç»ı¼º
+        const source = map.getSource(CONFIG.idRules.roomSid(fid));
+        const data = source?.serialize ? source.serialize().data : source?._data;
+        const features = data?.features || [];
+        features.slice(1).forEach((feature) => {
+            createRoomMarker(map, feature, `<strong>${feature.properties?.name ?? ""}</strong>`);
+        });
         allRooms(map, bid, level, lvI, (map, rid) => showLayer(map, rid));
         showLayer(map, CONFIG.idRules.clickedFloor(bid, level));
     }
@@ -248,12 +257,12 @@ export function setRooms(map, bid, level, lvI, fInfo) {
         generateRooms(map, fInfo, fid, level);
     }
 }
-//ì¸µ ìƒì„±í•˜ëŠ” í•¨ìˆ˜
+//Ãş »ı¼ºÇÏ´Â ÇÔ¼ö
 function generateFloors(map, fInfo) {
     const bid = fInfo.bid;
     const { floorThickness, floorGap } = CONFIG.buildingDefaults;
 
-    //ì¸µ ëª¨ì–‘(í´ë¦¬ê³¤ì´ë‘ ë†’ì´ ë“±)ì´ë‘ ê°ì¢… ì •ë³´ë“¤ floorSpecì— ì €ì¥
+    //Ãş ¸ğ¾ç(Æú¸®°ïÀÌ¶û ³ôÀÌ µî)ÀÌ¶û °¢Á¾ Á¤º¸µé floorSpec¿¡ ÀúÀå
     let floorsSpec = []
     fInfo.flList.forEach((flVarNum, i) => {
         let fi = i - fInfo.bmLevel;
@@ -278,15 +287,15 @@ function generateFloors(map, fInfo) {
         })
     })
 
-    // floorSpec ê¸°ë°˜ìœ¼ë¡œ sourceë¡œ ì €ì¥
+    // floorSpec ±â¹İÀ¸·Î source·Î ÀúÀå
     setLayers(map, CONFIG.idRules.floorSid(bid), floorsSpec);
-    // í•¸ë“¤ëŸ¬ ì§€ì •
+    // ÇÚµé·¯ ÁöÁ¤
     floorsSpec.forEach((f, i) => {
         const fid = f.properties.layerId;
         setHandler(map, "click", fid, e => handleFloorClick(map, bid, fid, f.properties.level, i))
     });
 }
-//ë°© ìƒì„±í•˜ëŠ” í•¨ìˆ˜
+//¹æ »ı¼ºÇÏ´Â ÇÔ¼ö
 async function generateRooms(map, fInfo, fid, level) {
     const bid = fInfo.bid;
     const { floorThickness, floorGap, colorPalette, baseThickness, roomThickness } = CONFIG.buildingDefaults;
@@ -307,7 +316,7 @@ async function generateRooms(map, fInfo, fid, level) {
         geometry: { type: "Polygon", coordinates: fInfo.flVars[fInfo.flList[lvI]] }
     })
 
-    // !!ì›ë³¸!! í˜¹ì‹œë‚˜ í•´ì„œ ë‚¨ê²¨ë‘¡ë‹ˆë‹¹...
+    // !!¿øº»!! È¤½Ã³ª ÇØ¼­ ³²°ÜµÓ´Ï´ç...
     // rooms.forEach((room, i) => {
     //     roomsSpec.push({
     //         type: "Feature",
@@ -315,7 +324,7 @@ async function generateRooms(map, fInfo, fid, level) {
     //             name: room.name,
     //             base: base + baseThickness,
     //             height: base + baseThickness + roomThickness,
-    //             color: room.color ? room.color : "#0088ff",// ì„ì‹œ ì»¬ëŸ¬
+    //             color: room.color ? room.color : "#0088ff",// ÀÓ½Ã ÄÃ·¯
     //             anchor: "bottom",
     //             // offset: 0,
     //             layerId: CONFIG.idRules.rid(bid, level, i + 1)
@@ -324,7 +333,7 @@ async function generateRooms(map, fInfo, fid, level) {
     //     })
     // })
 
-    // ìˆ˜ì •í•œ ë¶€ë¶„
+    // ¼öÁ¤ÇÑ ºÎºĞ
     rooms.forEach((room, i) => {
     const roomFeature = {
         type: "Feature",
@@ -340,22 +349,22 @@ async function generateRooms(map, fInfo, fid, level) {
     };
     roomsSpec.push(roomFeature);
 
-    // ë°© ì´ë¦„ìœ¼ë¡œ ë§ˆì»¤ ìƒì„±
+    // ¹æ ÀÌ¸§À¸·Î ¸¶Ä¿ »ı¼º
     createRoomMarker(map, roomFeature, `<strong>${room.name}</strong>`);
     });
-    // ì—¬ê¸°ê¹Œì§€
+    // ¿©±â±îÁö
 
 
     setLayers(map, CONFIG.idRules.roomSid(fid), roomsSpec);
-    // í•¸ë“¤ëŸ¬ ì§€ì •
+    // ÇÚµé·¯ ÁöÁ¤
     roomsSpec.forEach((r, i) => {
-        if (i === 0) return; // í´ë¦­ëœ ì¸µ ë² ì´ìŠ¤ëŠ” í•¸ë“¤ëŸ¬ ì§€ì • ì•ˆí•¨
+        if (i === 0) return; // Å¬¸¯µÈ Ãş º£ÀÌ½º´Â ÇÚµé·¯ ÁöÁ¤ ¾ÈÇÔ
         const rid = r.properties.layerId;
     });
 }
 
 
-// ì¶”ê°€ : centerê°’ ê³„ì‚°í•¨ìˆ˜ (ì¢Œí‘œ ë°°ì—´ì˜ ì¤‘ì‹¬ê°’ì„ ê³„ì‚°)
+// ¸¶Ä¿ ¶ç¿ï center°ª °è»êÇÔ¼ö (ÁÂÇ¥ ¹è¿­ÀÇ Áß½É°ªÀ» °è»ê)
 function getPolygonCenter(coords) {
     if (!coords || !coords.length || !coords[0].length) return null;
     const ring = coords[0];
@@ -366,20 +375,35 @@ function getPolygonCenter(coords) {
     return [sum[0] / ring.length, sum[1] / ring.length];
 }
 
-// ì¶”ê°€ : ë°© ì¤‘ì•™ì— ë§ˆì»¤ ìƒì„±
+// ¹æ Áß¾Ó¿¡ ¸¶Ä¿ »ı¼º
 export function createRoomMarker(map, roomFeature, labelHtml = "") {
     if (!roomFeature?.geometry?.coordinates) return null;
     const center = getPolygonCenter(roomFeature.geometry.coordinates);
     if (!center) return null;
 
-    const altitude = (roomFeature.properties?.height ?? 0) + 3.5;
+    const altitude = Number(roomFeature.properties?.height ?? 0) + 5;
     const el = document.createElement("div");
     el.className = "floating-marker";
     el.innerHTML = labelHtml || roomFeature.properties?.name || "";
 
-    return new mapboxgl.Marker({
+    const marker = new mapboxgl.Marker({
         element: el,
         anchor: "bottom",
-        altitude : altitude
+        altitude: altitude,
+        //pitchAlignment: "map",
+        //rotationAlignment: "map"
     }).setLngLat(center).addTo(map);
+    addRoomMarker(marker); // »ı¼ºµÈ ¸¶Ä¿¸¦ ÃßÀû ¹è¿­¿¡ ÀúÀå
+    return marker;
+}
+
+// ¹æ ¸¶Ä¿ °ü¸®
+function addRoomMarker(marker) {
+    if (!cache.roomMarkers) cache.roomMarkers = [];
+    cache.roomMarkers.push(marker);
+}
+function clearRoomMarkers() {
+    if (!Array.isArray(cache.roomMarkers)) cache.roomMarkers = [];
+    cache.roomMarkers.forEach(m => m.remove());
+    cache.roomMarkers = [];
 }
