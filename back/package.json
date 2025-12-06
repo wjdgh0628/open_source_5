@@ -1,0 +1,27 @@
+{
+  "name": "hansei_map_server",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "server": "node server/server.js",
+    "editor": "open http://localhost:4000/editor && node server/server.js",
+    "start": "node server/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^16.5.0"
+  },
+  "imports": {
+    "#shared/*": "./shared/*",
+    "#scripts/*": "./server/scripts/*",
+    "#server/*": "./server/*"
+  }
+}

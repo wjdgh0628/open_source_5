@@ -1,0 +1,240 @@
+import { idRules } from '@shared/rules.js';
+import { getInfos as infos, getMap as Map } from '@shared/cache.js';
+import { MC } from './mapConfig.js';
+import { handleFloorClick } from './mapHandlers.js';
+
+/**카메라 이동 함수*/
+export function flyCamera(mode, center, bearing = null, lvI = null) {
+	const modeConfig = {...MC.camera[mode]};
+	if(bearing) modeConfig.bearing = bearing;
+	if(lvI) modeConfig.zoom -= (lvI * MC.camera.floorZoomStep);
+	Map().flyTo({ center, ...modeConfig, essential: true });
+}
+
+
+/**데이터 배열 받아서 층이나 방 만드는 함수*/
+function setLayers(sourceId, features) {
+	if (Map().getSource(sourceId)) {
+		console.log(`source id: ${sourceId}가 이미 존재`);
+		return;
+	}
+	Map().addSource(sourceId, {
+		type: "geojson",
+		data: ({
+			type: "FeatureCollection",
+			features: features
+		})
+	});
+	features.forEach((f, i) => {
+		const layerId = f.properties.layerId;
+		Map().addLayer({
+			id: layerId,
+			type: "fill-extrusion",
+			source: sourceId,
+			filter: ["==", ["get", "layerId"], layerId],
+			paint: {
+				"fill-extrusion-color": ["get", "color"],
+				"fill-extrusion-base": ["get", "base"],
+				"fill-extrusion-height": ["get", "height"],
+				"fill-extrusion-opacity": 1
+			}
+		});
+		if (!f.properties.name) return; //이름이 없으면 라벨 생성 안함
+		Map().addLayer({
+			id: idRules.lid(layerId),
+			type: 'symbol',
+			source: sourceId,
+			filter: ["==", ["get", "layerId"], layerId],
+			layout: {
+				'text-field': ["get", "name"],
+				'text-size': 14,
+				'text-anchor': ["get", "anchor"],
+				'text-allow-overlap': true,
+				'symbol-placement': 'point',
+				'symbol-z-order': "source"
+			},
+			paint: {
+				'symbol-z-offset': f.properties.base,
+				'text-color': '#000000',
+				'text-halo-color': '#ffffff',
+				'text-halo-width': 2
+			}
+		});
+		// console.log(CONFIG.idRules.lid(layerId));
+	});
+}
+/**핸들러 적용 함수*/
+export function setHandler(type, id, callback) {
+	const handler = e => {
+		const features = Map().queryRenderedFeatures(e.point);
+		if (!features.length) { return; }
+
+		const topFeature = features[0];// z-index 개념은 없지만, queryRenderedFeatures의 배열은 위에서부터 순서대로 정렬됨
+		const cur = e.features[0]; // 이 레이어 핸들러에 전달된 피처
+
+		// feature.id가 있다면 id까지 비교 (없으면 layer.id만 비교)
+		const isTop = (topFeature.layer.id === id) && (topFeature.id == null || topFeature.id === cur.id);
+
+		// 원하는 이벤트를 topFeature 하나에만 적용
+		if (isTop) { callback(topFeature); }
+	};
+	Map().on(type, id, (e) => handler(e));
+}
+
+/**레이어 보이기/숨기기*/
+export function showLayer(id) {
+	Map().getLayer(id) && Map().setLayoutProperty(id, "visibility", "visible");
+	Map().getLayer(idRules.lid(id)) && Map().setLayoutProperty(idRules.lid(id), "visibility", "visible");
+}
+export function hideLayer(id) {
+	Map().getLayer(id) && Map().setLayoutProperty(id, "visibility", "none");
+	Map().getLayer(idRules.lid(id)) && Map().setLayoutProperty(idRules.lid(id), "visibility", "none");
+}
+/**특정 건물의 층들 숨기기*/
+export async function hideFloorsByBid(bid) {
+	const lvCount = (infos()[bid].rooms.length);
+	allFloors(lvCount, bid, (fid, lvI) => {
+		hideLayer(fid);
+		hideAllRooms(bid, lvI);
+	});
+}
+/**전체 건물들 층 숨기기*/
+/* async function hideAllFloors(map) {
+	const bidList = Object.keys(await reqBasicInfos(urls));
+	for (const bid of bidList) {
+		await hideFloorsByBid( bid);
+	}
+} */
+/**층 내 전체 방 숨기기*/
+export async function hideAllRooms(bid, lvI) {
+	hideLayer(idRules.clickedFloor(bid, lvI));
+	await allRooms(bid, lvI, (rid) => hideLayer(rid));
+}
+
+
+/**건물 내 전체 층에 대해 콜백*/
+function allFloors(lvCount, bid, cb) {
+	for (let i = 0; i < lvCount; i++) {
+		const fid = idRules.fid(bid, i);
+		cb(fid, i);
+	}
+}
+/**층 내 전체 방에 대해 콜백*/
+async function allRooms(bid, lvI, cb) {
+	const rooms = infos()[bid].rooms[lvI];
+	rooms.forEach((r,i) => cb(idRules.rid(bid, lvI, i)));
+}
+
+/**
+ * 층 생성/보이기
+ * info: bid, flList, flVars, flLevel, bmLevel
+ */
+export function setFloors(info) {
+	const bid = info.bid;
+	const lvCount = info.flLevel + info.bmLevel;
+	if (Map().getSource(idRules.floorSid(bid))) {
+		allFloors(lvCount, bid, (fid) => { showLayer(fid); });
+	}
+	else {
+		generateFloors(info);
+	}
+}
+/**
+ * 방 생성/보이기
+ * info: bid, flVars, flList
+ */
+export async function setRooms(bid, lvI, info) {
+	const fid = idRules.fid(bid, lvI);
+	if (Map().getSource(idRules.roomSid(fid))) {
+		await allRooms(bid, lvI, (rid) => showLayer(rid));
+		showLayer(idRules.clickedFloor(bid, lvI));
+	}
+	else {
+		generateRooms(info, fid, lvI);
+	}
+}
+/**
+ * 층 생성하는 함수
+ * info: bid, flList, flVars,flLevel, bmLevel
+ */
+function generateFloors(info) {
+	const bid = info.bid;
+	const { floorThickness, floorGap } = MC.layerProps;
+
+	//층 모양(폴리곤이랑 높이 등)이랑 각종 정보들 floorSpec에 저장
+	let floorsSpec = [];
+	info.flList.forEach((flVarNum, lvI) => {
+		let fi = lvI - info.bmLevel;
+		let bi = info.bmLevel - lvI;
+		const base = lvI * (floorThickness + floorGap);
+		const level = idRules.level(info.bmLevel, lvI);
+		floorsSpec.push({
+			type: "Feature",
+			properties: {
+				name: idRules.lvChar(info.bmLevel, lvI),
+				base,
+				height: base + floorThickness,
+				// color: i >= info.bmLevel ? colorPalette[fi * colorJump] : basementPalette[bi - 1],
+				color: MC.layerProps.taseTheRainbow(lvI, fi, bi, info.bmLevel, info.flLevel),
+				level: level,
+				anchor: "left",
+				// offset: info.offset,
+				layerId: idRules.fid(bid, lvI)
+			},
+			geometry: { type: "Polygon", coordinates: info.flVars[flVarNum] }
+		});
+	});
+
+	// floorSpec 기반으로 source로 저장
+	setLayers(idRules.floorSid(bid), floorsSpec);
+	// 핸들러 지정
+	floorsSpec.forEach((f, i) => {
+		const fid = f.properties.layerId;
+		setHandler("click", fid, e => handleFloorClick(fid, i, info));
+	});
+}
+/**
+ * 방 생성하는 함수
+ * info: bid, flVars, flList
+ */
+async function generateRooms(info, fid, lvI) {
+	const bid = info.bid;
+	const { floorThickness, floorGap, colorPalette, baseThickness, roomThickness } = MC.layerProps;
+	const base = (lvI * (floorThickness + floorGap));
+	const rooms = infos()[bid].rooms[lvI];
+	let roomsSpec = [];
+
+	roomsSpec.push({
+		type: "Feature",
+		properties: {
+			base: base,
+			height: base + baseThickness,
+			color: MC.layerProps.clickedFloorColor,
+			// offset: 0,
+			layerId: idRules.clickedFloor(bid, lvI)
+		},
+		geometry: { type: "Polygon", coordinates: info.flVars[info.flList[lvI]] }
+	});
+	rooms.forEach((room, i) => {
+		roomsSpec.push({
+			type: "Feature",
+			properties: {
+				name: room.name,
+				base: base + baseThickness,
+				height: base + baseThickness + roomThickness,
+				color: room.color ? room.color : "#0088ff",// 임시 컬러
+				anchor: "bottom",
+				// offset: 0,
+				layerId: idRules.rid(bid, lvI, i)
+			},
+			geometry: { type: "Polygon", coordinates: room.polygon }
+		});
+	});
+
+	setLayers(idRules.roomSid(fid), roomsSpec);
+	// 핸들러 지정
+	roomsSpec.forEach((r, i) => {
+		if (i === 0) return; // 클릭된 층 베이스는 핸들러 지정 안함
+		const rid = r.properties.layerId;
+	});
+}
