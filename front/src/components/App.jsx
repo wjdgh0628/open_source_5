@@ -6,9 +6,9 @@ import { fetchBuildingsInfo } from '@shared/fetchData.js';
 import './App.css';
 import Map from './map/Map.jsx';
 import SideBar from './sidebar/SideBar.jsx';
-
+const API_BASE = import.meta.env.VITE_API_BASE;
 export function App() {
-	const [urls, setUrls] = useState(setApiUrl(__API_BASE__));
+	const [urls, setUrls] = useState(setApiUrl(API_BASE));
 	const [stInfo, setStInfo] = useState(null);
 
 	useEffect(() => {

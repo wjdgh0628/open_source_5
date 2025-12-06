@@ -34,5 +34,11 @@ export default defineConfig([
 		env: {
 			node: true
 		}
+	},
+	{
+		files: ["vite.config.js"],
+		env: {
+			node: true
+		}
 	}
 ]);
