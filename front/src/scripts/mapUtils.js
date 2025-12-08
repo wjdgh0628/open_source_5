@@ -4,6 +4,8 @@ import { getInfos as infos, getMap as Map } from '@shared/cache.js';
 import { MC } from './mapConfig.js';
 import { handleFloorClick } from './mapHandlers.js';
 
+let popup = null;
+
 /**카메라 이동 함수*/
 export function flyCamera(mode, center, bearing = null, lvI = null) {
 	const modeConfig = { ...MC.camera[mode] };
@@ -80,7 +82,7 @@ function setLayers(sourceId, features) {
 			});
 		}
 		if (f.properties.popup) { //팝업 정보가 있으면 팝업 레이어 생성
-			let popup = null;
+			
 			Map().on('mouseenter', layerId, (e) => {
 				if (!popup) {
 					popup = new mapboxgl.Popup({ altitude: f.properties.base + MC.layerProps.roomThickness, closeButton: false, closeOnClick: false, closeOnMove: true })
@@ -89,6 +91,12 @@ function setLayers(sourceId, features) {
 						.setMaxWidth("300px")
 						.addTo(Map());
 					// console.log('팝업 생성');
+				}
+				else{
+					popup.setLngLat(f.properties.center);
+					popup.setHTML(f.properties.popup);
+					popup.setAltitude(f.properties.base + MC.layerProps.roomThickness);
+					popup.addTo(Map());
 				}
 			});
 			Map().on('mouseleave', layerId, (e) => {
