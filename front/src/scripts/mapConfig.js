@@ -38,10 +38,19 @@ export const MC = {
 			const colorJump = parseInt(colorPalette.length / flLevel);
 			return i >= bmLevel ? colorPalette[fi * colorJump] : basementPalette[bi - 1];
 		},
-		oreoCake: (i, fi, bmLevel) => {
+		oreoCake: (i, bmLevel) => {
+			const fi = i - bmLevel;
 			return i >= bmLevel ? fi % 2 == 0 ? "#FFFFFF" : "#000000" : "#4400FF";
+		},
+		gradation: (i, bmLevel, flLevel) => {
+			const fi = i - bmLevel;
+			const base = [4, 65, 124];
+			const top = [158, 204, 243];
+			const now = base.map((b, idx) => parseInt(b + (top[idx] - b) * (fi / (flLevel - 1))));
+			const hex = now.map(n => n.toString(16).padStart(2, '0')).join('');
+			return i >= bmLevel ? `#${hex}` : "#555555";
 		}
-		// basementPalette: ["#ff00ff", "#cc00ff", "#8800ff", "#4400ff"]
+		// basementPalette: ["#ffffffff", "#cc00ff", "#8800ff", "#4400ff"]
 	},
 	bgIdList: [
 		"land",

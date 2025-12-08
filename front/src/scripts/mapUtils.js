@@ -175,7 +175,7 @@ function generateFloors(info) {
 				base,
 				height: base + floorThickness,
 				// color: i >= info.bmLevel ? colorPalette[fi * colorJump] : basementPalette[bi - 1],
-				color: MC.layerProps.taseTheRainbow(lvI, fi, bi, info.bmLevel, info.flLevel),
+				color: MC.layerProps.gradation(lvI, info.bmLevel, info.flLevel),
 				level: level,
 				anchor: "left",
 				// offset: info.offset,
