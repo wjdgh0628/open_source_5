@@ -3,6 +3,8 @@
         [
             {
                 "name": "무도장",
+                "desc": "",
+                "tags": [],
                 "color": "#F5F5F0",
                 "polygon": [
                     [
@@ -27,6 +29,8 @@
             },
             {
                 "name": "체육관",
+                "desc": "",
+                "tags": [],
                 "color": "#DAA520",
                 "polygon": [
                     [
@@ -51,6 +55,8 @@
             },
             {
                 "name": "휴게실",
+                "desc": "",
+                "tags": [],
                 "color": "#E8DCC4",
                 "polygon": [
                     [
@@ -75,6 +81,8 @@
             },
             {
                 "name": "여자탈의실",
+                "desc": "",
+                "tags": [],
                 "color": "#ff0000",
                 "polygon": [
                     [
@@ -99,6 +107,8 @@
             },
             {
                 "name": "남자탈의실",
+                "desc": "",
+                "tags": [],
                 "color": "#0000ff",
                 "polygon": [
                     [
@@ -125,6 +135,8 @@
         [
             {
                 "name": "학생식당",
+                "desc": "",
+                "tags": [],
                 "color": "#ff8c00",
                 "polygon": [
                     [
@@ -149,6 +161,8 @@
             },
             {
                 "name": "교수식당",
+                "desc": "",
+                "tags": [],
                 "color": "#4e342e",
                 "polygon": [
                     [
@@ -189,6 +203,8 @@
             },
             {
                 "name": "엘리베이터",
+                "desc": "",
+                "tags": [],
                 "color": "#ffffff",
                 "polygon": [
                     [
@@ -213,6 +229,8 @@
             },
             {
                 "name": "107-C호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -237,6 +255,8 @@
             },
             {
                 "name": "107-D호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -261,6 +281,8 @@
             },
             {
                 "name": "106-A호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -285,6 +307,8 @@
             },
             {
                 "name": "108-B호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -309,6 +333,8 @@
             },
             {
                 "name": "109호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -333,6 +359,8 @@
             },
             {
                 "name": "106호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -357,6 +385,8 @@
             },
             {
                 "name": "105호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -381,6 +411,8 @@
             },
             {
                 "name": "104호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -405,6 +437,8 @@
             },
             {
                 "name": "107-B호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -429,6 +463,8 @@
             },
             {
                 "name": "107-A호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -455,6 +491,8 @@
         [
             {
                 "name": "A",
+                "desc": "",
+                "tags": [],
                 "color": "#ff4013",
                 "polygon": [
                     [
@@ -507,6 +545,8 @@
             },
             {
                 "name": "B",
+                "desc": "",
+                "tags": [],
                 "color": "#ff4013",
                 "polygon": [
                     [
@@ -555,6 +595,8 @@
             },
             {
                 "name": "C",
+                "desc": "",
+                "tags": [],
                 "color": "#ff4013",
                 "polygon": [
                     [
@@ -603,6 +645,8 @@
             },
             {
                 "name": "D",
+                "desc": "",
+                "tags": [],
                 "color": "#ff4013",
                 "polygon": [
                     [
@@ -655,6 +699,8 @@
             },
             {
                 "name": "E",
+                "desc": "",
+                "tags": [],
                 "color": "#ff4013",
                 "polygon": [
                     [
@@ -711,6 +757,8 @@
             },
             {
                 "name": "F",
+                "desc": "",
+                "tags": [],
                 "color": "#ff4013",
                 "polygon": [
                     [
@@ -759,6 +807,8 @@
             },
             {
                 "name": "G",
+                "desc": "",
+                "tags": [],
                 "color": "#ff4013",
                 "polygon": [
                     [
@@ -807,6 +857,8 @@
             },
             {
                 "name": "H",
+                "desc": "",
+                "tags": [],
                 "color": "#ff4013",
                 "polygon": [
                     [
@@ -871,6 +923,8 @@
             },
             {
                 "name": "채플 계단",
+                "desc": "",
+                "tags": [],
                 "color": "#ff4013",
                 "polygon": [
                     [
@@ -899,6 +953,8 @@
             },
             {
                 "name": "201호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -939,6 +995,8 @@
             },
             {
                 "name": "202호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -963,6 +1021,8 @@
             },
             {
                 "name": "203호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -987,6 +1047,8 @@
             },
             {
                 "name": "204호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -1011,6 +1073,8 @@
             },
             {
                 "name": "205호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -1035,6 +1099,8 @@
             },
             {
                 "name": "206호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -1059,6 +1125,8 @@
             },
             {
                 "name": "210호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -1083,6 +1151,8 @@
             },
             {
                 "name": "화장실",
+                "desc": "",
+                "tags": [],
                 "color": "#007aff",
                 "polygon": [
                     [
@@ -1107,6 +1177,8 @@
             },
             {
                 "name": "엘리베이터",
+                "desc": "",
+                "tags": [],
                 "color": "#ffffff",
                 "polygon": [
                     [
@@ -1133,6 +1205,8 @@
         [
             {
                 "name": "I",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -1173,6 +1247,8 @@
             },
             {
                 "name": "J",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -1221,6 +1297,8 @@
             },
             {
                 "name": "K",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -1269,6 +1347,8 @@
             },
             {
                 "name": "L",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -1309,6 +1389,8 @@
             },
             {
                 "name": "채플 계단",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -1333,6 +1415,8 @@
             },
             {
                 "name": "엘리베이터",
+                "desc": "",
+                "tags": [],
                 "color": "#ffffff",
                 "polygon": [
                     [
@@ -1357,6 +1441,8 @@
             },
             {
                 "name": "301호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -1397,6 +1483,8 @@
             },
             {
                 "name": "302호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -1421,6 +1509,8 @@
             },
             {
                 "name": "303호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -1445,6 +1535,8 @@
             },
             {
                 "name": "304호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -1469,6 +1561,8 @@
             },
             {
                 "name": "305호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -1493,6 +1587,8 @@
             },
             {
                 "name": "화장실",
+                "desc": "",
+                "tags": [],
                 "color": "#007aff",
                 "polygon": [
                     [
@@ -1517,6 +1613,8 @@
             },
             {
                 "name": "311호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -1541,6 +1639,8 @@
             },
             {
                 "name": "307호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -1565,6 +1665,8 @@
             },
             {
                 "name": "306호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -1589,6 +1691,8 @@
             },
             {
                 "name": "308호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -1613,6 +1717,8 @@
             },
             {
                 "name": "309호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -1639,6 +1745,8 @@
         [
             {
                 "name": "402호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -1663,6 +1771,8 @@
             },
             {
                 "name": "403호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -1687,6 +1797,8 @@
             },
             {
                 "name": "404호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -1711,6 +1823,8 @@
             },
             {
                 "name": "405호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -1735,6 +1849,8 @@
             },
             {
                 "name": "406호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -1759,6 +1875,8 @@
             },
             {
                 "name": "408호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -1783,6 +1901,8 @@
             },
             {
                 "name": "407호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -1815,6 +1935,8 @@
             },
             {
                 "name": "화장실",
+                "desc": "",
+                "tags": [],
                 "color": "#007aff",
                 "polygon": [
                     [
@@ -1839,6 +1961,8 @@
             },
             {
                 "name": "엘리베이터",
+                "desc": "",
+                "tags": [],
                 "color": "#ffffff",
                 "polygon": [
                     [
@@ -1863,6 +1987,8 @@
             },
             {
                 "name": "401호",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -1913,6 +2039,8 @@
         [
             {
                 "name": "511",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -1937,6 +2065,8 @@
             },
             {
                 "name": "512",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -1961,6 +2091,8 @@
             },
             {
                 "name": "513",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -1985,6 +2117,8 @@
             },
             {
                 "name": "514",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -2009,6 +2143,8 @@
             },
             {
                 "name": "화장실",
+                "desc": "",
+                "tags": [],
                 "color": "#007aff",
                 "polygon": [
                     [
@@ -2033,6 +2169,8 @@
             },
             {
                 "name": "창고",
+                "desc": "",
+                "tags": [],
                 "color": "#007aff",
                 "polygon": [
                     [
@@ -2057,6 +2195,8 @@
             },
             {
                 "name": "엘리베이터",
+                "desc": "",
+                "tags": [],
                 "color": "#ffffff",
                 "polygon": [
                     [
@@ -2097,6 +2237,8 @@
             },
             {
                 "name": "515",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11   ",
                 "polygon": [
                     [
@@ -2121,6 +2263,8 @@
             },
             {
                 "name": "510",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -2145,6 +2289,8 @@
             },
             {
                 "name": "509",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -2169,6 +2315,8 @@
             },
             {
                 "name": "508",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -2193,6 +2341,8 @@
             },
             {
                 "name": "507",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -2217,6 +2367,8 @@
             },
             {
                 "name": "506",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -2241,6 +2393,8 @@
             },
             {
                 "name": "505",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -2265,6 +2419,8 @@
             },
             {
                 "name": "516",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -2289,6 +2445,8 @@
             },
             {
                 "name": "517",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -2313,6 +2471,8 @@
             },
             {
                 "name": "503",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11",
                 "polygon": [
                     [
@@ -2337,6 +2497,8 @@
             },
             {
                 "name": "501",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11",
                 "polygon": [
                     [
@@ -2377,6 +2539,8 @@
             },
             {
                 "name": "504",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -2399,6 +2563,8 @@
             },
             {
                 "name": "504",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11",
                 "polygon": [
                     [
@@ -2423,6 +2589,8 @@
         [
             {
                 "name": "610",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11",
                 "polygon": [
                     [
@@ -2447,6 +2615,8 @@
             },
             {
                 "name": "607",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -2471,6 +2641,8 @@
             },
             {
                 "name": "608",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -2495,6 +2667,8 @@
             },
             {
                 "name": "609",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -2519,6 +2693,8 @@
             },
             {
                 "name": "엘리베이터",
+                "desc": "",
+                "tags": [],
                 "color": "#007aff",
                 "polygon": [
                     [
@@ -2543,6 +2719,8 @@
             },
             {
                 "name": "611",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -2567,6 +2745,8 @@
             },
             {
                 "name": "600",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11",
                 "polygon": [
                     [
@@ -2591,6 +2771,8 @@
             },
             {
                 "name": "604",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -2615,6 +2797,8 @@
             },
             {
                 "name": "605",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -2639,6 +2823,8 @@
             },
             {
                 "name": "606",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -2663,6 +2849,8 @@
             },
             {
                 "name": "603",
+                "desc": "",
+                "tags": [],
                 "color": "#bedce6",
                 "polygon": [
                     [
@@ -2687,6 +2875,8 @@
             },
             {
                 "name": "602",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -2711,6 +2901,8 @@
             },
             {
                 "name": "601",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -2769,6 +2961,8 @@
         [
             {
                 "name": "703",
+                "desc": "",
+                "tags": [],
                 "color": "#98c4f0",
                 "polygon": [
                     [
@@ -2841,6 +3035,8 @@
             },
             {
                 "name": "704",
+                "desc": "",
+                "tags": [],
                 "color": "#dce1e6",
                 "polygon": [
                     [
@@ -2865,6 +3061,8 @@
             },
             {
                 "name": "705",
+                "desc": "",
+                "tags": [],
                 "color": "#dce1e6",
                 "polygon": [
                     [
@@ -2889,6 +3087,8 @@
             },
             {
                 "name": "705호",
+                "desc": "",
+                "tags": [],
                 "color": "#dce1e6",
                 "polygon": [
                     [
@@ -2913,6 +3113,8 @@
             },
             {
                 "name": "707",
+                "desc": "",
+                "tags": [],
                 "color": "#dce1e6",
                 "polygon": [
                     [
@@ -2937,6 +3139,8 @@
             },
             {
                 "name": "706",
+                "desc": "",
+                "tags": [],
                 "color": "#dce1e6",
                 "polygon": [
                     [
@@ -2961,6 +3165,8 @@
             },
             {
                 "name": "709",
+                "desc": "",
+                "tags": [],
                 "color": "#dce1e6",
                 "polygon": [
                     [
@@ -2985,6 +3191,8 @@
             },
             {
                 "name": "엘리베이터",
+                "desc": "",
+                "tags": [],
                 "color": "#007dff",
                 "polygon": [
                     [
@@ -3009,6 +3217,8 @@
             },
             {
                 "name": "711",
+                "desc": "",
+                "tags": [],
                 "color": "#dce1e6",
                 "polygon": [
                     [
@@ -3033,6 +3243,8 @@
             },
             {
                 "name": "703B",
+                "desc": "",
+                "tags": [],
                 "color": "#afb9c3",
                 "polygon": [
                     [
@@ -3057,6 +3269,8 @@
             },
             {
                 "name": "703C",
+                "desc": "",
+                "tags": [],
                 "color": "#afb9c3",
                 "polygon": [
                     [
@@ -3081,6 +3295,8 @@
             },
             {
                 "name": "702",
+                "desc": "",
+                "tags": [],
                 "color": "#dce1e6",
                 "polygon": [
                     [
@@ -3105,6 +3321,8 @@
             },
             {
                 "name": "703A",
+                "desc": "",
+                "tags": [],
                 "color": "#afb9c3",
                 "polygon": [
                     [
@@ -3129,6 +3347,8 @@
             },
             {
                 "name": "701",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -3177,6 +3397,8 @@
             },
             {
                 "name": "710",
+                "desc": "",
+                "tags": [],
                 "color": "#a0785a",
                 "polygon": [
                     [
@@ -3203,6 +3425,8 @@
         [
             {
                 "name": "엘리베이터",
+                "desc": "",
+                "tags": [],
                 "color": "#007bff",
                 "polygon": [
                     [
@@ -3227,6 +3451,8 @@
             },
             {
                 "name": "801",
+                "desc": "",
+                "tags": [],
                 "color": "#bedceb",
                 "polygon": [
                     [
@@ -3275,6 +3501,8 @@
             },
             {
                 "name": "815",
+                "desc": "",
+                "tags": [],
                 "color": "#a0785a",
                 "polygon": [
                     [
@@ -3299,6 +3527,8 @@
             },
             {
                 "name": "802",
+                "desc": "",
+                "tags": [],
                 "color": "#afb9c3",
                 "polygon": [
                     [
@@ -3323,6 +3553,8 @@
             },
             {
                 "name": "803",
+                "desc": "",
+                "tags": [],
                 "color": "#dce1e6",
                 "polygon": [
                     [
@@ -3347,6 +3579,8 @@
             },
             {
                 "name": "804",
+                "desc": "",
+                "tags": [],
                 "color": "#dce1e6",
                 "polygon": [
                     [
@@ -3371,6 +3605,8 @@
             },
             {
                 "name": "806-c",
+                "desc": "",
+                "tags": [],
                 "color": "#1e2d55",
                 "polygon": [
                     [
@@ -3395,6 +3631,8 @@
             },
             {
                 "name": "806",
+                "desc": "",
+                "tags": [],
                 "color": "#1e2d55",
                 "polygon": [
                     [
@@ -3419,6 +3657,8 @@
             },
             {
                 "name": "805",
+                "desc": "",
+                "tags": [],
                 "color": "#96a0aa",
                 "polygon": [
                     [
@@ -3443,6 +3683,8 @@
             },
             {
                 "name": "807",
+                "desc": "",
+                "tags": [],
                 "color": "#afb9c3",
                 "polygon": [
                     [
@@ -3467,6 +3709,8 @@
             },
             {
                 "name": "813",
+                "desc": "",
+                "tags": [],
                 "color": "#afb9c3",
                 "polygon": [
                     [
@@ -3491,6 +3735,8 @@
             },
             {
                 "name": "812",
+                "desc": "",
+                "tags": [],
                 "color": "#dce1e6",
                 "polygon": [
                     [
@@ -3515,6 +3761,8 @@
             },
             {
                 "name": "811",
+                "desc": "",
+                "tags": [],
                 "color": "#afb9c3",
                 "polygon": [
                     [
@@ -3539,6 +3787,8 @@
             },
             {
                 "name": "810",
+                "desc": "",
+                "tags": [],
                 "color": "#dce1e6",
                 "polygon": [
                     [
@@ -3563,6 +3813,8 @@
             },
             {
                 "name": "809",
+                "desc": "",
+                "tags": [],
                 "color": "#dce1e6",
                 "polygon": [
                     [
@@ -3587,6 +3839,8 @@
             },
             {
                 "name": "808",
+                "desc": "",
+                "tags": [],
                 "color": "#a0785a",
                 "polygon": [
                     [
@@ -3611,6 +3865,8 @@
             },
             {
                 "name": "814",
+                "desc": "",
+                "tags": [],
                 "color": "#a0785a",
                 "polygon": [
                     [
@@ -3635,6 +3891,8 @@
             },
             {
                 "name": "814",
+                "desc": "",
+                "tags": [],
                 "color": "#a0785a",
                 "polygon": [
                     [
@@ -3661,6 +3919,8 @@
         [
             {
                 "name": "920",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11",
                 "polygon": [
                     [
@@ -3685,6 +3945,8 @@
             },
             {
                 "name": "900-a",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11",
                 "polygon": [
                     [
@@ -3709,6 +3971,8 @@
             },
             {
                 "name": "921",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11",
                 "polygon": [
                     [
@@ -3733,6 +3997,8 @@
             },
             {
                 "name": "922",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11",
                 "polygon": [
                     [
@@ -3757,6 +4023,8 @@
             },
             {
                 "name": "901",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11",
                 "polygon": [
                     [
@@ -3781,6 +4049,8 @@
             },
             {
                 "name": "902",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11",
                 "polygon": [
                     [
@@ -3805,6 +4075,8 @@
             },
             {
                 "name": "903",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11",
                 "polygon": [
                     [
@@ -3829,6 +4101,8 @@
             },
             {
                 "name": "904",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11",
                 "polygon": [
                     [
@@ -3853,6 +4127,8 @@
             },
             {
                 "name": "905",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11",
                 "polygon": [
                     [
@@ -3877,6 +4153,8 @@
             },
             {
                 "name": "906",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11",
                 "polygon": [
                     [
@@ -3901,6 +4179,8 @@
             },
             {
                 "name": "907",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11",
                 "polygon": [
                     [
@@ -3925,6 +4205,8 @@
             },
             {
                 "name": "908",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11",
                 "polygon": [
                     [
@@ -3949,6 +4231,8 @@
             },
             {
                 "name": "909",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11",
                 "polygon": [
                     [
@@ -3973,6 +4257,8 @@
             },
             {
                 "name": "910",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11",
                 "polygon": [
                     [
@@ -3997,6 +4283,8 @@
             },
             {
                 "name": "911",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11",
                 "polygon": [
                     [
@@ -4021,6 +4309,8 @@
             },
             {
                 "name": "912",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11",
                 "polygon": [
                     [
@@ -4045,6 +4335,8 @@
             },
             {
                 "name": "913",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11",
                 "polygon": [
                     [
@@ -4069,6 +4361,8 @@
             },
             {
                 "name": "914",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11",
                 "polygon": [
                     [
@@ -4093,6 +4387,8 @@
             },
             {
                 "name": "915",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11",
                 "polygon": [
                     [
@@ -4117,6 +4413,8 @@
             },
             {
                 "name": "916",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11",
                 "polygon": [
                     [
@@ -4141,6 +4439,8 @@
             },
             {
                 "name": "917",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11",
                 "polygon": [
                     [
@@ -4165,6 +4465,8 @@
             },
             {
                 "name": "919",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11",
                 "polygon": [
                     [
@@ -4189,6 +4491,8 @@
             },
             {
                 "name": "918",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11",
                 "polygon": [
                     [
@@ -4213,6 +4517,8 @@
             },
             {
                 "name": "900-B",
+                "desc": "",
+                "tags": [],
                 "color": "#00ff11",
                 "polygon": [
                     [
@@ -4237,6 +4543,8 @@
             },
             {
                 "name": "화장실",
+                "desc": "",
+                "tags": [],
                 "color": "#ecc5ca",
                 "polygon": [
                     [
@@ -4261,6 +4569,8 @@
             },
             {
                 "name": "엘리베이터2",
+                "desc": "",
+                "tags": [],
                 "color": "#007aff",
                 "polygon": [
                     [
@@ -4285,6 +4595,8 @@
             },
             {
                 "name": "922",
+                "desc": "",
+                "tags": [],
                 "color": "#a0785a",
                 "polygon": [
                     [
@@ -4364,6 +4676,8 @@
         [
             {
                 "name": "엘리베이터",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -4388,6 +4702,8 @@
             },
             {
                 "name": "화장실",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -4412,6 +4728,8 @@
             },
             {
                 "name": "103호",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -4436,6 +4754,8 @@
             },
             {
                 "name": "104호",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -4460,6 +4780,8 @@
             },
             {
                 "name": "102호(행정실)",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -4484,6 +4806,8 @@
             },
             {
                 "name": "101호",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -4508,6 +4832,8 @@
             },
             {
                 "name": "100호",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -4534,6 +4860,8 @@
         [
             {
                 "name": "엘리베이터",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -4558,6 +4886,8 @@
             },
             {
                 "name": "화장실",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -4582,6 +4912,8 @@
             },
             {
                 "name": "203호(통합 서버실)",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -4606,6 +4938,8 @@
             },
             {
                 "name": "201호",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -4630,6 +4964,8 @@
             },
             {
                 "name": "202호",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -4654,6 +4990,8 @@
             },
             {
                 "name": "204호(임베디드 시스템실)",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -4680,6 +5018,8 @@
         [
             {
                 "name": "엘리베이터",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -4704,6 +5044,8 @@
             },
             {
                 "name": "화장실",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -4728,6 +5070,8 @@
             },
             {
                 "name": "307호",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -4752,6 +5096,8 @@
             },
             {
                 "name": "308호",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -4776,6 +5122,8 @@
             },
             {
                 "name": "309호",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -4800,6 +5148,8 @@
             },
             {
                 "name": "310호",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -4824,6 +5174,8 @@
             },
             {
                 "name": "301호",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -4848,6 +5200,8 @@
             },
             {
                 "name": "304호",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -4872,6 +5226,8 @@
             },
             {
                 "name": "303호",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -4896,6 +5252,8 @@
             },
             {
                 "name": "305호",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -4920,6 +5278,8 @@
             },
             {
                 "name": "306호",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -4944,6 +5304,8 @@
             },
             {
                 "name": "302호",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -4970,6 +5332,8 @@
         [
             {
                 "name": "엘리베이터",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -4994,6 +5358,8 @@
             },
             {
                 "name": "화장실",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -5018,6 +5384,8 @@
             },
             {
                 "name": "404호",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -5042,6 +5410,8 @@
             },
             {
                 "name": "405",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -5066,6 +5436,8 @@
             },
             {
                 "name": "401호",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -5090,6 +5462,8 @@
             },
             {
                 "name": "402호",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
@@ -5114,6 +5488,8 @@
             },
             {
                 "name": "403호",
+                "desc": "",
+                "tags": [],
                 "color": "#ff9500",
                 "polygon": [
                     [
