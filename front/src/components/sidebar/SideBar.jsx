@@ -38,7 +38,7 @@ export default function SideBar({ infos }) {
 		});
 	};
 
-	// const ensureExpanded = () => setIsExpanded(true);
+	const ensureExpanded = () => setIsExpanded(true);
 	return (
 		<div className={`l-navbar ${isExpanded ? 'expander' : ''}`} id="navbar">
 			<nav className="nav">
@@ -66,6 +66,7 @@ export default function SideBar({ infos }) {
 							favorites={favorites}
 							onToggleFavorite={toggleFavoriteRoom}
 							onRoomClick={onRoomClick}
+							ensureExpanded={ensureExpanded}
 						/>
 
 						{/* 즐겨찾기 (방 전용) */}

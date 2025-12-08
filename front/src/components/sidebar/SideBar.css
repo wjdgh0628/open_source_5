@@ -314,10 +314,21 @@ ul.collapse__menu
 .nav__search {
     margin-bottom: 0.75rem;
 }
-
+.nav__search-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.nav__search-icon {
+    position: absolute;
+    left: 10px;
+    font-size: 1rem;
+    pointer-events: none;
+    color: #888;
+}
 .nav__search-input {
     width: 100%;
-    padding: 0.4rem 0.5rem;
+    padding: 0.4rem 0.5rem 0.4rem 2rem; /* 왼쪽 아이콘 공간 확보 */
     border-radius: 0.5rem;
     border: 1px solid #ddd;
     font-family: var(--body-font);
@@ -376,3 +387,8 @@ ul.collapse__menu
     color: #888;
     padding: 0.3rem 0.2rem;
 }
+
+/* 사이드바 접힘/펼침에 따른 검색 UI 표시 */
+.nav__search-collapsed { display: none; }
+.l-navbar:not(.expander) .nav__search { display: none; }
+.l-navbar:not(.expander) .nav__search-collapsed { display: grid; } /* nav__link 레이아웃 상속 */
