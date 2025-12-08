@@ -1,40 +1,71 @@
-#roomsPanel
-{
-	display: flex;
-	gap: 12px;
-}
+/* --- New two-column layout styles --- */
 
-.rooms-col
+#mainPanel
 {
 	flex: 1;
-	min-width: 0;
+	min-height: 0;
+	display: flex;
 }
 
-.rooms-col h4
+#leftRoomsPanel
 {
-	margin: 0 0 6px;
+	width: 360px;
+	min-width: 260px;
+	max-width: 420px;
+	border-right: 1px solid #ccc;
+	background: #fafafa;
+	padding: 8px 10px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+#leftRoomsPanel h3
+{
+	margin: 0 0 4px;
+	font-size: 13px;
+}
+
+.rooms-section
+{
+	flex: 1;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+.rooms-section h4
+{
+	margin: 0 0 4px;
 	font-size: 12px;
 	color: #333;
 }
 
+.rooms-list
+{
+	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+#rightPanel
+{
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+}
+
 .room-name
 {
-	width: 180px;
+	width: 100%;
 	font-size: 12px;
 	padding: 2px 4px;
 }
 
-.room-header .left
-{
-	display: flex;
-	align-items: center;
-	gap: 6px;
-}
-
-.room-header .actions button
-{
-	font-size: 11px;
-}
 
 #imageModeBtn
 {
@@ -154,27 +185,6 @@ textarea
 	cursor: crosshair;
 }
 
-#bottomPanel
-{
-	border-top: 1px solid #ccc;
-	padding: 6px 10px;
-	height: 220px;
-	overflow: auto;
-	background: #fafafa;
-}
-
-#bottomPanel h3
-{
-	margin: 0 0 6px;
-	font-size: 13px;
-}
-
-#roomList
-{
-	display: flex;
-	flex-direction: column;
-	gap: 6px;
-}
 
 .room-item
 {
@@ -184,24 +194,67 @@ textarea
 	background: #fff;
 }
 
-.room-header
+
+.room-row
 {
 	display: flex;
-	justify-content: space-between;
+	gap: 6px;
 	align-items: center;
 	margin-bottom: 4px;
 }
 
-.room-header span
+.room-col-main
 {
-	font-size: 12px;
-	font-weight: 600;
+	flex: 0 0 40%;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
 }
 
-.room-header .actions
+.room-col-side
+{
+	flex: 1 1 0;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.room-tags,
+.room-desc
+{
+	width: 100%;
+	font-size: 12px;
+	padding: 2px 4px;
+}
+
+.room-actions-row
 {
 	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	gap: 4px;
+	flex-shrink: 0;
+}
+
+.room-actions-row button
+{
+	font-size: 11px;
+}
+
+.room-extra
+{
+	margin-top: 4px;
+	display: flex;
+	align-items: flex-start;
 	gap: 6px;
+}
+
+.coords-copy
+{
+	font-size: 11px;
+	flex-shrink: 0;
 }
 
 .room-coords
@@ -211,6 +264,13 @@ textarea
 	white-space: pre;
 	max-height: 80px;
 	overflow: auto;
+	margin: 0;
+}
+
+.room-item.coords-hidden .room-coords,
+.room-item.coords-hidden .coords-copy
+{
+	display: none;
 }
 
 .room-item.active

@@ -397,70 +397,88 @@ export function setActiveRoom(list, index) {
 	draw();
 }
 
-export function refreshSavedList() {
-	savedRoomListEl.innerHTML = "";
-	state.saved.forEach((room, idx) => {
-		const div = document.createElement("div");
-		div.className = "room-item";
-		if (idx === state.activeSavedIndex) div.classList.add("active");
-		const header = document.createElement("div");
-		header.className = "room-header";
 
-		const left = document.createElement("div");
-		left.className = "left";
+// --- New unified room item layout helper ---
+function createRoomItem(room, idx, type) {
+	const div = document.createElement("div");
+	div.className = "room-item";
+	const isSaved = type === "saved";
+	if (isSaved && idx === state.activeSavedIndex) div.classList.add("active");
+	if (!isSaved && idx === state.activeRoomIndex) div.classList.add("active");
 
-		const title = document.createElement("span");
-		title.textContent = `저장 ${idx + 1}`;
+	// Single horizontal row: [ 왼쪽(이름+태그) | 오른쪽(설명+색상/버튼) ]
+	const row = document.createElement("div");
+	row.className = "room-row";
 
-		const nameInput = document.createElement("input");
-		nameInput.className = "room-name";
-		nameInput.placeholder = "이름";
-		nameInput.value = room.name || "";
-		nameInput.addEventListener("change", () => {
-			room.name = nameInput.value.trim();
-			writeSavedBackToDB();
-		});
+	// 왼쪽 컬럼: 이름 + 태그 (짧게)
+	const leftCol = document.createElement("div");
+	leftCol.className = "room-col-main";
 
-		const descInput = document.createElement("input");
-		descInput.className = "room-desc";
-		descInput.placeholder = "설명";
-		descInput.value = room.desc || "";
-		descInput.addEventListener("change", () => {
-			room.desc = descInput.value.trim();
-			writeSavedBackToDB();
-		});
+	const nameInput = document.createElement("input");
+	nameInput.className = "room-name";
+	nameInput.placeholder = "이름";
+	nameInput.value = room.name || "";
+	nameInput.addEventListener("change", () => {
+		room.name = nameInput.value.trim();
+		if (isSaved) writeSavedBackToDB();
+	});
+	leftCol.appendChild(nameInput);
 
-		const tagsInput = document.createElement("input");
-		tagsInput.className = "room-tags";
-		tagsInput.placeholder = "태그 (쉼표로 구분)";
-		tagsInput.value = Array.isArray(room.tags) ? room.tags.join(", ") : "";
-		tagsInput.addEventListener("change", () => {
-			const raw = tagsInput.value
-				.split(",")
-				.map((s) => s.trim())
-				.filter((s) => s.length > 0);
-			room.tags = raw;
-			writeSavedBackToDB();
-		});
+	const tagsInput = document.createElement("input");
+	tagsInput.className = "room-tags";
+	tagsInput.placeholder = "태그 (쉼표로 구분)";
+	tagsInput.value = Array.isArray(room.tags) ? room.tags.join(", ") : "";
+	tagsInput.addEventListener("change", () => {
+		const raw = tagsInput.value
+			.split(",")
+			.map((s) => s.trim())
+			.filter((s) => s.length > 0);
+		room.tags = raw;
+		if (isSaved) writeSavedBackToDB();
+	});
+	leftCol.appendChild(tagsInput);
 
-		const colorInput = document.createElement("input");
-		colorInput.type = "color";
-		colorInput.className = "room-color";
-		colorInput.value = room.color || "#ff9500";
-		colorInput.addEventListener("change", () => {
+	// 오른쪽 컬럼: 설명 + 색상/버튼 (길게)
+	const rightCol = document.createElement("div");
+	rightCol.className = "room-col-side";
+
+	const descInput = document.createElement("input");
+	descInput.className = "room-desc";
+	descInput.placeholder = "설명";
+	descInput.value = room.desc || "";
+	descInput.addEventListener("change", () => {
+		room.desc = descInput.value.trim();
+		if (isSaved) writeSavedBackToDB();
+	});
+	rightCol.appendChild(descInput);
+
+	const actionCol = document.createElement("div");
+	actionCol.className = "room-actions-row";
+
+	const colorInput = document.createElement("input");
+	colorInput.type = "color";
+	colorInput.className = "room-color";
+	colorInput.value = room.color || (isSaved ? "#ff9500" : "#007aff");
+	colorInput.addEventListener("change", () => {
+		if (!isSaved) {
 			pushHistory();
-			room.color = colorInput.value;
+		}
+		room.color = colorInput.value;
+		if (isSaved) {
 			writeSavedBackToDB();
-			draw();
-		});
+		} else {
+			refreshDraftList();
+		}
+		draw();
+	});
+	actionCol.appendChild(colorInput);
 
-		left.append(title, nameInput, descInput, tagsInput, colorInput);
-
-		const actions = document.createElement("div");
-		actions.className = "actions";
-		const toDraft = document.createElement("button");
-		toDraft.textContent = "빼기";
-		toDraft.onclick = () => {
+	let primaryBtn;
+	if (isSaved) {
+		primaryBtn = document.createElement("button");
+		primaryBtn.textContent = "빼기";
+		primaryBtn.addEventListener("click", (e) => {
+			e.stopPropagation();
 			const r = state.saved.splice(idx, 1)[0];
 			writeSavedBackToDB();
 			const draft = {
@@ -468,95 +486,26 @@ export function refreshSavedList() {
 				name: r.name || "",
 				color: r.color || "#007aff",
 				points: r.points.map((p) => [p[0], p[1]]),
-				closed: true
+				closed: true,
+				desc: r.desc || "",
+				tags: Array.isArray(r.tags) ? r.tags.slice() : []
 			};
 			state.rooms.push(draft);
 			refreshSavedList();
 			refreshDraftList();
 			draw();
-		};
-		const del = document.createElement("button");
-		del.textContent = "삭제";
-		del.onclick = () => {
-			state.saved.splice(idx, 1);
-			writeSavedBackToDB();
-			refreshSavedList();
-			draw();
-		};
-		const copy = document.createElement("button");
-		copy.textContent = "좌표 복사";
-		copy.onclick = async () => {
-			const text = formatCoords(room.points, { decimals: COORD_DECIMALS, close: true });
-			try {
-				await navigator.clipboard.writeText(text);
-			} catch (e) {
-				console.error("클립보드 복사 실패", e);
-			}
-		};
-
-		actions.append(toDraft, del, copy);
-		header.append(left, actions);
-		div.appendChild(header);
-
-		const pre = document.createElement("pre");
-		pre.className = "room-coords";
-		pre.textContent = formatCoords(room.points, { decimals: COORD_DECIMALS, close: true });
-		div.appendChild(pre);
-
-		div.addEventListener("click", function (event) {
-			if (event.target.tagName === "BUTTON" || event.target.tagName === "INPUT") return;
-			setActiveRoom("saved", idx);
 		});
-
-		savedRoomListEl.appendChild(div);
-	});
-}
-
-export function refreshDraftList() {
-	draftRoomListEl.innerHTML = "";
-	state.rooms.forEach((room, idx) => {
-		const div = document.createElement("div");
-		div.className = "room-item";
-		if (idx === state.activeRoomIndex) div.classList.add("active");
-		const header = document.createElement("div");
-		header.className = "room-header";
-
-		const left = document.createElement("div");
-		left.className = "left";
-		const title = document.createElement("span");
-		title.textContent = `작업 ${idx + 1} (id:${room.id})`;
-		const nameInput = document.createElement("input");
-		nameInput.className = "room-name";
-		nameInput.placeholder = "이름";
-		nameInput.value = room.name || "";
-		nameInput.addEventListener("change", () => {
-			room.name = nameInput.value.trim();
-		});
-
-		const colorInput = document.createElement("input");
-		colorInput.type = "color";
-		colorInput.className = "room-color";
-		colorInput.value = room.color || "#007aff";
-		colorInput.addEventListener("change", () => {
-			pushHistory();
-			room.color = colorInput.value;
-			refreshDraftList();
-			draw();
-		});
-
-		left.append(title, nameInput, colorInput);
-
-		const actions = document.createElement("div");
-		actions.className = "actions";
-		const save = document.createElement("button");
-		save.textContent = "저장";
-		save.onclick = () => {
+	} else {
+		primaryBtn = document.createElement("button");
+		primaryBtn.textContent = "저장";
+		primaryBtn.addEventListener("click", (e) => {
+			e.stopPropagation();
 			const r = state.rooms[idx];
-			if (!r || r.points.length < 3) return;
+			if (!r || !Array.isArray(r.points) || r.points.length < 3) return;
 			let name = (r.name || "").trim();
 			if (!name) {
 				const input = window.prompt("방 이름을 입력하세요:", "");
-				if (input === null) return; // cancelled
+				if (input === null) return;
 				name = input.trim();
 				if (!name) return;
 				r.name = name;
@@ -576,37 +525,98 @@ export function refreshDraftList() {
 			deleteDraft(idx);
 			refreshSavedList();
 			draw();
-		};
-		const del = document.createElement("button");
-		del.textContent = "삭제";
-		del.onclick = () => deleteDraft(idx);
-		const copy = document.createElement("button");
-		copy.textContent = "좌표 복사";
-		copy.onclick = async () => {
-			const text = formatCoords(room.points, { decimals: COORD_DECIMALS, close: true });
-			try {
-				await navigator.clipboard.writeText(text);
-			} catch (e) {
-				console.error("클립보드 복사 실패", e);
-			}
-		};
-
-		actions.append(save, del, copy);
-		header.append(left, actions);
-		div.appendChild(header);
-
-		const pre = document.createElement("pre");
-		pre.className = "room-coords";
-		pre.textContent = formatCoords(room.points, { decimals: COORD_DECIMALS, close: true });
-		div.appendChild(pre);
-
-		// Add click handler to select/activate draft room
-		div.addEventListener("click", function (event) {
-			if (event.target.tagName === "BUTTON" || event.target.tagName === "INPUT") return;
-			setActiveDraft(idx);
 		});
+	}
+	actionCol.appendChild(primaryBtn);
 
-		draftRoomListEl.appendChild(div);
+	const delBtn = document.createElement("button");
+	delBtn.textContent = "삭제";
+	delBtn.addEventListener("click", (e) => {
+		e.stopPropagation();
+		if (isSaved) {
+			state.saved.splice(idx, 1);
+			writeSavedBackToDB();
+			refreshSavedList();
+			draw();
+		} else {
+			deleteDraft(idx);
+			draw();
+		}
+	});
+	actionCol.appendChild(delBtn);
+
+	const toggleBtn = document.createElement("button");
+	toggleBtn.textContent = "좌표 보기";
+	actionCol.appendChild(toggleBtn);
+
+	rightCol.appendChild(actionCol);
+
+	row.append(leftCol, rightCol);
+
+	// 좌표 및 좌표 복사 (기본 숨김)
+	const coordsRow = document.createElement("div");
+	coordsRow.className = "room-extra";
+
+	const copyBtn = document.createElement("button");
+	copyBtn.className = "coords-copy";
+	copyBtn.textContent = "좌표 복사";
+
+	const pre = document.createElement("pre");
+	pre.className = "room-coords";
+	pre.textContent = formatCoords(room.points || [], {
+		decimals: COORD_DECIMALS,
+		close: true
+	});
+
+	copyBtn.addEventListener("click", async (e) => {
+		e.stopPropagation();
+		const text = pre.textContent;
+		try {
+			await navigator.clipboard.writeText(text);
+		} catch (err) {
+			console.error("클립보드 복사 실패", err);
+		}
+	});
+
+	coordsRow.append(copyBtn, pre);
+
+	// 초기에는 좌표 숨김
+	div.classList.add("coords-hidden");
+	toggleBtn.addEventListener("click", (e) => {
+		e.stopPropagation();
+		const hidden = div.classList.toggle("coords-hidden");
+		toggleBtn.textContent = hidden ? "좌표 보기" : "좌표 숨기기";
+	});
+
+	div.append(row, coordsRow);
+
+	// 항목 클릭 시 활성화 (입력/버튼은 제외)
+	div.addEventListener("click", (event) => {
+		const tag = event.target.tagName;
+		if (tag === "BUTTON" || tag === "INPUT" || tag === "TEXTAREA") return;
+		if (isSaved) {
+			setActiveRoom("saved", idx);
+		} else {
+			setActiveDraft(idx);
+		}
+	});
+
+	return div;
+}
+
+export function refreshSavedList() {
+	savedRoomListEl.innerHTML = "";
+	state.saved.forEach((room, idx) => {
+		const item = createRoomItem(room, idx, "saved");
+		savedRoomListEl.appendChild(item);
+	});
+}
+
+export function refreshDraftList() {
+	draftRoomListEl.innerHTML = "";
+	state.rooms.forEach((room, idx) => {
+		const item = createRoomItem(room, idx, "draft");
+		draftRoomListEl.appendChild(item);
 	});
 }
 
