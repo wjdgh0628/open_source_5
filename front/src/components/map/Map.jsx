@@ -40,12 +40,38 @@ function initMap(urls) {
 				"fill-extrusion-opacity": 1
 			}
 		});
+		map.addLayer({
+			id: idRules.lid(idRules.buildings),
+			type: 'symbol',
+			source: "campus",
+			filter: [
+				"all",
+				["==", ["get", "origin"], null],
+				["has", "building:levels"]
+			],
+			layout: {
+				'text-field': ["get", "name"],
+				'text-size': 14,
+				'text-anchor': "bottom",
+				'text-allow-overlap': true,
+				'symbol-placement': 'point',
+				'symbol-z-order': "source"
+			},
+			paint: {
+				'symbol-z-offset': ["*",
+					["coalesce", ["get", "building:levels"], 0],
+					 MC.layerProps.levelThick],
+				'text-color': '#000000',
+				'text-halo-color': '#ffffff',
+				'text-halo-width': 2
+			}
+		});
 
 	});
 	return map;
 }
 
-function Map({urls}) {
+function Map({ urls }) {
 	const mapId = 'map';
 
 	useEffect(() => {
