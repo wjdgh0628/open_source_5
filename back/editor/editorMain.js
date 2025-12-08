@@ -58,7 +58,41 @@ export function getRoom(list, index) {
 }
 
 // --- Rooms/infos bridge helpers & save timer ---
+
 let roomsSaveTimer = null;
+
+// --- Polygon normalization helpers ---
+function stripClosingPoint(points) {
+	if (!Array.isArray(points) || points.length < 2) return Array.isArray(points) ? points.slice() : [];
+	const first = points[0];
+	const last = points[points.length - 1];
+	if (
+		first &&
+		last &&
+		first.length >= 2 &&
+		last.length >= 2 &&
+		first[0] === last[0] &&
+		first[1] === last[1]
+	) {
+		return points.slice(0, -1);
+	}
+	return points.slice();
+}
+
+function ensureClosedPolygon(points) {
+	const base = stripClosingPoint(points);
+	if (!Array.isArray(base) || base.length < 3) return [];
+	const first = base[0];
+	const last = base[base.length - 1];
+	if (
+		!last ||
+		first[0] !== last[0] ||
+		first[1] !== last[1]
+	) {
+		return [...base, [first[0], first[1]]];
+	}
+	return base.slice();
+}
 
 function ensureRoomsArrayForBuilding(bid, totLevel) {
 	editInfos((infos) => {
@@ -89,11 +123,13 @@ function loadSavedRoomsForCurrent() {
 				pts = r.polygon;
 			}
 		}
+		// 편집 시에는 마지막 점이 첫 점과 중복되지 않도록 정규화
+		const normalizedPts = stripClosingPoint(pts);
 		return {
 			id: `s${idx + 1}`,
 			name: r.name || "",
 			color: r.color || "#ff9500",
-			points: pts,
+			points: normalizedPts,
 			closed: true,
 			desc: r.desc || "",
 			tags: Array.isArray(r.tags) ? r.tags.slice() : []
@@ -103,13 +139,18 @@ function loadSavedRoomsForCurrent() {
 
 export function writeSavedBackToDB() {
 	if (!state.building || state.floorIndex == null) return;
-	const list = state.saved.map((r) => ({
-		name: r.name || "",
-		desc: r.desc || "",
-		tags: Array.isArray(r.tags) ? r.tags.slice() : [],
-		color: r.color || "#ff9500",
-		polygon: Array.isArray(r.points) && r.points.length ? [r.points] : []
-	}));
+	const list = state.saved.map((r) => {
+		const basePts = Array.isArray(r.points) ? r.points : [];
+		const ring = ensureClosedPolygon(basePts);
+		return {
+			name: r.name || "",
+			desc: r.desc || "",
+			tags: Array.isArray(r.tags) ? r.tags.slice() : [],
+			color: r.color || "#ff9500",
+			// infos에는 닫힌 폴리곤(첫 점이 마지막에 한 번 더 포함된 형태)으로 저장
+			polygon: ring.length ? [ring] : []
+		};
+	});
 	editInfos((infos) => {
 		const b = infos[state.building];
 		if (!b) return infos;
