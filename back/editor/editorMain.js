@@ -105,10 +105,10 @@ export function writeSavedBackToDB() {
 	if (!state.building || state.floorIndex == null) return;
 	const list = state.saved.map((r) => ({
 		name: r.name || "",
-		color: r.color || "#ff9500",
-		polygon: Array.isArray(r.points) && r.points.length ? [r.points] : [],
 		desc: r.desc || "",
-		tags: Array.isArray(r.tags) ? r.tags.slice() : []
+		tags: Array.isArray(r.tags) ? r.tags.slice() : [],
+		color: r.color || "#ff9500",
+		polygon: Array.isArray(r.points) && r.points.length ? [r.points] : []
 	}));
 	editInfos((infos) => {
 		const b = infos[state.building];
