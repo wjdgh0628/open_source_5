@@ -266,7 +266,7 @@ async function generateRooms(info, fid, lvI) {
 				anchor: "bottom",
 				// offset: 0,
 				layerId: idRules.rid(bid, lvI, i),
-				popup: room.describe ? room.describe : "상세설명 없음",
+				popup: room.desc ? room.desc : "상세설명 없음",
 				center: calCenter(room.polygon)
 			},
 			geometry: { type: "Polygon", coordinates: room.polygon }
