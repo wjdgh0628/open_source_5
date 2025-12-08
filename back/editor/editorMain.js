@@ -94,7 +94,9 @@ function loadSavedRoomsForCurrent() {
 			name: r.name || "",
 			color: r.color || "#ff9500",
 			points: pts,
-			closed: true
+			closed: true,
+			desc: r.desc || "",
+			tags: Array.isArray(r.tags) ? r.tags.slice() : []
 		};
 	});
 }
@@ -104,7 +106,9 @@ export function writeSavedBackToDB() {
 	const list = state.saved.map((r) => ({
 		name: r.name || "",
 		color: r.color || "#ff9500",
-		polygon: Array.isArray(r.points) && r.points.length ? [r.points] : []
+		polygon: Array.isArray(r.points) && r.points.length ? [r.points] : [],
+		desc: r.desc || "",
+		tags: Array.isArray(r.tags) ? r.tags.slice() : []
 	}));
 	editInfos((infos) => {
 		const b = infos[state.building];
@@ -404,12 +408,38 @@ export function refreshSavedList() {
 
 		const left = document.createElement("div");
 		left.className = "left";
+
+		const title = document.createElement("span");
+		title.textContent = `저장 ${idx + 1}`;
+
 		const nameInput = document.createElement("input");
 		nameInput.className = "room-name";
 		nameInput.placeholder = "이름";
 		nameInput.value = room.name || "";
 		nameInput.addEventListener("change", () => {
 			room.name = nameInput.value.trim();
+			writeSavedBackToDB();
+		});
+
+		const descInput = document.createElement("input");
+		descInput.className = "room-desc";
+		descInput.placeholder = "설명";
+		descInput.value = room.desc || "";
+		descInput.addEventListener("change", () => {
+			room.desc = descInput.value.trim();
+			writeSavedBackToDB();
+		});
+
+		const tagsInput = document.createElement("input");
+		tagsInput.className = "room-tags";
+		tagsInput.placeholder = "태그 (쉼표로 구분)";
+		tagsInput.value = Array.isArray(room.tags) ? room.tags.join(", ") : "";
+		tagsInput.addEventListener("change", () => {
+			const raw = tagsInput.value
+				.split(",")
+				.map((s) => s.trim())
+				.filter((s) => s.length > 0);
+			room.tags = raw;
 			writeSavedBackToDB();
 		});
 
@@ -424,9 +454,7 @@ export function refreshSavedList() {
 			draw();
 		});
 
-		const title = document.createElement("span");
-		title.textContent = `저장 ${idx + 1}`;
-		left.append(title, nameInput, colorInput);
+		left.append(title, nameInput, descInput, tagsInput, colorInput);
 
 		const actions = document.createElement("div");
 		actions.className = "actions";
@@ -539,7 +567,9 @@ export function refreshDraftList() {
 				name,
 				color: r.color || "#ff9500",
 				points: r.points,
-				closed: true
+				closed: true,
+				desc: r.desc || "",
+				tags: Array.isArray(r.tags) ? r.tags.slice() : []
 			};
 			state.saved.push(savedEntry);
 			writeSavedBackToDB();
