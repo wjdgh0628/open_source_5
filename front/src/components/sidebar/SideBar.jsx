@@ -7,6 +7,7 @@ import './SideBar.css';
 import LogoImg from '@assets/logo2.png';
 import BuildingList from './BuildingList.jsx';
 import Favorites from './Favorites.jsx';
+import Search from './Search.jsx';
 
 export default function SideBar({ infos }) {
 	// UI 상태
@@ -59,6 +60,14 @@ export default function SideBar({ infos }) {
 					</div>
 
 					<div className="nav__list">
+						{/* 강의실 검색 */}
+						<Search
+							roomsIndex={roomsList}
+							favorites={favorites}
+							onToggleFavorite={toggleFavoriteRoom}
+							onRoomClick={onRoomClick}
+						/>
+
 						{/* 즐겨찾기 (방 전용) */}
 						<div
 							className="nav__link collapse showCollapse"

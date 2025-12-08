@@ -309,3 +309,70 @@ ul.collapse__menu
 {
     color: #f0c300;
 }
+
+/* 검색 박스 */
+.nav__search {
+    margin-bottom: 0.75rem;
+}
+
+.nav__search-input {
+    width: 100%;
+    padding: 0.4rem 0.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid #ddd;
+    font-family: var(--body-font);
+    font-size: var(--small-font-size);
+    box-sizing: border-box;
+    outline: none;
+}
+
+.nav__search-input:focus {
+    border-color: var(--first-color);
+    box-shadow: 0 0 0 1px rgba(36, 93, 199, 0.2);
+}
+
+.nav__search-results {
+    margin-top: 0.35rem;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.nav__search-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav__search-item {
+    cursor: pointer;
+}
+
+.nav__search-main {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+}
+
+.nav__search-room-name {
+    font-size: 0.9rem;
+    font-weight: var(--font-weight-bold);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.nav__search-building {
+    font-size: 0.8rem;
+    color: #666;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.nav__search-empty {
+    font-size: 0.85rem;
+    color: #888;
+    padding: 0.3rem 0.2rem;
+}
