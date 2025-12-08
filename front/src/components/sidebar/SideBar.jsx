@@ -17,6 +17,15 @@ export default function SideBar({ infos }) {
 
 	// 데이터 상태
 	const [favorites, setFavorites] = useState(() => loadRoomFavorites()); // [rid, rid, ...]
+	const [favoriteLabels, setFavoriteLabels] = useState(() => {
+		if (typeof window === 'undefined') return {};
+		try {
+			const raw = window.localStorage.getItem('hmh_favoriteLabels');
+			return raw ? JSON.parse(raw) : {};
+		} catch {
+			return {};
+		}
+	});
 
 	// 사이드바 몸통 패딩 동기화 (사이드바가 확장 상태일 때만 패딩 적용)
 	useEffect(() => {
@@ -27,6 +36,15 @@ export default function SideBar({ infos }) {
 		}
 	}, [isExpanded]);
 
+	useEffect(() => {
+		if (typeof window === 'undefined') return;
+		try {
+			window.localStorage.setItem('hmh_favoriteLabels', JSON.stringify(favoriteLabels));
+		} catch {
+			// ignore storage errors
+		}
+	}, [favoriteLabels]);
+
 	const roomsList = useMemo(() => indexRoomList(infos), [infos]);
 
 	// 즐겨찾기 토글(방 rid 기준)
@@ -34,6 +52,19 @@ export default function SideBar({ infos }) {
 		setFavorites((prev) => {
 			const next = toggleRoomFavoriteInList(prev, rid);
 			saveRoomFavorites(next);
+			return next;
+		});
+	};
+
+	const handleFavoriteLabelChange = (rid, label) => {
+		setFavoriteLabels((prev) => {
+			const next = { ...prev };
+			const trimmed = label.trim();
+			if (!trimmed) {
+				delete next[rid];
+			} else {
+				next[rid] = trimmed;
+			}
 			return next;
 		});
 	};
@@ -87,6 +118,8 @@ export default function SideBar({ infos }) {
 								roomList={roomsList}
 								onToggleFavorite={toggleFavoriteRoom}
 								onRoomClick={onRoomClick}
+								favoriteLabels={favoriteLabels}
+								onChangeFavoriteLabel={handleFavoriteLabelChange}
 							/>
 						</ul>
 

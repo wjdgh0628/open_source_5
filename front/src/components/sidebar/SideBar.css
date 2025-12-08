@@ -283,10 +283,51 @@ ul.collapse__menu
     white-space: nowrap;                 /* 줄바꿈 방지 */
 }
 
-.building-list-item:hover .favorite-btn
-{
+/* 추가된 스타일 시작 */
+.favorite-room-label {
+    flex-grow: 1;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.favorite-edit-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0 4px 0 0;
+    color: #888;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.favorite-edit-btn:hover {
+    transform: scale(1.1);
+}
+
+.building-list-item:hover .favorite-edit-btn {
     color: var(--white-color);
 }
+
+.favorite-edit-input {
+    width: 100%;
+    font-size: 0.9rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 2px 4px;
+    box-sizing: border-box;
+    outline: none;
+}
+
+.favorite-edit-input:focus {
+    border-color: var(--first-color);
+    box-shadow: 0 0 0 1px rgba(36, 93, 199, 0.2);
+}
+/* 추가된 스타일 끝 */
 
 /* 즐겨찾기 버튼 스타일 */
 .favorite-btn

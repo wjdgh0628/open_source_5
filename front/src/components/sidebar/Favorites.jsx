@@ -1,20 +1,27 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { idRules } from '@shared/rules.js';
 
 /**
  * props:
  * - favorites: string[] (rid[])
- * - roomList: { [rid]: { bid, buildingName, level, name } }
+ * - roomList: { [rid]: { bid, buildingName, level, name, lvI, bmLevel } }
  * - onToggleFavorite: (rid) => void
  * - onRoomClick: (bid, floorIndex, rid) => void
+ * - favoriteLabels: { [rid]: string }
+ * - onChangeFavoriteLabel: (rid: string, label: string) => void
  */
 export default function Favorites({
 	favorites,
 	roomList,
 	onToggleFavorite,
 	onRoomClick,
+	favoriteLabels,
+	onChangeFavoriteLabel,
 }) {
-// 존재하는 rid만 표시
+	const [editingRid, setEditingRid] = useState(null);
+	const [editValue, setEditValue] = useState('');
+
+	// 존재하는 rid만 표시
 	const favItems = useMemo(() => {
 		const items = [];
 		for (const rid of favorites) {
@@ -43,27 +50,91 @@ export default function Favorites({
 
 	return (
 		<>
-			{favItems.map(({ rid, bid, lvI, roomName, buildingName, bmLevel }) => (
-				<li
-					key={rid}
-					className="building-list-item"
-					onClick={() => onRoomClick(bid, lvI, rid)}
-				>
-					<button
-						className="favorite-btn favorited"
-						onClick={(e) => {
-							e.stopPropagation();
-							onToggleFavorite(rid);
+			{favItems.map(({ rid, bid, lvI, roomName, buildingName, bmLevel }) => {
+				const isEditing = editingRid === rid;
+				const defaultLabel = `${buildingName} / ${idRules.lvChar(bmLevel, lvI)} / ${roomName}`;
+				const displayLabel = favoriteLabels?.[rid] ?? defaultLabel;
+
+				const commitEdit = () => {
+					onChangeFavoriteLabel(rid, editValue);
+					setEditingRid(null);
+					setEditValue('');
+				};
+
+				const cancelEdit = () => {
+					setEditingRid(null);
+					setEditValue('');
+				};
+
+				return (
+					<li
+						key={rid}
+						className="building-list-item"
+						onClick={() => {
+							if (!isEditing) {
+								onRoomClick(bid, lvI, rid);
+							}
 						}}
-						title="즐겨찾기 해제"
 					>
-						★
-					</button>
-					<span>
-						{buildingName} / {idRules.lvChar(bmLevel, lvI)} / {roomName}
-					</span>
-				</li>
-			))}
+						<button
+							className="favorite-btn favorited"
+							onClick={(e) => {
+								e.stopPropagation();
+								onToggleFavorite(rid);
+							}}
+							title="즐겨찾기 해제"
+						>
+							★
+						</button>
+						<span
+							className="favorite-room-label"
+							onClick={(e) => {
+								if (isEditing) {
+									e.stopPropagation();
+								}
+							}}
+						>
+							{isEditing ? (
+								<input
+									className="favorite-edit-input"
+									type="text"
+									value={editValue}
+									autoFocus
+									onChange={(e) => setEditValue(e.target.value)}
+									onClick={(e) => e.stopPropagation()}
+									onKeyDown={(e) => {
+										if (e.key === 'Enter') {
+											e.preventDefault();
+											commitEdit();
+										} else if (e.key === 'Escape') {
+											e.preventDefault();
+											cancelEdit();
+										}
+									}}
+									onBlur={commitEdit}
+								/>
+							) : (
+								displayLabel
+							)}
+						</span>
+						<button
+							className="favorite-edit-btn"
+							title="표시 이름 편집"
+							onClick={(e) => {
+								e.stopPropagation();
+								if (isEditing) {
+									commitEdit();
+								} else {
+									setEditingRid(rid);
+									setEditValue(displayLabel);
+								}
+							}}
+						>
+							<ion-icon name="create-outline" />
+						</button>
+					</li>
+				);
+			})}
 		</>
 	);
 }
