@@ -81,16 +81,19 @@ function setLayers(sourceId, features) {
 		}
 		if (f.properties.popup) { //팝업 정보가 있으면 팝업 레이어 생성
 			let popup = null;
-			Map().on('mouseenter', layerId, () => {
-				popup = new mapboxgl.Popup({ altitude: f.properties.base + MC.layerProps.roomThickness, closeButton: false, closeOnClick: true })
-					.setLngLat(f.properties.center)
-					.setHTML(f.properties.popup)
-					.setMaxWidth("300px")
-					.addTo(Map());
-				// console.log(f.properties.center);
+			Map().on('mouseenter', layerId, (e) => {
+				if (!popup) {
+					popup = new mapboxgl.Popup({ altitude: f.properties.base + MC.layerProps.roomThickness, closeButton: false, closeOnClick: false, closeOnMove: true })
+						.setLngLat(f.properties.center)
+						.setHTML(f.properties.popup)
+						.setMaxWidth("300px")
+						.addTo(Map());
+					// console.log('팝업 생성');
+				}
 			});
-			Map().on('mouseleave', layerId, () => {
-				if (popup) {
+			Map().on('mouseleave', layerId, (e) => {
+				const intoPopup = e.originalEvent.relatedTarget?.classList.contains('mapboxgl-popup-content');
+				if (popup && !intoPopup) {
 					popup.remove();
 					popup = null;
 					// console.log("팝업 제거");
