@@ -10,7 +10,8 @@ let popup = null;
 export function flyCamera(mode, center, bearing = null, lvI = null) {
 	const modeConfig = { ...MC.camera[mode] };
 	if (bearing) modeConfig.bearing = bearing;
-	if (lvI) modeConfig.zoom -= (lvI * MC.camera.floorZoomStep);
+	if (lvI) Map().setCamera({"camera-projection": "orthographic"});
+	else Map().setCamera({"camera-projection": "perspective"});
 	Map().flyTo({ center, ...modeConfig, essential: true });
 }
 
@@ -84,27 +85,29 @@ function setLayers(sourceId, features) {
 		if (f.properties.popup) { //팝업 정보가 있으면 팝업 레이어 생성
 			
 			Map().on('mouseenter', layerId, (e) => {
+				// console.log('mouseenter');
+				const isPerspective = Map().getCamera()["camera-projection"] == "perspective";
 				if (!popup) {
-					popup = new mapboxgl.Popup({ altitude: f.properties.base + MC.layerProps.roomThickness, closeButton: false, closeOnClick: false, closeOnMove: true })
+					popup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false, closeOnMove: true })
 						.setLngLat(f.properties.center)
+						.setAltitude(isPerspective? f.properties.base + MC.layerProps.roomThickness : 0)
 						.setHTML(f.properties.popup)
 						.setMaxWidth("300px")
 						.addTo(Map());
-					// console.log('팝업 생성');
 				}
-				else{
-					popup.setLngLat(f.properties.center);
-					popup.setHTML(f.properties.popup);
-					popup.setAltitude(f.properties.base + MC.layerProps.roomThickness);
-					popup.addTo(Map());
+				else {
+					popup.setLngLat(f.properties.center)
+						.setHTML(f.properties.popup)
+						.setAltitude(isPerspective? f.properties.base + MC.layerProps.roomThickness : 0)
+						.addTo(Map());
 				}
 			});
 			Map().on('mouseleave', layerId, (e) => {
+				// console.log("mouseleave");
 				const intoPopup = e.originalEvent.relatedTarget?.classList.contains('mapboxgl-popup-content');
 				if (popup && !intoPopup) {
 					popup.remove();
 					popup = null;
-					// console.log("팝업 제거");
 				}
 			});
 		}
