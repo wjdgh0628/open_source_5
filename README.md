@@ -51,8 +51,8 @@ HMH은 한세대학교 학생들에게 **직관적이고 맞춤형 3D 지도**�
 
 ## ⚙️ 시스템 구성도
 
-<img height="400" alt="KakaoTalk_20251209_180751255" src="https://github.com/user-attachments/assets/799c0981-3e15-4142-94f0-6497fe2e0d61" />
-<img height="400" alt="KakaoTalk_20251209_180751255_01" src="https://github.com/user-attachments/assets/89ebddd6-4204-46c5-bd02-4d0ac32f4716" />
+<img width="450" alt="KakaoTalk_20251209_180751255" src="https://github.com/user-attachments/assets/799c0981-3e15-4142-94f0-6497fe2e0d61" />
+<img width="450" alt="KakaoTalk_20251209_180751255_01" src="https://github.com/user-attachments/assets/89ebddd6-4204-46c5-bd02-4d0ac32f4716" />
 
 
 <br>
