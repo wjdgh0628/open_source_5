@@ -23,4 +23,3 @@ export const SC = {
 		"vision"
 	]
 };
-export const basicInfos = {};

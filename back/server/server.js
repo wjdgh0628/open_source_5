@@ -3,10 +3,9 @@ import path from 'path';
 import { exec } from 'child_process';
 import readline from 'readline';
 
-import { __dirname, SC, basicInfos } from '#scripts/serverConfig.js';
+import { __dirname} from '#scripts/serverConfig.js';
 import { api } from '#scripts/api.js';
-import { fetchAllRooms, fetchBuildingsInfo } from '#scripts/fileIO.js';
-import { idRules, jsonProp, PORT } from '#shared/rules.js';
+import { PORT } from '#shared/rules.js';
 
 const app = express();
 let server;
@@ -34,41 +33,6 @@ app.get("/", (req, res) => {
  *		}
  *	}
  */
-export function initList() {
-	// 원본 방 데이터: { [bid]: Array<Array<{ name: string, ... }>> }
-	const rData = fetchAllRooms();
-
-	// 건물 정보(name, bmLevel 등) 요청
-	const req = [{ bid: jsonProp.id, name: 'name' }, { bmLevel: 'bmLevel' }, {}];
-	const bData = fetchBuildingsInfo(SC.bidList, req); // { [bid]: { name, bmLevel, ... } }
-
-	for (const bid of Object.keys(rData || {})) {
-		const buildingRooms = rData[bid] || [];
-		const info = (bData && bData[bid]) || {};
-
-		const bmLevel = typeof info.bmLevel === 'number' ? info.bmLevel : 0;
-		const name = info.name || bid;
-
-		const floorsArr = [];
-
-		buildingRooms.forEach((floor, lvI) => {
-			const roomsArr = [];
-			(floor || []).forEach((room, i) => {
-				if (!room) return;
-				const roomName = room.name || '';
-				const rid = idRules.rid(bid, lvI, i);
-				roomsArr.push({ name: roomName, rid });
-			});
-			floorsArr[lvI] = roomsArr;
-		});
-
-		basicInfos[bid] = {
-			name,
-			bmLevel,
-			rooms: floorsArr,
-		};
-	}
-}
 function openInBrowser(url) {
 	const opener = process.platform === "darwin" ? "open" : process.platform === "win32" ? "start" : "xdg-open";
 	const command = process.platform === "win32" ? `${opener} "" "${url}"` : `${opener} "${url}"`;
@@ -77,13 +41,9 @@ function openInBrowser(url) {
 	});
 }
 
-
-
 function startServer() {
 	server = app.listen(PORT, () => {
-		initList();
 		console.log(`Rooms server running at http://localhost:${PORT}`);
-		console.log('Controls: press r to restart, q to quit');
 	});
 }
 
