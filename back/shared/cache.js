@@ -23,7 +23,6 @@ export function subInfos(fn) {
 	infosListeners.add(fn);
 	return () => infosListeners.delete(fn);
 }
-
 export function editInfos(mutator) {
 	const next = mutator(infos) || infos;
 	infos = next;

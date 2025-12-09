@@ -48,6 +48,7 @@ export function indexRoomList(raw) {
 						lvI: lvI,
 						bmLevel: f.bmLevel,
 						name: r.name || '',
+						tags: Array.isArray(r.tags) ? r.tags : [],
 					};
 				}
 			});

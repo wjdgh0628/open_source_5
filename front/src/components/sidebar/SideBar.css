@@ -283,10 +283,51 @@ ul.collapse__menu
     white-space: nowrap;                 /* 줄바꿈 방지 */
 }
 
-.building-list-item:hover .favorite-btn
-{
+/* 추가된 스타일 시작 */
+.favorite-room-label {
+    flex-grow: 1;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.favorite-edit-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0 4px 0 0;
+    color: #888;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.favorite-edit-btn:hover {
+    transform: scale(1.1);
+}
+
+.building-list-item:hover .favorite-edit-btn {
     color: var(--white-color);
 }
+
+.favorite-edit-input {
+    width: 100%;
+    font-size: 0.9rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 2px 4px;
+    box-sizing: border-box;
+    outline: none;
+}
+
+.favorite-edit-input:focus {
+    border-color: var(--first-color);
+    box-shadow: 0 0 0 1px rgba(36, 93, 199, 0.2);
+}
+/* 추가된 스타일 끝 */
 
 /* 즐겨찾기 버튼 스타일 */
 .favorite-btn
@@ -309,3 +350,86 @@ ul.collapse__menu
 {
     color: #f0c300;
 }
+
+/* 검색 박스 */
+.nav__search {
+    margin-bottom: 0.75rem;
+}
+.nav__search-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.nav__search-icon {
+    position: absolute;
+    left: 10px;
+    font-size: 1rem;
+    pointer-events: none;
+    color: #888;
+}
+.nav__search-input {
+    width: 100%;
+    padding: 0.4rem 0.5rem 0.4rem 2rem; /* 왼쪽 아이콘 공간 확보 */
+    border-radius: 0.5rem;
+    border: 1px solid #ddd;
+    font-family: var(--body-font);
+    font-size: var(--small-font-size);
+    box-sizing: border-box;
+    outline: none;
+}
+
+.nav__search-input:focus {
+    border-color: var(--first-color);
+    box-shadow: 0 0 0 1px rgba(36, 93, 199, 0.2);
+}
+
+.nav__search-results {
+    margin-top: 0.35rem;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.nav__search-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav__search-item {
+    cursor: pointer;
+}
+
+.nav__search-main {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+}
+
+.nav__search-room-name {
+    font-size: 0.9rem;
+    font-weight: var(--font-weight-bold);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.nav__search-building {
+    font-size: 0.8rem;
+    color: #666;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.nav__search-empty {
+    font-size: 0.85rem;
+    color: #888;
+    padding: 0.3rem 0.2rem;
+}
+
+/* 사이드바 접힘/펼침에 따른 검색 UI 표시 */
+.nav__search-collapsed { display: none; }
+.l-navbar:not(.expander) .nav__search { display: none; }
+.l-navbar:not(.expander) .nav__search-collapsed { display: grid; } /* nav__link 레이아웃 상속 */

@@ -7,6 +7,7 @@ import './SideBar.css';
 import LogoImg from '@assets/logo2.png';
 import BuildingList from './BuildingList.jsx';
 import Favorites from './Favorites.jsx';
+import Search from './Search.jsx';
 
 export default function SideBar({ infos }) {
 	// UI 상태
@@ -16,6 +17,15 @@ export default function SideBar({ infos }) {
 
 	// 데이터 상태
 	const [favorites, setFavorites] = useState(() => loadRoomFavorites()); // [rid, rid, ...]
+	const [favoriteLabels, setFavoriteLabels] = useState(() => {
+		if (typeof window === 'undefined') return {};
+		try {
+			const raw = window.localStorage.getItem('hmh_favoriteLabels');
+			return raw ? JSON.parse(raw) : {};
+		} catch {
+			return {};
+		}
+	});
 
 	// 사이드바 몸통 패딩 동기화 (사이드바가 확장 상태일 때만 패딩 적용)
 	useEffect(() => {
@@ -25,6 +35,15 @@ export default function SideBar({ infos }) {
 			document.body.classList.remove('body-pd');
 		}
 	}, [isExpanded]);
+
+	useEffect(() => {
+		if (typeof window === 'undefined') return;
+		try {
+			window.localStorage.setItem('hmh_favoriteLabels', JSON.stringify(favoriteLabels));
+		} catch {
+			// ignore storage errors
+		}
+	}, [favoriteLabels]);
 
 	const roomsList = useMemo(() => indexRoomList(infos), [infos]);
 
@@ -37,7 +56,20 @@ export default function SideBar({ infos }) {
 		});
 	};
 
-	// const ensureExpanded = () => setIsExpanded(true);
+	const handleFavoriteLabelChange = (rid, label) => {
+		setFavoriteLabels((prev) => {
+			const next = { ...prev };
+			const trimmed = label.trim();
+			if (!trimmed) {
+				delete next[rid];
+			} else {
+				next[rid] = trimmed;
+			}
+			return next;
+		});
+	};
+
+	const ensureExpanded = () => setIsExpanded(true);
 	return (
 		<div className={`l-navbar ${isExpanded ? 'expander' : ''}`} id="navbar">
 			<nav className="nav">
@@ -59,6 +91,15 @@ export default function SideBar({ infos }) {
 					</div>
 
 					<div className="nav__list">
+						{/* 강의실 검색 */}
+						<Search
+							roomsIndex={roomsList}
+							favorites={favorites}
+							onToggleFavorite={toggleFavoriteRoom}
+							onRoomClick={onRoomClick}
+							ensureExpanded={ensureExpanded}
+						/>
+
 						{/* 즐겨찾기 (방 전용) */}
 						<div
 							className="nav__link collapse showCollapse"
@@ -77,6 +118,8 @@ export default function SideBar({ infos }) {
 								roomList={roomsList}
 								onToggleFavorite={toggleFavoriteRoom}
 								onRoomClick={onRoomClick}
+								favoriteLabels={favoriteLabels}
+								onChangeFavoriteLabel={handleFavoriteLabelChange}
 							/>
 						</ul>
 
