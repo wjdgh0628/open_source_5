@@ -3,10 +3,9 @@ import path from 'path';
 import { exec } from 'child_process';
 import readline from 'readline';
 
-import { __dirname, SC, basicInfos } from '#scripts/serverConfig.js';
+import { __dirname} from '#scripts/serverConfig.js';
 import { api } from '#scripts/api.js';
-import { fetchAllRooms, fetchBuildingsInfo } from '#scripts/fileIO.js';
-import { idRules, jsonProp, PORT } from '#shared/rules.js';
+import { PORT } from '#shared/rules.js';
 
 const app = express();
 let server;
@@ -23,52 +22,7 @@ app.get("/editor", (req, res) => {
 app.get("/", (req, res) => {
 	res.redirect("/map/index.html");
 });
-/** 
- *	console.log('Initialized basicInfos:', basicInfos);
- *	최종 roomList 구조:
- *	{
- *		[bid]: {
- *	    	name: string,
- *	    	bmLevel: number,
- *	    	rooms: Array<Array<{ name: string, rid: string }>>
- *		}
- *	}
- */
-export function initList() {
-	// 원본 방 데이터: { [bid]: Array<Array<{ name: string, ... }>> }
-	const rData = fetchAllRooms();
 
-	// 건물 정보(name, bmLevel 등) 요청
-	const req = [{ bid: jsonProp.id, name: 'name' }, { bmLevel: 'bmLevel' }, {}];
-	const bData = fetchBuildingsInfo(SC.bidList, req); // { [bid]: { name, bmLevel, ... } }
-
-	for (const bid of Object.keys(rData || {})) {
-		const buildingRooms = rData[bid] || [];
-		const info = (bData && bData[bid]) || {};
-
-		const bmLevel = typeof info.bmLevel === 'number' ? info.bmLevel : 0;
-		const name = info.name || bid;
-
-		const floorsArr = [];
-
-		buildingRooms.forEach((floor, lvI) => {
-			const roomsArr = [];
-			(floor || []).forEach((room, i) => {
-				if (!room) return;
-				const roomName = room.name || '';
-				const rid = idRules.rid(bid, lvI, i);
-				roomsArr.push({ name: roomName, rid });
-			});
-			floorsArr[lvI] = roomsArr;
-		});
-
-		basicInfos[bid] = {
-			name,
-			bmLevel,
-			rooms: floorsArr,
-		};
-	}
-}
 function openInBrowser(url) {
 	const opener = process.platform === "darwin" ? "open" : process.platform === "win32" ? "start" : "xdg-open";
 	const command = process.platform === "win32" ? `${opener} "" "${url}"` : `${opener} "${url}"`;
@@ -77,13 +31,9 @@ function openInBrowser(url) {
 	});
 }
 
-
-
 function startServer() {
 	server = app.listen(PORT, () => {
-		initList();
 		console.log(`Rooms server running at http://localhost:${PORT}`);
-		console.log('Controls: press r to restart, q to quit');
 	});
 }
 
@@ -107,9 +57,9 @@ function shutdownServer(code = 0) {
 function readlinePrompt() {
 	if (process.stdin.isTTY) {
 		const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-		const prompt = () => rl.setPrompt('> [r]estart, [q]uit, [o]pen editor: ');
-		// prompt();
-		// rl.prompt();
+		const prompt = () => rl.setPrompt('> [r]estart, [q]uit, [o]pen map, [e]ditor: ');
+		prompt();
+		rl.prompt();
 		rl.on('line', (line) => {
 			const k = (line || '').trim().toLowerCase();
 			if (k === 'r') {
@@ -119,6 +69,10 @@ function readlinePrompt() {
 				shutdownServer(0);
 				return;
 			} else if (k === 'o') {
+				const url = `http://localhost:${PORT}/`;
+				console.log(`Opening map: ${url}`);
+				openInBrowser(url);
+			} else if (k === 'e') {
 				const url = `http://localhost:${PORT}/editor/editor.html`;
 				console.log(`Opening editor: ${url}`);
 				openInBrowser(url);
@@ -136,7 +90,6 @@ function readlinePrompt() {
 }
 
 startServer();
-// 일반 시그널 처리
 process.on('SIGINT', () => shutdownServer(0));
 process.on('SIGTERM', () => shutdownServer(0));
 readlinePrompt();
