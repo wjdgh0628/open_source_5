@@ -25,10 +25,10 @@ export const MC = {
 		floorZoomStep: 0.07
 	},
 	layerProps: {
-		floorThickness: 3,
-		baseThickness: 1,
-		roomThickness: 2,
-		floorGap: 3,
+		floorThickness: 1.5,
+		baseThickness: 0.5,
+		roomThickness: 1,
+		floorGap: 4.5,
 		levelThick: 6,
 		clickedFloorColor: "#888888",
 		defaultFloorCount: 3,
