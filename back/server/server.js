@@ -79,6 +79,10 @@ function readlinePrompt() {
 				shutdownServer(0);
 				return;
 			} else if (k === 'o') {
+				const url = `http://localhost:${PORT}/`;
+				console.log(`Opening map: ${url}`);
+				openInBrowser(url);
+			} else if (k === 'e') {
 				const url = `http://localhost:${PORT}/editor/editor.html`;
 				console.log(`Opening editor: ${url}`);
 				openInBrowser(url);
