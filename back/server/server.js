@@ -22,17 +22,7 @@ app.get("/editor", (req, res) => {
 app.get("/", (req, res) => {
 	res.redirect("/map/index.html");
 });
-/** 
- *	console.log('Initialized basicInfos:', basicInfos);
- *	최종 roomList 구조:
- *	{
- *		[bid]: {
- *	    	name: string,
- *	    	bmLevel: number,
- *	    	rooms: Array<Array<{ name: string, rid: string }>>
- *		}
- *	}
- */
+
 function openInBrowser(url) {
 	const opener = process.platform === "darwin" ? "open" : process.platform === "win32" ? "start" : "xdg-open";
 	const command = process.platform === "win32" ? `${opener} "" "${url}"` : `${opener} "${url}"`;
@@ -67,9 +57,9 @@ function shutdownServer(code = 0) {
 function readlinePrompt() {
 	if (process.stdin.isTTY) {
 		const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-		const prompt = () => rl.setPrompt('> [r]estart, [q]uit, [o]pen editor: ');
-		// prompt();
-		// rl.prompt();
+		const prompt = () => rl.setPrompt('> [r]estart, [q]uit, [o]pen map, [e]ditor: ');
+		prompt();
+		rl.prompt();
 		rl.on('line', (line) => {
 			const k = (line || '').trim().toLowerCase();
 			if (k === 'r') {
@@ -100,7 +90,6 @@ function readlinePrompt() {
 }
 
 startServer();
-// 일반 시그널 처리
 process.on('SIGINT', () => shutdownServer(0));
 process.on('SIGTERM', () => shutdownServer(0));
 readlinePrompt();
