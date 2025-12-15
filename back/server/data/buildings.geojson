@@ -1532,7 +1532,7 @@
 				"@id": "theology",
 				"name": "신학관",
 				"building": "university",
-				"building:levels": 6,
+				"building:levels": 5,
 				"base": 0,
 				"center": [
 					126.95395868271589,
@@ -1541,10 +1541,9 @@
 				"bearing": 180,
 				"floorBearing": -3,
 				"floors": {
-					"flLevel": 6,
+					"flLevel": 5,
 					"bmLevel": 0,
 					"flList": [
-						0,
 						0,
 						0,
 						0,
