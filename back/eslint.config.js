@@ -30,7 +30,7 @@ export default defineConfig([
 		},
 	},
 	{
-		files: ["server/server.js"],
+		files: ["server/**/*.js"],
 		env: {
 			node: true
 		}

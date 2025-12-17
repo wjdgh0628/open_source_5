@@ -26,3 +26,4 @@ dist-ssr
 # 추가 지정
 floorplans
 package-lock.json
+.env

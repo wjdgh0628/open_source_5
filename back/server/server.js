@@ -1,26 +1,75 @@
+import 'dotenv/config';
 import express from 'express';
 import path from 'path';
 import { exec } from 'child_process';
 import readline from 'readline';
+import session from "express-session";
 
-import { __dirname} from '#scripts/serverConfig.js';
+import { __dirname } from '#scripts/serverConfig.js';
 import { api } from '#scripts/api.js';
+import auth from '#scripts/auth.js';
 import { PORT } from '#shared/rules.js';
 
 const app = express();
 let server;
 
+// body parsers (needed for /api/login)
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// session (login state)
+app.use(session({
+	name: 'hmh.sid',
+	secret: process.env.SESSION_SECRET || 'dev-secret-change-me',
+	resave: false,
+	saveUninitialized: false,
+	cookie: {
+		httpOnly: true,
+		sameSite: 'lax',
+		secure: process.env.NODE_ENV === 'production',
+	},
+}));
+
+// expose session user to request
+app.use((req, res, next) => {
+	req.user = req.session?.user || null;
+	next();
+});
+
 // app.use('/', express.static(path.join(__dirname)));
+
+// auth routes first
+app.use('/api', auth);
 app.use('/api', api);
-app.use('/editor', express.static(path.join(__dirname, '../editor')));
-app.use('/map', express.static(path.join(__dirname, '../map/dist')));
+
+// public shared assets (if you truly want these public)
 app.use('/shared', express.static(path.resolve(__dirname, '../shared')));
 
-app.get("/editor", (req, res) => {
-	res.redirect("/editor/editor.html");
+// protect map/editor assets by middleware on the prefix
+app.use('/map', requireAuth, express.static(path.join(__dirname, '../map/dist')));
+app.use('/editor', requireAuth, requireRole('admin'), express.static(path.join(__dirname, '../editor')));
+
+function requireAuth(req, res, next) {
+	if (!req.user) return res.status(401).end();
+	next();
+}
+function requireRole(role) {
+	return (req, res, next) => (req.user?.role === role ? next() : res.status(403).end());
+}
+
+app.get('/login', (req, res) => {
+	if (req.user) return res.redirect('/map');
+	res.sendFile(path.resolve(__dirname, '../public/login.html'));
 });
-app.get("/", (req, res) => {
-	res.redirect("/map/index.html");
+
+app.get('/editor', requireAuth, requireRole('admin'), (req, res) => {
+	res.redirect('/editor/editor.html');
+});
+app.get('/map', requireAuth, (req, res) => {
+	res.redirect('/map/index.html');
+});
+app.get('/', (req, res) => {
+	res.redirect('/login');
 });
 
 function openInBrowser(url) {
@@ -73,7 +122,7 @@ function readlinePrompt() {
 				console.log(`Opening map: ${url}`);
 				openInBrowser(url);
 			} else if (k === 'e') {
-				const url = `http://localhost:${PORT}/editor/editor.html`;
+				const url = `http://localhost:${PORT}/editor`;
 				console.log(`Opening editor: ${url}`);
 				openInBrowser(url);
 			} else if (k) {
@@ -93,4 +142,3 @@ startServer();
 process.on('SIGINT', () => shutdownServer(0));
 process.on('SIGTERM', () => shutdownServer(0));
 readlinePrompt();
-
