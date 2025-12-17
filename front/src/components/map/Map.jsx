@@ -10,7 +10,7 @@ import './Map.css';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 function initMap(urls) {
-	mapboxgl.accessToken = MC.map.key;
+	mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_API_KEY;
 	// 맵 초기화 (기존과 동일)
 	const map = new mapboxgl.Map({
 		container: "map",

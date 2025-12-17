@@ -12,8 +12,7 @@ export const MC = {
 				126.95850903964549,
 				37.349584812158525
 			]
-		],
-		key: "pk.eyJ1IjoibGF6eWRldjEwMjQiLCJhIjoiY21mdW91NnNyMTVkZDJtcHd4dHNtNHU0ayJ9.mLzbdcCPq_-BeA8DlHu1KA"
+		]
 	},
 	camera: {
 		building: "around",
