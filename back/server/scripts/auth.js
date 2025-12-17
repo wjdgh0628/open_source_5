@@ -56,7 +56,7 @@ router.post('/logout', (req, res) => {
 	});
 });
 
-router.get('/auth/config', (req, res) => {
+router.get('/config', (req, res) => {
 	return res.json({ clientId: process.env.GOOGLE_CLIENT_ID || '' });
 });
 

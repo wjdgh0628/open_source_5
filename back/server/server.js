@@ -13,6 +13,9 @@ import { PORT } from '#shared/rules.js';
 const app = express();
 let server;
 
+// trust first proxy (needed for secure cookies behind Nginx/Cloudflare/Heroku)
+app.set('trust proxy', 1);
+
 // body parsers (needed for /api/login)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -30,46 +33,47 @@ app.use(session({
 	},
 }));
 
-// expose session user to request
+
 app.use((req, res, next) => {
 	req.user = req.session?.user || null;
 	next();
 });
 
-// app.use('/', express.static(path.join(__dirname)));
-
-// auth routes first
-app.use('/api', auth);
 app.use('/api', api);
-
-// public shared assets (if you truly want these public)
 app.use('/shared', express.static(path.resolve(__dirname, '../shared')));
 
 // protect map/editor assets by middleware on the prefix
+app.use('/auth', auth);
 app.use('/map', requireAuth, express.static(path.join(__dirname, '../map/dist')));
 app.use('/editor', requireAuth, requireRole('admin'), express.static(path.join(__dirname, '../editor')));
 
 function requireAuth(req, res, next) {
-	if (!req.user) return res.status(401).end();
-	next();
+  if (!req.user) return res.status(401).end();
+  next();
 }
 function requireRole(role) {
-	return (req, res, next) => (req.user?.role === role ? next() : res.status(403).end());
+  return (req, res, next) => (req.user?.role === role ? next() : res.status(403).end());
 }
 
+// 로그인 페이지
 app.get('/login', (req, res) => {
-	if (req.user) return res.redirect('/map');
-	res.sendFile(path.resolve(__dirname, '../public/login.html'));
+  if (req.user) return res.redirect('/portal');
+  res.sendFile(path.resolve(__dirname, '../public/login.html'));
+});
+
+// 포털(선택 화면)
+app.get('/portal', requireAuth, (req, res) => {
+  res.sendFile(path.resolve(__dirname, '../public/portal.html'));
 });
 
 app.get('/editor', requireAuth, requireRole('admin'), (req, res) => {
-	res.redirect('/editor/editor.html');
+  res.redirect('/editor/editor.html');
 });
 app.get('/map', requireAuth, (req, res) => {
-	res.redirect('/map/index.html');
+  res.redirect('/map/index.html');
 });
 app.get('/', (req, res) => {
-	res.redirect('/login');
+  res.redirect('/login');
 });
 
 function openInBrowser(url) {
