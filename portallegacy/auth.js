@@ -10,6 +10,7 @@ router.post("/login", async (req, res) => {
 		if (!credential) return res.status(400).json({ error: "missing credential" });
 
 		const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+		console.log("GOOGLE_CLIENT_ID:", GOOGLE_CLIENT_ID);
 		const ALLOWED_HD = process.env.ALLOWED_HD;
 		const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "").split(",").map(s => s.trim()).filter(Boolean);
 
