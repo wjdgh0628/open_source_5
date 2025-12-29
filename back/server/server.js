@@ -13,9 +13,15 @@ import { PORT } from '#shared/rules.js';
 const app = express();
 let server;
 
+// Security: require a strong session secret in production
+if (process.env.NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
+	throw new Error('Missing SESSION_SECRET in production');
+}
+
 // trust first proxy (needed for secure cookies behind Nginx/Cloudflare/Heroku)
 app.set('trust proxy', 1);
 
+// NOTE: The fallback secret is dev-only. In production, SESSION_SECRET is required (see check above).
 // body parsers (needed for /api/login)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -23,11 +29,12 @@ app.use(express.urlencoded({ extended: true }));
 // session (login state)
 app.use(session({
 	name: 'hmh.sid',
-	secret: process.env.SESSION_SECRET || 'dev-secret-change-me',
+	secret: process.env.SESSION_SECRET,
 	resave: false,
 	saveUninitialized: false,
 	cookie: {
 		httpOnly: true,
+		maxAge: 1000 * 60 * 60 * 12,
 		sameSite: 'lax',
 		secure: process.env.NODE_ENV === 'production',
 	},

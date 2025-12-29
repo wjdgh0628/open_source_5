@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import './Portal.css'
 
 const API_BASE = String(import.meta.env.VITE_API_BASE || '').replace(/\/+$/, '')
@@ -6,46 +7,44 @@ const API_BASE = String(import.meta.env.VITE_API_BASE || '').replace(/\/+$/, '')
 function Portal() {
   const [user, setUser] = useState(null)
   const [err, setErr] = useState('')
+  const navigate = useNavigate()
 
   useEffect(() => {
     let alive = true
 
     ;(async () => {
-      try {
-        const r = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' })
-        if (!r.ok) {
-          location.href = '/login'
-          return
-        }
-        const j = await r.json().catch(() => ({}))
-        if (!j.user) {
-          location.href = '/login'
-          return
-        }
-        if (!alive) return
-        setUser(j.user)
-      } catch {
-        location.href = '/login'
+      const me = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' })
+        .then(r => (r.ok ? r.json() : null))
+        .catch(() => null)
+
+      if (!me?.user) {
+        navigate('/login')
+        return
       }
+      if (!alive) return
+      setUser(me.user)
     })()
 
     return () => {
       alive = false
     }
-  }, [])
+  }, [navigate])
 
   const onLogout = async () => {
     setErr('')
-    try {
-      const r = await fetch(`${API_BASE}/auth/logout`, {
-        method: 'POST',
-        credentials: 'include',
-      })
-      if (r.ok) location.href = '/login'
-      else setErr('로그아웃 실패')
-    } catch {
-      setErr('네트워크 오류')
-    }
+
+    const ok = await fetch(`${API_BASE}/auth/logout`, {
+      method: 'POST',
+      credentials: 'include',
+    })
+      .then(r => r.ok)
+      .catch(() => false)
+
+    window.google?.accounts?.id?.disableAutoSelect?.()
+    window.google?.accounts?.id?.cancel?.()
+
+    if (ok) navigate('/login')
+    else setErr('로그아웃 실패')
   }
 
   if (!user) return null

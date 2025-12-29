@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import './Login.css'
 
 const API_BASE = String(import.meta.env.VITE_API_BASE || '').replace(/\/+$/, '')
@@ -30,6 +31,7 @@ function loadGsiScript() {
 function Login() {
   const gbtnRef = useRef(null)
   const [err, setErr] = useState('')
+  const navigate = useNavigate()
 
   useEffect(() => {
     let alive = true
@@ -38,27 +40,21 @@ function Login() {
       setErr('')
 
       // 이미 로그인 상태면 포털로
-      try {
-        const me = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' })
-          .then(r => (r.ok ? r.json() : null))
-          .catch(() => null)
-        if (me?.user) {
-          location.href = '/portal'
-          return
-        }
-      } catch {}
+      const me = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' })
+        .then(r => (r.ok ? r.json() : null))
+        .catch(() => null)
 
-      // 서버에서 Client ID 가져오기
-      let clientId = ''
-      try {
-        const r = await fetch(`${API_BASE}/auth/config`, { credentials: 'include' })
-        const j = await r.json().catch(() => ({}))
-        clientId = j.clientId || ''
-      } catch {
-        if (alive) setErr('서버에 연결할 수 없습니다.')
+      if (me?.user) {
+        navigate('/portal')
         return
       }
 
+      // 서버에서 Client ID 가져오기
+      const cfg = await fetch(`${API_BASE}/auth/config`, { credentials: 'include' })
+        .then(r => r.json())
+        .catch(() => null)
+
+      const clientId = cfg?.clientId || ''
       if (!clientId) {
         if (alive) setErr('GOOGLE_CLIENT_ID가 설정되어 있지 않습니다.')
         return
@@ -95,7 +91,7 @@ function Login() {
             return
           }
 
-          location.href = '/portal'
+          navigate('/portal')
         } catch {
           setErr('네트워크 오류')
         }
@@ -104,6 +100,7 @@ function Login() {
       window.google.accounts.id.initialize({
         client_id: clientId,
         callback: onCredential,
+        auto_select: false,
       })
 
       // 같은 DOM에 재렌더 대비: 기존 버튼 비우고 다시 렌더
@@ -119,8 +116,9 @@ function Login() {
 
     return () => {
       alive = false
+      window.google?.accounts?.id?.cancel?.()
     }
-  }, [])
+  }, [navigate])
 
   return (
     <div className="wrap">
