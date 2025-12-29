@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './Portal.css'
 
-const API_BASE = String(import.meta.env.VITE_API_BASE || '').replace(/\/+$/, '')
+const AUTH_ORIGIN = String(import.meta.env.VITE_AUTH_ORIGIN || '').replace(/\/+$/, '')
+const authUrl = (p) => (AUTH_ORIGIN ? `${AUTH_ORIGIN}${p}` : p)
 
 function Portal() {
   const [user, setUser] = useState(null)
@@ -13,7 +14,7 @@ function Portal() {
     let alive = true
 
     ;(async () => {
-      const me = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' })
+      const me = await fetch(authUrl('/auth/me'), { credentials: 'include' })
         .then(r => (r.ok ? r.json() : null))
         .catch(() => null)
 
@@ -33,7 +34,7 @@ function Portal() {
   const onLogout = async () => {
     setErr('')
 
-    const ok = await fetch(`${API_BASE}/auth/logout`, {
+    const ok = await fetch(authUrl('/auth/logout'), {
       method: 'POST',
       credentials: 'include',
     })

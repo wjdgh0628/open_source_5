@@ -13,6 +13,8 @@ import { PORT } from '#shared/rules.js';
 const app = express();
 let server;
 
+const portalDist = path.resolve(__dirname, '../portal/dist');
+
 // Security: require a strong session secret in production
 if (process.env.NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
 	throw new Error('Missing SESSION_SECRET in production');
@@ -46,6 +48,7 @@ app.use((req, res, next) => {
 	next();
 });
 
+
 app.use('/api', api);
 app.use('/shared', express.static(path.resolve(__dirname, '../shared')));
 
@@ -53,6 +56,33 @@ app.use('/shared', express.static(path.resolve(__dirname, '../shared')));
 app.use('/auth', auth);
 app.use('/map', requireAuth, express.static(path.join(__dirname, '../map/dist')));
 app.use('/editor', requireAuth, requireRole('admin'), express.static(path.join(__dirname, '../editor')));
+
+// Portal SPA (Vite build output)
+app.use(express.static(portalDist));
+
+// /login : public (serve SPA index)
+app.get(/^\/login(?:\/.*)?$/, (req, res) => {
+  if (req.user) return res.redirect('/portal');
+  res.sendFile(path.join(portalDist, 'index.html'));
+});
+
+// /portal : auth required (serve SPA index)
+app.get(/^\/portal(?:\/.*)?$/, requireAuth, (req, res) => {
+  res.sendFile(path.join(portalDist, 'index.html'));
+});
+
+// Root entry
+app.get('/', (req, res) => {
+  res.redirect('/login');
+});
+
+// Keep legacy editor/map redirects
+app.get('/editor', requireAuth, requireRole('admin'), (req, res) => {
+  res.redirect('/editor/editor.html');
+});
+app.get('/map', requireAuth, (req, res) => {
+  res.redirect('/map/index.html');
+});
 
 function requireAuth(req, res, next) {
   if (!req.user) return res.status(401).end();
@@ -62,26 +92,6 @@ function requireRole(role) {
   return (req, res, next) => (req.user?.role === role ? next() : res.status(403).end());
 }
 
-// 로그인 페이지
-app.get('/login', (req, res) => {
-  if (req.user) return res.redirect('/portal');
-  res.sendFile(path.resolve(__dirname, '../public/login.html'));
-});
-
-// 포털(선택 화면)
-app.get('/portal', requireAuth, (req, res) => {
-  res.sendFile(path.resolve(__dirname, '../public/portal.html'));
-});
-
-app.get('/editor', requireAuth, requireRole('admin'), (req, res) => {
-  res.redirect('/editor/editor.html');
-});
-app.get('/map', requireAuth, (req, res) => {
-  res.redirect('/map/index.html');
-});
-app.get('/', (req, res) => {
-  res.redirect('/login');
-});
 
 function openInBrowser(url) {
 	const opener = process.platform === "darwin" ? "open" : process.platform === "win32" ? "start" : "xdg-open";
@@ -117,7 +127,7 @@ function shutdownServer(code = 0) {
 function readlinePrompt() {
 	if (process.stdin.isTTY) {
 		const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-		const prompt = () => rl.setPrompt('> [r]estart, [q]uit, [o]pen map, [e]ditor: ');
+		const prompt = () => rl.setPrompt('> [r]estart, [q]uit, [o]pen');
 		prompt();
 		rl.prompt();
 		rl.on('line', (line) => {
@@ -130,11 +140,7 @@ function readlinePrompt() {
 				return;
 			} else if (k === 'o') {
 				const url = `http://localhost:${PORT}/`;
-				console.log(`Opening map: ${url}`);
-				openInBrowser(url);
-			} else if (k === 'e') {
-				const url = `http://localhost:${PORT}/editor`;
-				console.log(`Opening editor: ${url}`);
+				console.log(`Opening: ${url}`);
 				openInBrowser(url);
 			} else if (k) {
 				console.log('Unknown command:', k);

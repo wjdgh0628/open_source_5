@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './Login.css'
 
-const API_BASE = String(import.meta.env.VITE_API_BASE || '').replace(/\/+$/, '')
+const AUTH_ORIGIN = String(import.meta.env.VITE_AUTH_ORIGIN || '').replace(/\/+$/, '')
+const authUrl = (p) => (AUTH_ORIGIN ? `${AUTH_ORIGIN}${p}` : p)
 
 function loadGsiScript() {
   return new Promise((resolve, reject) => {
@@ -40,7 +41,7 @@ function Login() {
       setErr('')
 
       // 이미 로그인 상태면 포털로
-      const me = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' })
+      const me = await fetch(authUrl('/auth/me'), { credentials: 'include' })
         .then(r => (r.ok ? r.json() : null))
         .catch(() => null)
 
@@ -50,7 +51,7 @@ function Login() {
       }
 
       // 서버에서 Client ID 가져오기
-      const cfg = await fetch(`${API_BASE}/auth/config`, { credentials: 'include' })
+      const cfg = await fetch(authUrl('/auth/config'), { credentials: 'include' })
         .then(r => r.json())
         .catch(() => null)
 
@@ -78,7 +79,7 @@ function Login() {
       async function onCredential(resp) {
         setErr('')
         try {
-          const r = await fetch(`${API_BASE}/auth/login`, {
+          const r = await fetch(authUrl('/auth/login'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
