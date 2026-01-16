@@ -27,3 +27,4 @@ dist-ssr
 floorplans
 package-lock.json
 *.zip
+.env
