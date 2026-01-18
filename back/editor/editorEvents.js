@@ -184,22 +184,24 @@ export function onMouseMove(e) {
 				return;
 			}
 
-			const [lon2, lat2] = screenToWorld(x, y);
-			const [wx1, wy1] = lonLatToWorld(t.startLonLat[0], t.startLonLat[1]);
-			const [wx2, wy2] = lonLatToWorld(lon2, lat2);
+			// Screen-space rectangle (axis-aligned on screen regardless of view rotation/zoom)
+			const sx1 = t.startScreen.x;
+			const sy1 = t.startScreen.y;
+			const sx2 = x;
+			const sy2 = y;
 
-			const minX = Math.min(wx1, wx2);
-			const maxX = Math.max(wx1, wx2);
-			const minY = Math.min(wy1, wy2);
-			const maxY = Math.max(wy1, wy2);
+			const minSX = Math.min(sx1, sx2);
+			const maxSX = Math.max(sx1, sx2);
+			const minSY = Math.min(sy1, sy2);
+			const maxSY = Math.max(sy1, sy2);
 
-			const cornersWorld = [
-				[minX, minY],
-				[maxX, minY],
-				[maxX, maxY],
-				[minX, maxY]
+			// Convert the 4 screen corners back to lon/lat points
+			const cornersLonLat = [
+				screenToWorld(minSX, minSY),
+				screenToWorld(maxSX, minSY),
+				screenToWorld(maxSX, maxSY),
+				screenToWorld(minSX, maxSY)
 			];
-			const cornersLonLat = cornersWorld.map(([wx, wy]) => worldToLonLat(wx, wy));
 
 			// If rectangle not yet created, create a new draft room
 			if (!t.hasRect) {

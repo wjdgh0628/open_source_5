@@ -202,7 +202,7 @@ export function hitTestFilledRoom(screenX, screenY) {
 	return hit;
 }
 
-export function findNearestVertex(screenX, screenY, thresholdPx = 8) {
+export function findNearestVertex(screenX, screenY, thresholdPx = 20) {
 	let best = null;
 	let bestDist = Infinity;
 	// Draft rooms
