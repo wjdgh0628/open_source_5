@@ -5840,7 +5840,7 @@
                 "name": "엘리베이터",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#ffffff",
                 "polygon": [
                     [
                         [
@@ -5986,7 +5986,7 @@
                 "name": "201호",
                 "desc": "종합강의실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#bedceb",
                 "polygon": [
                     [
                         [
@@ -6046,7 +6046,7 @@
                 "name": "203호",
                 "desc": "강의실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#bedceb",
                 "polygon": [
                     [
                         [
@@ -6076,7 +6076,7 @@
                 "name": "204호",
                 "desc": "교수연구실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#00ff11",
                 "polygon": [
                     [
                         [
@@ -6106,7 +6106,7 @@
                 "name": "205호",
                 "desc": "교수실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#00ff11",
                 "polygon": [
                     [
                         [
@@ -6226,7 +6226,7 @@
                 "name": "엘리베이터",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#ffffff",
                 "polygon": [
                     [
                         [
@@ -6258,7 +6258,7 @@
                 "name": "301호",
                 "desc": "박사과정연구실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#00ff11",
                 "polygon": [
                     [
                         [
@@ -6318,7 +6318,7 @@
                 "name": "301-B호",
                 "desc": "강의실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#bedceb",
                 "polygon": [
                     [
                         [
@@ -6346,9 +6346,9 @@
             },
             {
                 "name": "301-C호",
-                "desc": "유시티박사과정",
+                "desc": "유시티박사과정 연구실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#00ff11",
                 "polygon": [
                     [
                         [
@@ -6408,7 +6408,7 @@
                 "name": "303호",
                 "desc": "교수실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#00ff11",
                 "polygon": [
                     [
                         [
@@ -6438,7 +6438,7 @@
                 "name": "304호",
                 "desc": "강의실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#bedceb",
                 "polygon": [
                     [
                         [
@@ -6468,7 +6468,7 @@
                 "name": "305호",
                 "desc": "세미나실, 강의실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#bedceb",
                 "polygon": [
                     [
                         [
@@ -6588,7 +6588,7 @@
                 "name": "엘리베이터",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#ffffff",
                 "polygon": [
                     [
                         [
@@ -6620,7 +6620,7 @@
                 "name": "401-A호",
                 "desc": "강의실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#bedceb",
                 "polygon": [
                     [
                         [
@@ -6650,7 +6650,7 @@
                 "name": "401-B호",
                 "desc": "한세한국어학당 강사실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#00ff11",
                 "polygon": [
                     [
                         [
@@ -6680,7 +6680,7 @@
                 "name": "402-A호",
                 "desc": "강의실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#bedceb",
                 "polygon": [
                     [
                         [
@@ -6710,7 +6710,7 @@
                 "name": "402-B호",
                 "desc": "한세한국어학당 강의실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#bedceb",
                 "polygon": [
                     [
                         [
@@ -6740,7 +6740,7 @@
                 "name": "403호",
                 "desc": "강의실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#bedceb",
                 "polygon": [
                     [
                         [
@@ -6770,7 +6770,7 @@
                 "name": "404호",
                 "desc": "멀티실 강의실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#bedceb",
                 "polygon": [
                     [
                         [
@@ -6800,7 +6800,7 @@
                 "name": "405호",
                 "desc": "멀티실 강의실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#bedceb",
                 "polygon": [
                     [
                         [
@@ -6830,7 +6830,7 @@
                 "name": "406-A호",
                 "desc": "멀티실 강의실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#bedceb",
                 "polygon": [
                     [
                         [
@@ -6860,7 +6860,7 @@
                 "name": "406-B호",
                 "desc": "강의실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#bedceb",
                 "polygon": [
                     [
                         [
@@ -6890,7 +6890,7 @@
                 "name": "407호",
                 "desc": "강의실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#bedceb",
                 "polygon": [
                     [
                         [
@@ -6980,7 +6980,7 @@
                 "name": "엘리베이터",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#ffffff",
                 "polygon": [
                     [
                         [
@@ -7132,7 +7132,7 @@
                 "name": "504호",
                 "desc": "교수실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#00ff11",
                 "polygon": [
                     [
                         [
@@ -7222,7 +7222,7 @@
                 "name": "507호",
                 "desc": "디지털스튜디오 강의실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#bedceb",
                 "polygon": [
                     [
                         [
@@ -7252,7 +7252,7 @@
                 "name": "508호",
                 "desc": "IT융합전자공학과 석사과정연구실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#00ff11",
                 "polygon": [
                     [
                         [
@@ -7372,7 +7372,7 @@
                 "name": "엘리베이터",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#ffffff",
                 "polygon": [
                     [
                         [
@@ -7494,7 +7494,7 @@
                 "name": "604호",
                 "desc": "교수실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#00ff11",
                 "polygon": [
                     [
                         [
@@ -7554,7 +7554,7 @@
                 "name": "606호",
                 "desc": "복합강의상담실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#bedceb",
                 "polygon": [
                     [
                         [
@@ -7584,7 +7584,7 @@
                 "name": "607호",
                 "desc": "ICT환경공학과 원우회실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#afb9c3",
                 "polygon": [
                     [
                         [
@@ -7734,7 +7734,7 @@
                 "name": "엘리베이터",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#ffffff",
                 "polygon": [
                     [
                         [
@@ -7856,7 +7856,7 @@
                 "name": "703호",
                 "desc": "교수실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#00ff11",
                 "polygon": [
                     [
                         [
@@ -7886,7 +7886,7 @@
                 "name": "704호",
                 "desc": "교수실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#00ff11",
                 "polygon": [
                     [
                         [
@@ -7916,7 +7916,7 @@
                 "name": "705호",
                 "desc": "교수실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#00ff11",
                 "polygon": [
                     [
                         [
@@ -8096,7 +8096,7 @@
                 "name": "엘리베이터",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#ffffff",
                 "polygon": [
                     [
                         [
