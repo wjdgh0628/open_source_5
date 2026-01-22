@@ -1,5 +1,5 @@
-// src/SideBar.jsx
-import React, { useEffect, useMemo, useState } from 'react';
+// src/components/sidebar/SideBar.jsx
+import React, { use, useEffect, useMemo, useState } from 'react';
 import { handleRoomListClick as onRoomClick } from '@scripts/mapHandlers.js';
 import { loadRoomFavorites, saveRoomFavorites, toggleRoomFavoriteInList, indexRoomList } from '@scripts/sideBarUtils.js';
 
@@ -9,11 +9,12 @@ import BuildingList from './BuildingList.jsx';
 import Favorites from './Favorites.jsx';
 import Search from './Search.jsx';
 
-export default function SideBar({ infos, role, setRole }) {
+export default function SideBar({ infos, user, setUser }) {
 	// UI 상태
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [favOpen, setFavOpen] = useState(true);
 	const [allOpen, setAllOpen] = useState(true);
+	const [footerErr, setFooterErr] = useState('');
 
 	// 데이터 상태
 	const [favorites, setFavorites] = useState(() => loadRoomFavorites()); // [rid, rid, ...]
@@ -26,6 +27,10 @@ export default function SideBar({ infos, role, setRole }) {
 			return {};
 		}
 	});
+
+	useEffect(() => {
+		console.log(user);
+	}, [user]);
 
 	// 사이드바 몸통 패딩 동기화 (사이드바가 확장 상태일 때만 패딩 적용)
 	useEffect(() => {
@@ -70,10 +75,33 @@ export default function SideBar({ infos, role, setRole }) {
 	};
 
 	const ensureExpanded = () => setIsExpanded(true);
+
+	const role = (user?.role || user?.user?.role || '').toLowerCase();
+	const isAdmin = role === 'admin';
+
+	const goEditor = () => {
+		window.location.href = '/editor';
+	};
+
+	const logout = async () => {
+		setFooterErr('');
+		try {
+			const r = await fetch('/auth/logout', { method: 'POST' });
+			if (r.ok) {
+				setUser(null);
+				window.location.href = '/login';
+				return;
+			}
+			setFooterErr('로그아웃 실패');
+		} catch {
+			setFooterErr('네트워크 오류');
+		}
+	};
+
 	return (
 		<div className={`l-navbar ${isExpanded ? 'expander' : ''}`} id="navbar">
 			<nav className="nav">
-				<div>
+				<div className="nav__body">
 					<div className="nav__brand">
 						<ion-icon
 							name="menu-outline"
@@ -144,6 +172,40 @@ export default function SideBar({ infos, role, setRole }) {
 							/>
 						</ul>
 					</div>
+				</div>
+
+				{/* User footer (always visible) */}
+				<div className="nav__footer">
+					<div className="user__card">
+						{(user?.picture || user?.photo || user?.avatar || user?.image || user?.user?.picture) ? (
+							<img
+								className="user__avatar"
+								src={(user?.picture || user?.photo || user?.avatar || user?.image || user?.user?.picture)}
+								alt="프로필"
+							/>
+						) : (
+							<div className="user__avatar" style={{ background: '#eee' }} />
+						)}
+						<div className="user__meta">
+							<div className="user__name">{user?.name || user?.user?.name || ''}</div>
+							<div className="user__email">{user?.email || user?.user?.email || ''}</div>
+						</div>
+					</div>
+
+					<div className="user__actions">
+						{isAdmin && (
+							<button className="user__btn primary" onClick={goEditor} type="button">
+								<ion-icon name="create-outline" />
+								에디터
+							</button>
+						)}
+						<button className="user__btn" onClick={logout} type="button">
+							<ion-icon name="log-out-outline" />
+							로그아웃
+						</button>
+					</div>
+
+					{!!footerErr && <div className="user__err">{footerErr}</div>}
 				</div>
 			</nav>
 		</div>

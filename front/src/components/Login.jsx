@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import "./Login.css";
 
-function Login({ setRole, urls }) {
+function Login({ setUser, urls }) {
 	const [error, setError] = useState("");
 	const gbtnRef = useRef(null);
 
@@ -13,13 +13,13 @@ function Login({ setRole, urls }) {
 				const j = await r.json();
 				if (j && j.user) {
 					console.log("Already logged in as", j);
-					setRole(j.role);
+					setUser(j);
 				}
 			} catch {
 				/* ignore */
 			}
 		})();
-	}, [urls, setRole]);
+	}, [urls, setUser]);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -103,7 +103,7 @@ function Login({ setRole, urls }) {
 				// 로그인 성공 시 역할만 갱신
 				const me = await fetch(urls.me, { credentials: "include" });
 				const mj = await me.json();
-				setRole?.(mj.role || mj.user?.role || null);
+				setUser(mj || null);
 			} catch {
 				setError("네트워크 오류");
 			}
@@ -113,7 +113,7 @@ function Login({ setRole, urls }) {
 		return () => {
 			cancelled = true;
 		};
-	}, [urls, setRole]);
+	}, [urls, setUser]);
 
 	return (
 		<aside className="login-sidebar" aria-label="Login">

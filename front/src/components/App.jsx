@@ -11,24 +11,24 @@ const API_BASE = import.meta.env.VITE_API_BASE;
 export function App() {
 	const [urls, setUrls] = useState(setApiUrl(API_BASE));
 	const [stInfo, setStInfo] = useState(null);
-	const [role, setRole] = useState(null);
+	const [user, setUser] = useState(null);
 
 	useEffect(() => {
 		(async () => {
-			if (role !== null) {
+			if (user !== null) {
 				const bInfo = await fetchBuildingsInfo(urls.buildingsUrl, urls.roomsUrl);
 				setInfos(bInfo);
 				setStInfo(bInfo);
 				console.log("건물 정보 로드 완료", bInfo);
 			}
 		})();
-	}, [urls, role]);
+	}, [urls, user]);
 
 	return (
 		<>
-			<Map urls={urls} isLoggedIn={role !== null} />
-			{role === null && <Login setRole={setRole} urls={urls} />}
-			{role !== null && <SideBar infos={stInfo} role={role} />}
+			<Map urls={urls} isLoggedIn={user !== null} />
+			{user === null && <Login setUser={setUser} urls={urls} />}
+			{user !== null && <SideBar infos={stInfo} user={user} setUser={setUser} urls={urls} />}
 		</>
 	);
 }
