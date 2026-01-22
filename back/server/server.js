@@ -49,7 +49,7 @@ app.use('/shared', express.static(path.resolve(__dirname, '../shared')));
 
 // protect map/editor assets by middleware on the prefix
 app.use('/auth', auth);
-app.use('/map', requireAuth, express.static(path.join(__dirname, '../map/dist')));
+app.use('/map', express.static(path.join(__dirname, '../map/dist')));
 app.use('/editor', requireAuth, requireRole('admin'), express.static(path.join(__dirname, '../editor')));
 
 function requireAuth(req, res, next) {
