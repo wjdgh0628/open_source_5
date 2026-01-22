@@ -293,3 +293,75 @@ textarea
 	padding: 0;
 	border: none;
 }
+
+/* --- Room holes UI --- */
+.room-holes {
+	margin-top: 6px;
+	border-top: 1px dashed #ddd;
+	padding-top: 6px;
+}
+
+.room-holes-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	margin-bottom: 6px;
+}
+
+.room-holes-title {
+	font-size: 12px;
+	color: #333;
+}
+
+.room-holes-list {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.room-hole-item {
+	border: 1px solid #eee;
+	border-radius: 4px;
+	padding: 6px;
+	background: #fafafa;
+}
+
+.room-hole-head {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 6px;
+}
+
+.room-hole-label {
+	font-size: 11px;
+	color: #555;
+	margin-right: auto;
+}
+
+.room-hole-coords {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+	font-size: 11px;
+	white-space: pre;
+	max-height: 80px;
+	overflow: auto;
+	margin: 0;
+}
+
+.room-hole-textarea {
+	width: 100%;
+	min-height: 84px;
+	resize: vertical;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+	font-size: 11px;
+	white-space: pre;
+}
+
+/* --- Compact icon buttons (no external fonts) --- */
+.room-actions-row button {
+	min-width: 26px;
+	height: 22px;
+	padding: 0 6px;
+	line-height: 20px;
+}

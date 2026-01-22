@@ -111,20 +111,35 @@ function loadSavedRoomsForCurrent() {
 	const b = infosMap ? infosMap[state.building] : null;
 	const arr = (b && Array.isArray(b.rooms) ? b.rooms[state.floorIndex] : null) || [];
 	state.saved = arr.map((r, idx) => {
-		let pts = [];
+		let outer = [];
+		let holes = [];
 		if (Array.isArray(r.polygon)) {
-			if (
-				r.polygon.length &&
-				Array.isArray(r.polygon[0]) &&
-				Array.isArray(r.polygon[0][0])
-			) {
-				pts = r.polygon[0];
+			// Support:
+			// 1) GeoJSON Polygon: [outerRing, hole1, hole2, ...]
+			// 2) Stored legacy: [ring]
+			// 3) MultiPolygon-like: [[outerRing, hole1, ...], ...] (take first polygon)
+			const p0 = r.polygon[0];
+			if (Array.isArray(p0) && p0.length && Array.isArray(p0[0]) && Array.isArray(p0[0][0])) {
+				// MultiPolygon: r.polygon[0] is a Polygon rings array
+				outer = Array.isArray(p0[0]) ? p0[0] : [];
+				holes = Array.isArray(p0) ? p0.slice(1) : [];
+			} else if (Array.isArray(p0) && p0.length && Array.isArray(p0[0])) {
+				// Polygon rings: r.polygon is [ring, hole, ...]
+				outer = r.polygon[0] || [];
+				holes = r.polygon.slice(1);
 			} else {
-				pts = r.polygon;
+				// Fallback
+				outer = r.polygon;
+				holes = [];
 			}
 		}
 		// 편집 시에는 마지막 점이 첫 점과 중복되지 않도록 정규화
-		const normalizedPts = stripClosingPoint(pts);
+		const normalizedPts = stripClosingPoint(outer);
+		const normalizedHoles = Array.isArray(holes)
+			? holes
+				.map((h) => stripClosingPoint(h))
+				.filter((h) => Array.isArray(h) && h.length >= 3)
+			: [];
 		const type = (r && typeof r.type === "string" && r.type.trim()) ? r.type.trim() : "기타";
 		const paletteColor = (type !== "기타" && PALETTE && PALETTE[type]) ? PALETTE[type] : null;
 		return {
@@ -133,6 +148,7 @@ function loadSavedRoomsForCurrent() {
 			type,
 			color: paletteColor || r.color || "#ff9500",
 			points: normalizedPts,
+			holes: normalizedHoles,
 			closed: true,
 			desc: r.desc || "",
 			tags: Array.isArray(r.tags) ? r.tags.slice() : []
@@ -144,7 +160,11 @@ export function writeSavedBackToDB() {
 	if (!state.building || state.floorIndex == null) return;
 	const list = state.saved.map((r) => {
 		const basePts = Array.isArray(r.points) ? r.points : [];
-		const ring = ensureClosedPolygon(basePts);
+		const outerRing = ensureClosedPolygon(basePts);
+		const holes = Array.isArray(r.holes) ? r.holes : [];
+		const holeRings = holes
+			.map((h) => ensureClosedPolygon(Array.isArray(h) ? h : []))
+			.filter((h) => Array.isArray(h) && h.length >= 4);
 		const type = (r && typeof r.type === "string" && r.type.trim()) ? r.type.trim() : "기타";
 		const paletteColor = (type !== "기타" && PALETTE && PALETTE[type]) ? PALETTE[type] : null;
 		return {
@@ -155,7 +175,7 @@ export function writeSavedBackToDB() {
 			// type이 "기타"가 아니면 팔레트 색상 우선, 그 외에는 수동 색상 사용
 			color: paletteColor || r.color || "#ff9500",
 			// infos에는 닫힌 폴리곤(첫 점이 마지막에 한 번 더 포함된 형태)으로 저장
-			polygon: ring.length ? [ring] : []
+			polygon: outerRing.length ? [outerRing, ...holeRings] : []
 		};
 	});
 	editInfos((infos) => {
@@ -399,7 +419,7 @@ export function getOrCreateActiveOpenDraft() {
 			return state.rooms[i];
 		}
 	}
-	const room = { id: state.roomIdCounter++, name: "", type: "기타", color: "#007aff", points: [], closed: false, desc: "", tags: [] };
+	const room = { id: state.roomIdCounter++, name: "", type: "기타", color: "#007aff", points: [], holes: [], closed: false, desc: "", tags: [] };
 	state.rooms.push(room);
 	state.activeRoomIndex = state.rooms.length - 1;
 	refreshDraftList();
@@ -574,7 +594,8 @@ function createRoomItem(room, idx, type) {
 	let primaryBtn;
 	if (isSaved) {
 		primaryBtn = document.createElement("button");
-		primaryBtn.textContent = "빼기";
+		primaryBtn.textContent = "-";
+		primaryBtn.title = "빼기";
 		primaryBtn.addEventListener("click", (e) => {
 			e.stopPropagation();
 			const r = state.saved.splice(idx, 1)[0];
@@ -596,7 +617,8 @@ function createRoomItem(room, idx, type) {
 		});
 	} else {
 		primaryBtn = document.createElement("button");
-		primaryBtn.textContent = "저장";
+		primaryBtn.textContent = "+";
+		primaryBtn.title = "저장";
 		primaryBtn.addEventListener("click", (e) => {
 			e.stopPropagation();
 			const r = state.rooms[idx];
@@ -630,7 +652,8 @@ function createRoomItem(room, idx, type) {
 	actionCol.appendChild(primaryBtn);
 
 	const delBtn = document.createElement("button");
-	delBtn.textContent = "삭제";
+	delBtn.textContent = "🗑";
+	delBtn.title = "삭제";
 	delBtn.addEventListener("click", (e) => {
 		e.stopPropagation();
 		if (isSaved) {
@@ -646,8 +669,14 @@ function createRoomItem(room, idx, type) {
 	actionCol.appendChild(delBtn);
 
 	const toggleBtn = document.createElement("button");
-	toggleBtn.textContent = "좌표 보기";
+	toggleBtn.textContent = "[x,y]";
+	toggleBtn.title = "좌표 보기/숨기기";
 	actionCol.appendChild(toggleBtn);
+	// --- holes toggle ---
+	const holesToggleBtn = document.createElement("button");
+	holesToggleBtn.textContent = "□";
+	holesToggleBtn.title = "구멍";
+	actionCol.appendChild(holesToggleBtn);
 
 	rightCol.appendChild(actionCol);
 
@@ -685,10 +714,119 @@ function createRoomItem(room, idx, type) {
 	toggleBtn.addEventListener("click", (e) => {
 		e.stopPropagation();
 		const hidden = div.classList.toggle("coords-hidden");
-		toggleBtn.textContent = hidden ? "좌표 보기" : "좌표 숨기기";
+		toggleBtn.textContent = "[x,y]";
 	});
 
-	div.append(row, coordsRow);
+	// 구멍 패널 (기본 숨김)
+	const holesPanel = document.createElement("div");
+	holesPanel.className = "room-holes";
+	holesPanel.style.display = "none";
+
+	const holesHeader = document.createElement("div");
+	holesHeader.className = "room-holes-header";
+
+	const holesTitle = document.createElement("div");
+	holesTitle.className = "room-holes-title";
+	holesTitle.textContent = "구멍";
+
+	const addHoleBtn = document.createElement("button");
+	addHoleBtn.textContent = "+";
+	addHoleBtn.title = "구멍 추가";
+
+	holesHeader.append(holesTitle, addHoleBtn);
+	holesPanel.appendChild(holesHeader);
+
+	const holesList = document.createElement("div");
+	holesList.className = "room-holes-list";
+	holesPanel.appendChild(holesList);
+
+	function renderHolesList() {
+		holesList.innerHTML = "";
+		if (!Array.isArray(room.holes)) room.holes = [];
+		room.holes.forEach((holePts, hIdx) => {
+			const item = document.createElement("div");
+			item.className = "room-hole-item";
+
+			const head = document.createElement("div");
+			head.className = "room-hole-head";
+
+			const label = document.createElement("div");
+			label.className = "room-hole-label";
+			label.textContent = `#${hIdx + 1}`;
+
+			const applyBtn = document.createElement("button");
+			applyBtn.textContent = "적용";
+
+			const delBtn2 = document.createElement("button");
+			delBtn2.textContent = "삭제";
+
+			head.append(label, applyBtn, delBtn2);
+
+			const ta = document.createElement("textarea");
+			ta.className = "room-hole-textarea";
+			ta.spellcheck = false;
+			ta.value = formatCoords(holePts || [], { decimals: COORD_DECIMALS, close: false });
+
+			function stripClosingPointLocal(points) {
+				if (!Array.isArray(points) || points.length < 2) return Array.isArray(points) ? points.slice() : [];
+				const first = points[0];
+				const last = points[points.length - 1];
+				if (first && last && first.length >= 2 && last.length >= 2 && first[0] === last[0] && first[1] === last[1]) {
+					return points.slice(0, -1);
+				}
+				return points.slice();
+			}
+
+			applyBtn.addEventListener("click", (e) => {
+				e.stopPropagation();
+				try {
+					const arr = JSON.parse(String(ta.value || "[]"));
+					if (!Array.isArray(arr) || arr.length < 3) return;
+					const norm = stripClosingPointLocal(arr);
+					room.holes[hIdx] = norm;
+					// normalize textarea display
+					ta.value = formatCoords(norm, { decimals: COORD_DECIMALS, close: false });
+					if (isSaved) writeSavedBackToDB();
+					else refreshDraftList();
+					draw();
+				} catch (err) {
+					console.error("구멍 JSON 파싱 실패", err);
+				}
+			});
+
+			delBtn2.addEventListener("click", (e) => {
+				e.stopPropagation();
+				if (!Array.isArray(room.holes)) room.holes = [];
+				room.holes.splice(hIdx, 1);
+				renderHolesList();
+				if (isSaved) writeSavedBackToDB();
+				else refreshDraftList();
+				draw();
+			});
+
+			item.append(head, ta);
+			holesList.appendChild(item);
+		});
+	}
+	renderHolesList();
+
+	addHoleBtn.addEventListener("click", (e) => {
+		e.stopPropagation();
+		if (!Array.isArray(room.holes)) room.holes = [];
+		room.holes.push([]);
+		renderHolesList();
+		if (isSaved) writeSavedBackToDB();
+		else refreshDraftList();
+		draw();
+	});
+
+	holesToggleBtn.addEventListener("click", (e) => {
+		e.stopPropagation();
+		const shown = holesPanel.style.display !== "none";
+		holesPanel.style.display = shown ? "none" : "block";
+	});
+
+	div.append(row, coordsRow, holesPanel);
 
 	// 항목 클릭 시 활성화 (입력/버튼은 제외)
 	div.addEventListener("click", (event) => {

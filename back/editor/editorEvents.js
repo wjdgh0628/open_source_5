@@ -212,6 +212,7 @@ export function onMouseMove(e) {
 					type: "기타",
 					color: "#007aff",
 					points: cornersLonLat,
+					holes: [],
 					closed: true,
 					desc: "",
 					tags: []

@@ -186,20 +186,36 @@ export function hitTestFilledRoom(screenX, screenY) {
 	// Saved rooms first
 	stateRef.saved.forEach((room, idx) => {
 		if (!room.points || room.points.length < 3) return;
-		const pts = toScreenPathLonLat(room.points);
-		if (pointInPolygonScreen(screenX, screenY, pts)) {
+		const outer = toScreenPathLonLat(room.points);
+		const holes = Array.isArray(room.holes) ? room.holes.map((h) => toScreenPathLonLat(h)) : [];
+		const inOuter = pointInPolygonScreen(screenX, screenY, outer);
+		const inHole = holes.some((hp) => pointInPolygonScreen(screenX, screenY, hp));
+		if (inOuter && !inHole) {
 			hit = { list: "saved", roomIndex: idx };
 		}
 	});
 	// Draft rooms (closed ones) drawn on top
 	stateRef.rooms.forEach((room, idx) => {
 		if (!room.closed || !room.points || room.points.length < 3) return;
-		const pts = toScreenPathLonLat(room.points);
-		if (pointInPolygonScreen(screenX, screenY, pts)) {
+		const outer = toScreenPathLonLat(room.points);
+		const holes = Array.isArray(room.holes) ? room.holes.map((h) => toScreenPathLonLat(h)) : [];
+		const inOuter = pointInPolygonScreen(screenX, screenY, outer);
+		const inHole = holes.some((hp) => pointInPolygonScreen(screenX, screenY, hp));
+		if (inOuter && !inHole) {
 			hit = { list: "draft", roomIndex: idx };
 		}
 	});
 	return hit;
+}
+function drawRingsScreen(screenRings, close = true) {
+	if (!Array.isArray(screenRings) || !screenRings.length) return;
+	const ctx = ctxRef;
+	ctx.beginPath();
+	for (const ring of screenRings) {
+		if (!ring || !ring.length) continue;
+		ring.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)));
+		if (close && ring.length >= 3) ctx.closePath();
+	}
 }
 
 export function findNearestVertex(screenX, screenY, thresholdPx = 20) {
@@ -254,8 +270,8 @@ export function draw() {
 	// Saved Rooms (rooms.json) — editable, stronger color
 	stateRef.saved.forEach((room, idx) => {
 		if (!room.points.length) return;
-		const screenPts = toScreenPathLonLat(room.points);
-		drawPathScreen(screenPts, true);
+		const rings = [toScreenPathLonLat(room.points), ...(Array.isArray(room.holes) ? room.holes.map((h) => toScreenPathLonLat(h)) : [])];
+		drawRingsScreen(rings, true);
 		const active = idx === stateRef.activeSavedIndex;
 		if (active) {
 			ctx.lineWidth = 3;
@@ -266,8 +282,20 @@ export function draw() {
 			ctx.strokeStyle = "#ff9500";
 			ctx.fillStyle = "rgba(255,149,0,.08)";
 		}
-		ctx.fill();
+		ctx.fill("evenodd");
 		ctx.stroke();
+		// Hole outlines (visual only)
+		if (Array.isArray(room.holes) && room.holes.length) {
+			ctx.save();
+			ctx.setLineDash([4, 3]);
+			ctx.lineWidth = 1;
+			room.holes.forEach((h) => {
+				const hp = toScreenPathLonLat(h);
+				drawPathScreen(hp, true);
+				ctx.stroke();
+			});
+			ctx.restore();
+		}
 	});
 
 	// Saved vertices (editable)
@@ -287,15 +315,27 @@ export function draw() {
 	// Draft Rooms (editable)
 	stateRef.rooms.forEach((room, idx) => {
 		if (!room.points.length) return;
-		const screenPts = toScreenPathLonLat(room.points);
-		drawPathScreen(screenPts, room.closed);
+		const rings = [toScreenPathLonLat(room.points), ...(Array.isArray(room.holes) ? room.holes.map((h) => toScreenPathLonLat(h)) : [])];
+		drawRingsScreen(rings, room.closed);
 		const active = idx === stateRef.activeRoomIndex;
 		ctx.lineWidth = active ? 2 : 1.5;
 		ctx.strokeStyle = active ? "#007aff" : "#e53935";
 		ctx.stroke();
 		if (room.closed) {
 			ctx.fillStyle = "rgba(0,122,255,.08)";
-			ctx.fill();
+			ctx.fill("evenodd");
+			// Hole outlines (visual only)
+			if (Array.isArray(room.holes) && room.holes.length) {
+				ctx.save();
+				ctx.setLineDash([4, 3]);
+				ctx.lineWidth = 1;
+				room.holes.forEach((h) => {
+					const hp = toScreenPathLonLat(h);
+					drawPathScreen(hp, true);
+					ctx.stroke();
+				});
+				ctx.restore();
+			}
 		}
 	});
 
