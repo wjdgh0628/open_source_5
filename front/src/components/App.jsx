@@ -15,10 +15,12 @@ export function App() {
 
 	useEffect(() => {
 		(async () => {
-			const bInfo = await fetchBuildingsInfo(urls.buildingsUrl, urls.roomsUrl);
-			setInfos(bInfo);
-			setStInfo(bInfo);
-			console.log("건물 정보 로드 완료", bInfo);
+			if (role !== null) {
+				const bInfo = await fetchBuildingsInfo(urls.buildingsUrl, urls.roomsUrl);
+				setInfos(bInfo);
+				setStInfo(bInfo);
+				console.log("건물 정보 로드 완료", bInfo);
+			}
 		})();
 	}, [urls, role]);
 
