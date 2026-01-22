@@ -9,8 +9,8 @@ import { handleBuildingClick, handleBackgroundClick } from '@scripts/mapHandlers
 import './Map.css';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-function initMap(urls) {
-	mapboxgl.accessToken = MC.map.key;
+function initMap() {
+	mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_API_KEY;
 	// 맵 초기화 (기존과 동일)
 	const map = new mapboxgl.Map({
 		container: "map",
@@ -28,61 +28,69 @@ function initMap(urls) {
 				"sky-atmosphere-sun-intensity": 15
 			}
 		});
-		map.addSource("campus", { type: "geojson", data: urls.buildingsUrl });
-		map.addLayer({
-			id: idRules.buildings,
-			type: "fill-extrusion",
-			source: "campus",
-			paint: {
-				"fill-extrusion-color": ["coalesce", ["get", "color"], "#aaaaaa"],
-				"fill-extrusion-base": ["coalesce", ["*", ["get", "base"], MC.layerProps.levelThick], 0],
-				"fill-extrusion-height": ["*", ["get", "building:levels"], MC.layerProps.levelThick],
-				"fill-extrusion-opacity": 1
-			}
-		});
-		map.addLayer({
-			id: idRules.lid(idRules.buildings),
-			type: 'symbol',
-			source: "campus",
-			filter: [
-				"all",
-				["==", ["get", "origin"], null],
-				["has", "building:levels"]
-			],
-			layout: {
-				'text-field': ["get", "name"],
-				'text-size': 14,
-				'text-anchor': "bottom",
-				'text-allow-overlap': true,
-				'symbol-placement': 'point',
-				'symbol-z-order': "source"
-			},
-			paint: {
-				'symbol-z-offset': ["*",
-					["coalesce", ["get", "building:levels"], 0],
-					 MC.layerProps.levelThick],
-				'text-color': '#000000',
-				'text-halo-color': '#ffffff',
-				'text-halo-width': 2
-			}
-		});
-
 	});
 	return map;
 }
+function setCampus(map, urls) {
+	map.addSource("campus", { type: "geojson", data: urls.buildingsUrl });
+	map.addLayer({
+		id: idRules.buildings,
+		type: "fill-extrusion",
+		source: "campus",
+		paint: {
+			"fill-extrusion-color": ["coalesce", ["get", "color"], "#aaaaaa"],
+			"fill-extrusion-base": ["coalesce", ["*", ["get", "base"], MC.layerProps.levelThick], 0],
+			"fill-extrusion-height": ["*", ["get", "building:levels"], MC.layerProps.levelThick],
+			"fill-extrusion-opacity": 1
+		}
+	});
+	map.addLayer({
+		id: idRules.lid(idRules.buildings),
+		type: 'symbol',
+		source: "campus",
+		filter: [
+			"all",
+			["==", ["get", "origin"], null],
+			["has", "building:levels"]
+		],
+		layout: {
+			'text-field': ["get", "name"],
+			'text-size': 14,
+			'text-anchor': "bottom",
+			'text-allow-overlap': true,
+			'symbol-placement': 'point',
+			'symbol-z-order': "source"
+		},
+		paint: {
+			'symbol-z-offset': ["*",
+				["coalesce", ["get", "building:levels"], 0],
+				MC.layerProps.levelThick],
+			'text-color': '#000000',
+			'text-halo-color': '#ffffff',
+			'text-halo-width': 2
+		}
+	});
+}
 
-function Map({ urls }) {
+function Map({ urls, isLoggedIn }) {
 	const mapId = 'map';
 
 	useEffect(() => {
 		if (!getMap()) {
-			setMap(initMap(urls));
-			//건물, 배경 클릭시 실행할 코드 지정
+			setMap(initMap());
+		}
+		//건물, 배경 클릭시 실행할 코드 지정
+		if (getMap() && isLoggedIn) {
+			setCampus(getMap(), urls);
 			setHandler("click", idRules.buildings, e => handleBuildingClick(e));
 			getMap().on('click', (e) => handleBackgroundClick(e));
 			// getMap().on('click', (e) =>{console.log(getMap().queryRenderedFeatures(e.point))});
 		}
-	}, [urls]);
+		if (getMap() && !isLoggedIn) {
+			getMap().remove();
+			setMap(initMap());
+		}
+	}, [urls, isLoggedIn]);
 
 	return <div id={mapId} />;
 }

@@ -32,5 +32,10 @@ export const setApiUrl = (base) => (
 	{
 		roomsUrl: base + "api/json/rooms",
 		buildingsUrl: base + "api/json/buildings",
+
+		login: base + "auth/login",
+		me: base + "auth/me",
+		logout: base + "auth/logout",
+		clientId: base + "auth/config"
 	}
 );

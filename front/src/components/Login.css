@@ -1,0 +1,61 @@
+
+ :root {
+	--login-sidebar-width: 20rem;
+}
+
+/* Left-fixed sidebar container (Login UI) */
+.login-sidebar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: var(--login-sidebar-width);
+	height: 100vh;
+	background: #ffffff;
+	color: #12192c;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	z-index: 120; /* slightly above the map/sidebar if needed */
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1.5rem;
+	box-sizing: border-box;
+}
+
+.login-sidebar__inner {
+	width: 100%;
+	max-width: 18rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.login-sidebar__title {
+	margin: 0 0 0.5rem 0;
+	font-size: 1.25rem;
+	font-weight: 700;
+}
+
+.login-sidebar__button {
+	display: flex;
+	justify-content: flex-start;
+}
+
+.login-sidebar__error {
+	margin: 0.25rem 0 0 0;
+	font-size: 0.9rem;
+	color: #b00020;
+	word-break: break-word;
+}
+
+/* Small screens: make it a top bar instead of squeezing the page */
+@media (max-width: 640px) {
+	.login-sidebar {
+		width: 100vw;
+		height: auto;
+		min-height: 0;
+		padding: 1rem;
+	}
+	.login-sidebar__inner {
+		max-width: none;
+	}
+}

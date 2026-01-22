@@ -5,14 +5,15 @@
   "type": "module",
   "scripts": {
     "server": "node server/server.js",
-    "editor": "start http://localhost:4000/editor && node server/server.js",
-    "editor_mac": "open http://localhost:4000/editor && node server/server.js",
     "start": "start http://localhost:4000/ && node server/server.js",
-    "start_mac": "open http://localhost:4000/ && node server/server.js"
+    "mac": "open http://localhost:4000/ && node server/server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^5.2.1"
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "express-session": "^1.18.2",
+    "google-auth-library": "^10.5.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

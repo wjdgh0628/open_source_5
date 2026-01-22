@@ -15,7 +15,11 @@ export default defineConfig(({ mode }) => {
 					searchForWorkspaceRoot(process.cwd()),
 					"../../"
 				]
-			}
+			},
+			proxy: {
+				'/auth': 'http://localhost:4000',
+				'/api': 'http://localhost:4000'
+			},
 		},
 		resolve: {
 			alias: [
