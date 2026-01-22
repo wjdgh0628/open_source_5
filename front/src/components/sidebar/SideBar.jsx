@@ -9,7 +9,7 @@ import BuildingList from './BuildingList.jsx';
 import Favorites from './Favorites.jsx';
 import Search from './Search.jsx';
 
-export default function SideBar({ infos, user, setUser }) {
+export default function SideBar({ infos, user, setUser, urls }) {
 	// UI 상태
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [favOpen, setFavOpen] = useState(true);
@@ -80,16 +80,15 @@ export default function SideBar({ infos, user, setUser }) {
 	const isAdmin = role === 'admin';
 
 	const goEditor = () => {
-		window.location.href = '/editor';
+		window.location.href = 'http://localhost:4000/editor';
 	};
 
 	const logout = async () => {
 		setFooterErr('');
 		try {
-			const r = await fetch('/auth/logout', { method: 'POST' });
+			const r = await fetch(urls.logout, { method: 'POST' });
 			if (r.ok) {
 				setUser(null);
-				window.location.href = '/login';
 				return;
 			}
 			setFooterErr('로그아웃 실패');
