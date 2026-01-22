@@ -9,7 +9,7 @@ import BuildingList from './BuildingList.jsx';
 import Favorites from './Favorites.jsx';
 import Search from './Search.jsx';
 
-export default function SideBar({ infos }) {
+export default function SideBar({ infos, role, setRole }) {
 	// UI 상태
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [favOpen, setFavOpen] = useState(true);

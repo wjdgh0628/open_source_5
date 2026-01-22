@@ -55,17 +55,6 @@ function requireRole(role) {
   return (req, res, next) => (req.user?.role === role ? next() : res.status(403).end());
 }
 
-// 로그인 페이지
-app.get('/login', (req, res) => {
-  if (req.user) return res.redirect('/portal');
-  res.sendFile(path.resolve(__dirname, '../public/login.html'));
-});
-
-// 포털(선택 화면)
-app.get('/portal', requireAuth, (req, res) => {
-  res.sendFile(path.resolve(__dirname, '../public/portal.html'));
-});
-
 app.get('/editor', requireAuth, requireRole('admin'), (req, res) => {
   res.redirect('/editor/editor.html');
 });
@@ -73,7 +62,7 @@ app.get('/map', requireAuth, (req, res) => {
   res.redirect('/map/index.html');
 });
 app.get('/', (req, res) => {
-  res.redirect('/login');
+  res.redirect('/map');
 });
 
 function openInBrowser(url) {
