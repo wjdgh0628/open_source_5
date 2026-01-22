@@ -1,4 +1,4 @@
-import { COORD_DECIMALS } from "./editorConfig.js";
+import { COORD_DECIMALS, PALETTE } from "./editorConfig.js";
 import { idRules } from "../shared/rules.js";
 import { initDraw, draw, bboxOfWorld, formatCoords, fitViewTo } from "./editorDraw.js";
 import { onMouseDown, onMouseMove, onWheel, onMouseUp, onKeyDown, onKeyUp } from "./editorEvents.js";
@@ -125,10 +125,13 @@ function loadSavedRoomsForCurrent() {
 		}
 		// 편집 시에는 마지막 점이 첫 점과 중복되지 않도록 정규화
 		const normalizedPts = stripClosingPoint(pts);
+		const type = (r && typeof r.type === "string" && r.type.trim()) ? r.type.trim() : "기타";
+		const paletteColor = (type !== "기타" && PALETTE && PALETTE[type]) ? PALETTE[type] : null;
 		return {
 			id: `s${idx + 1}`,
 			name: r.name || "",
-			color: r.color || "#ff9500",
+			type,
+			color: paletteColor || r.color || "#ff9500",
 			points: normalizedPts,
 			closed: true,
 			desc: r.desc || "",
@@ -142,11 +145,15 @@ export function writeSavedBackToDB() {
 	const list = state.saved.map((r) => {
 		const basePts = Array.isArray(r.points) ? r.points : [];
 		const ring = ensureClosedPolygon(basePts);
+		const type = (r && typeof r.type === "string" && r.type.trim()) ? r.type.trim() : "기타";
+		const paletteColor = (type !== "기타" && PALETTE && PALETTE[type]) ? PALETTE[type] : null;
 		return {
 			name: r.name || "",
+			type,
 			desc: r.desc || "",
 			tags: Array.isArray(r.tags) ? r.tags.slice() : [],
-			color: r.color || "#ff9500",
+			// type이 "기타"가 아니면 팔레트 색상 우선, 그 외에는 수동 색상 사용
+			color: paletteColor || r.color || "#ff9500",
 			// infos에는 닫힌 폴리곤(첫 점이 마지막에 한 번 더 포함된 형태)으로 저장
 			polygon: ring.length ? [ring] : []
 		};
@@ -392,7 +399,7 @@ export function getOrCreateActiveOpenDraft() {
 			return state.rooms[i];
 		}
 	}
-	const room = { id: state.roomIdCounter++, name: "", color: "#007aff", points: [], closed: false };
+	const room = { id: state.roomIdCounter++, name: "", type: "기타", color: "#007aff", points: [], closed: false, desc: "", tags: [] };
 	state.rooms.push(room);
 	state.activeRoomIndex = state.rooms.length - 1;
 	refreshDraftList();
@@ -447,13 +454,30 @@ function createRoomItem(room, idx, type) {
 	if (isSaved && idx === state.activeSavedIndex) div.classList.add("active");
 	if (!isSaved && idx === state.activeRoomIndex) div.classList.add("active");
 
-	// Single horizontal row: [ 왼쪽(이름+태그) | 오른쪽(설명+색상/버튼) ]
+	// Single horizontal row: [ 왼쪽(이름+태그+타입) | 오른쪽(설명+색상/버튼) ]
 	const row = document.createElement("div");
 	row.className = "room-row";
 
 	// 왼쪽 컬럼: 이름 + 태그 (짧게)
 	const leftCol = document.createElement("div");
 	leftCol.className = "room-col-main";
+
+	// --- type selector ---
+	const typeSelect = document.createElement("select");
+	typeSelect.className = "room-type";
+	const paletteKeys = Object.keys(PALETTE || {});
+	const typeOptions = ["기타", ...paletteKeys];
+	if (!room.type || typeof room.type !== "string" || !room.type.trim()) {
+		room.type = "기타";
+	}
+	typeOptions.forEach((t) => {
+		const opt = document.createElement("option");
+		opt.value = t;
+		opt.textContent = t;
+		typeSelect.appendChild(opt);
+	});
+	typeSelect.value = room.type;
+	leftCol.appendChild(typeSelect);
 
 	const nameInput = document.createElement("input");
 	nameInput.className = "room-name";
@@ -501,6 +525,16 @@ function createRoomItem(room, idx, type) {
 	colorInput.className = "room-color";
 	colorInput.value = room.color || (isSaved ? "#ff9500" : "#007aff");
 	colorInput.addEventListener("change", () => {
+		const t = (room.type && String(room.type).trim()) ? String(room.type).trim() : "기타";
+		room.type = t;
+		if (t !== "기타") {
+			// 팔레트 타입이면 수동 변경 금지: 팔레트 색으로 되돌림
+			const paletteColor = (PALETTE && PALETTE[t]) ? PALETTE[t] : (room.color || (isSaved ? "#ff9500" : "#007aff"));
+			room.color = paletteColor;
+			colorInput.value = paletteColor;
+			draw();
+			return;
+		}
 		if (!isSaved) {
 			pushHistory();
 		}
@@ -514,6 +548,29 @@ function createRoomItem(room, idx, type) {
 	});
 	actionCol.appendChild(colorInput);
 
+	// --- apply type->color and typeSelect handler ---
+	function applyTypeToColor() {
+		const t = (room.type && String(room.type).trim()) ? String(room.type).trim() : "기타";
+		room.type = t;
+		const paletteColor = (t !== "기타" && PALETTE && PALETTE[t]) ? PALETTE[t] : null;
+		if (paletteColor) {
+			room.color = paletteColor;
+			colorInput.value = paletteColor;
+		}
+		colorInput.disabled = t !== "기타";
+	}
+	applyTypeToColor();
+	typeSelect.addEventListener("change", () => {
+		room.type = typeSelect.value;
+		applyTypeToColor();
+		if (isSaved) {
+			writeSavedBackToDB();
+		} else {
+			refreshDraftList();
+		}
+		draw();
+	});
+
 	let primaryBtn;
 	if (isSaved) {
 		primaryBtn = document.createElement("button");
@@ -525,6 +582,7 @@ function createRoomItem(room, idx, type) {
 			const draft = {
 				id: state.roomIdCounter++,
 				name: r.name || "",
+				type: (r.type && String(r.type).trim()) ? String(r.type).trim() : "기타",
 				color: r.color || "#007aff",
 				points: r.points.map((p) => [p[0], p[1]]),
 				closed: true,
@@ -555,6 +613,7 @@ function createRoomItem(room, idx, type) {
 			const savedEntry = {
 				id: `s${Date.now()}_${idx}`,
 				name,
+				type: (r.type && String(r.type).trim()) ? String(r.type).trim() : "기타",
 				color: r.color || "#ff9500",
 				points: r.points,
 				closed: true,

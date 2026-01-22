@@ -209,9 +209,12 @@ export function onMouseMove(e) {
 				const newRoom = {
 					id: state.roomIdCounter++,
 					name: "",
+					type: "기타",
 					color: "#007aff",
 					points: cornersLonLat,
-					closed: true
+					closed: true,
+					desc: "",
+					tags: []
 				};
 				state.rooms.push(newRoom);
 				const idx = state.rooms.length - 1;
@@ -370,7 +373,10 @@ export function onKeyDown(e) {
 			if (r && Array.isArray(r.points) && r.points.length) {
 				state.clipboard = {
 					name: r.name || "",
+					type: (r.type && String(r.type).trim()) ? String(r.type).trim() : "기타",
 					color: r.color || "#007aff",
+					desc: r.desc || "",
+					tags: Array.isArray(r.tags) ? r.tags.slice() : [],
 					points: r.points.map((p) => [p[0], p[1]])
 				};
 			}
@@ -386,9 +392,12 @@ export function onKeyDown(e) {
 		const newRoom = {
 			id: state.roomIdCounter++,
 			name: state.clipboard.name || "",
+			type: (state.clipboard.type && String(state.clipboard.type).trim()) ? String(state.clipboard.type).trim() : "기타",
 			color: state.clipboard.color || "#007aff",
 			points: state.clipboard.points.map((p) => [p[0] + offsetX, p[1] - offsetY]),
-			closed: true
+			closed: true,
+			desc: state.clipboard.desc || "",
+			tags: Array.isArray(state.clipboard.tags) ? state.clipboard.tags.slice() : []
 		};
 		state.rooms.push(newRoom);
 		state.activeRoomIndex = state.rooms.length - 1;
