@@ -12,7 +12,7 @@ function Login({ setUser, urls }) {
 				const r = await fetch(urls.me, { credentials: "include" });
 				const j = await r.json();
 				if (j && j.user) {
-					console.log("Already logged in as", j);
+					// console.log("Already logged in as", j);
 					setUser(j);
 				}
 			} catch {

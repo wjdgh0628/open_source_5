@@ -19,7 +19,7 @@ export function App() {
 				const bInfo = await fetchBuildingsInfo(urls.buildingsUrl, urls.roomsUrl);
 				setInfos(bInfo);
 				setStInfo(bInfo);
-				console.log("건물 정보 로드 완료", bInfo);
+				console.log("건물 정보 로드 완료");
 			}
 			else {
 				setInfos(null);
