@@ -27,7 +27,7 @@ export function App() {
 	return (
 		<>
 			<Map urls={urls} isLoggedIn={role !== null} />
-			{role == null && <Login setRoles={setRole} urls={urls} />}
+			{role === null && <Login setRole={setRole} urls={urls} />}
 			{role !== null && <SideBar infos={stInfo} role={role} />}
 		</>
 	);
