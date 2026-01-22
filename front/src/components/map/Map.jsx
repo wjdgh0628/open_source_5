@@ -86,6 +86,10 @@ function Map({ urls, isLoggedIn }) {
 			getMap().on('click', (e) => handleBackgroundClick(e));
 			// getMap().on('click', (e) =>{console.log(getMap().queryRenderedFeatures(e.point))});
 		}
+		if (getMap() && !isLoggedIn) {
+			getMap().remove();
+			setMap(initMap());
+		}
 	}, [urls, isLoggedIn]);
 
 	return <div id={mapId} />;

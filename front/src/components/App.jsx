@@ -21,6 +21,11 @@ export function App() {
 				setStInfo(bInfo);
 				console.log("건물 정보 로드 완료", bInfo);
 			}
+			else {
+				setInfos(null);
+				setStInfo(null);
+				console.log("건물 정보 초기화 완료");
+			}
 		})();
 	}, [urls, user]);
 

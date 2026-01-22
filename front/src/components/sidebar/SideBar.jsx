@@ -28,10 +28,6 @@ export default function SideBar({ infos, user, setUser, urls }) {
 		}
 	});
 
-	useEffect(() => {
-		console.log(user);
-	}, [user]);
-
 	// 사이드바 몸통 패딩 동기화 (사이드바가 확장 상태일 때만 패딩 적용)
 	useEffect(() => {
 		if (isExpanded) {
