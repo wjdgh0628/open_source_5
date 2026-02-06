@@ -41,6 +41,20 @@
 	color: #333;
 }
 
+.rooms-section-head
+{
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+#applyUnsavedBtn
+{
+	font-size: 11px;
+	padding: 2px 8px;
+}
+
 .rooms-list
 {
 	flex: 1;

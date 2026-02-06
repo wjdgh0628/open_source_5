@@ -20,6 +20,7 @@ const floorSelect = el("floorSelect");
 const floorCoordsInput = el("floorCoordsInput");
 const applyFloorCoordsBtn = el("applyFloorCoordsBtn");
 const copyFloorCoordsBtn = el("copyFloorCoordsBtn");
+const applyUnsavedBtn = el("applyUnsavedBtn");
 
 // New: dual lists & file controls
 const savedRoomListEl = el("savedRoomList");
@@ -404,6 +405,25 @@ async function copyFloorCoords() {
 		await navigator.clipboard.writeText(text);
 	} catch (e) {
 		console.error("클립보드 복사 실패", e);
+	}
+}
+
+// 팔레트 변경 등 미저장 상태를 rooms.json에 다시 반영
+function applyPaletteAndSave() {
+	if (!Array.isArray(state.saved) || !state.saved.length) return;
+	let changed = false;
+	state.saved.forEach((room) => {
+		const t = (room.type && String(room.type).trim()) ? String(room.type).trim() : "기타";
+		const paletteColor = (t !== "기타" && PALETTE && PALETTE[t]) ? PALETTE[t] : null;
+		if (paletteColor && room.color !== paletteColor) {
+			room.color = paletteColor;
+			changed = true;
+		}
+	});
+	if (changed) {
+		writeSavedBackToDB();
+		refreshSavedList();
+		draw();
 	}
 }
 
@@ -864,6 +884,7 @@ function bind() {
 	floorSelect.addEventListener("change", onFloorChange);
 	applyFloorCoordsBtn.addEventListener("click", applyManualFloorCoords);
 	copyFloorCoordsBtn.addEventListener("click", copyFloorCoords);
+	applyUnsavedBtn.addEventListener("click", applyPaletteAndSave);
 
 	imageOpacityRange.addEventListener("input", () => {
 		const v = Number(imageOpacityRange.value) || 0;
