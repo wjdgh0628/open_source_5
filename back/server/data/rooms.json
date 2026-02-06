@@ -3247,7 +3247,7 @@
                     "본관610호",
                     "본610호"
                 ],
-                "color": "#00ff11",
+                "color": "#dfc386",
                 "polygon": [
                     [
                         [
@@ -3719,7 +3719,7 @@
                     "본관703호",
                     "본703호"
                 ],
-                "color": "#98c4f0",
+                "color": "#c2edff",
                 "polygon": [
                     [
                         [
@@ -3831,7 +3831,7 @@
                     "본관711호",
                     "본711호"
                 ],
-                "color": "#dce1e6",
+                "color": "#d2d8db",
                 "polygon": [
                     [
                         [
@@ -3863,7 +3863,7 @@
                 "tags": [
                     "본관 703B호"
                 ],
-                "color": "#afb9c3",
+                "color": "#4fff42",
                 "polygon": [
                     [
                         [
@@ -3895,7 +3895,7 @@
                 "tags": [
                     "본관 703C호"
                 ],
-                "color": "#afb9c3",
+                "color": "#4fff42",
                 "polygon": [
                     [
                         [
@@ -3929,7 +3929,7 @@
                     "본관702호",
                     "본702호"
                 ],
-                "color": "#dce1e6",
+                "color": "#4fff42",
                 "polygon": [
                     [
                         [
@@ -3961,7 +3961,7 @@
                 "tags": [
                     "본관 703A호"
                 ],
-                "color": "#afb9c3",
+                "color": "#4fff42",
                 "polygon": [
                     [
                         [
@@ -4343,7 +4343,7 @@
                     "본관806호",
                     "본806호"
                 ],
-                "color": "#1e2d55",
+                "color": "#cfdaf7",
                 "polygon": [
                     [
                         [
@@ -4710,12 +4710,12 @@
             {
                 "name": "920호",
                 "desc": "",
-                "color": "#e0defc",
                 "tags": [
                     "본관 920호",
                     "본관920호",
                     "본920호"
                 ],
+                "color": "#e0defc",
                 "polygon": [
                     [
                         [
@@ -4744,10 +4744,10 @@
             {
                 "name": "900-a호",
                 "desc": "",
-                "color": "#e0defc",
                 "tags": [
                     "본관 900A호"
                 ],
+                "color": "#e0defc",
                 "polygon": [
                     [
                         [
@@ -4776,12 +4776,12 @@
             {
                 "name": "921호",
                 "desc": "",
-                "color": "#e0defc",
                 "tags": [
                     "본관 921호",
                     "본관921호",
                     "본921호"
                 ],
+                "color": "#594dfe",
                 "polygon": [
                     [
                         [
@@ -4810,12 +4810,12 @@
             {
                 "name": "922호",
                 "desc": "",
-                "color": "#e0defc",
                 "tags": [
                     "본관 922호",
                     "본관922호",
                     "본922호"
                 ],
+                "color": "#e0defc",
                 "polygon": [
                     [
                         [
@@ -4844,12 +4844,12 @@
             {
                 "name": "901호",
                 "desc": "",
-                "color": "#e0defc",
                 "tags": [
                     "본관 901호",
                     "본관901호",
                     "본901호"
                 ],
+                "color": "#e0defc",
                 "polygon": [
                     [
                         [
@@ -4878,12 +4878,12 @@
             {
                 "name": "902호",
                 "desc": "",
-                "color": "#e0defc",
                 "tags": [
                     "본관 902호",
                     "본관902호",
                     "본902호"
                 ],
+                "color": "#e0defc",
                 "polygon": [
                     [
                         [
@@ -4912,12 +4912,12 @@
             {
                 "name": "903호",
                 "desc": "",
-                "color": "#e0defc",
                 "tags": [
                     "본관 903호",
                     "본관903호",
                     "본903호"
                 ],
+                "color": "#e0defc",
                 "polygon": [
                     [
                         [
@@ -4946,12 +4946,12 @@
             {
                 "name": "904호",
                 "desc": "",
-                "color": "#e0defc",
                 "tags": [
                     "본관 904호",
                     "본관904호",
                     "본904호"
                 ],
+                "color": "#e0defc",
                 "polygon": [
                     [
                         [
@@ -4980,12 +4980,12 @@
             {
                 "name": "905호",
                 "desc": "",
-                "color": "#e0defc",
                 "tags": [
                     "본관 905호",
                     "본관905호",
                     "본905호"
                 ],
+                "color": "#e0defc",
                 "polygon": [
                     [
                         [
@@ -5014,12 +5014,12 @@
             {
                 "name": "906호",
                 "desc": "",
-                "color": "#e0defc",
                 "tags": [
                     "본관 906호",
                     "본관906호",
                     "본906호"
                 ],
+                "color": "#e0defc",
                 "polygon": [
                     [
                         [
@@ -5048,12 +5048,12 @@
             {
                 "name": "907호",
                 "desc": "",
-                "color": "#e0defc",
                 "tags": [
                     "본관 907호",
                     "본관907호",
                     "본907호"
                 ],
+                "color": "#e0defc",
                 "polygon": [
                     [
                         [
@@ -5082,12 +5082,12 @@
             {
                 "name": "908호",
                 "desc": "",
-                "color": "#e0defc",
                 "tags": [
                     "본관 908호",
                     "본관908호",
                     "본908호"
                 ],
+                "color": "#e0defc",
                 "polygon": [
                     [
                         [
@@ -5116,12 +5116,12 @@
             {
                 "name": "909호",
                 "desc": "",
-                "color": "#e0defc",
                 "tags": [
                     "본관 909호",
                     "본관909호",
                     "본909호"
                 ],
+                "color": "#e0defc",
                 "polygon": [
                     [
                         [
@@ -5150,12 +5150,12 @@
             {
                 "name": "910호",
                 "desc": "",
-                "color": "#e0defc",
                 "tags": [
                     "본관 910호",
                     "본관910호",
                     "본910호"
                 ],
+                "color": "#e0defc",
                 "polygon": [
                     [
                         [
@@ -5184,12 +5184,12 @@
             {
                 "name": "911호",
                 "desc": "",
-                "color": "#e0defc",
                 "tags": [
                     "본관 911호",
                     "본관911호",
                     "본911호"
                 ],
+                "color": "#e0defc",
                 "polygon": [
                     [
                         [
@@ -5218,12 +5218,12 @@
             {
                 "name": "912호",
                 "desc": "",
-                "color": "#e0defc",
                 "tags": [
                     "본관 912호",
                     "본관912호",
                     "본912호"
                 ],
+                "color": "#e0defc",
                 "polygon": [
                     [
                         [
@@ -5252,12 +5252,12 @@
             {
                 "name": "913호",
                 "desc": "",
-                "color": "#e0defc",
                 "tags": [
                     "본관 913호",
                     "본관913호",
                     "본913호"
                 ],
+                "color": "#e0defc",
                 "polygon": [
                     [
                         [
@@ -5286,12 +5286,12 @@
             {
                 "name": "914호",
                 "desc": "",
-                "color": "#e0defc",
                 "tags": [
                     "본관 914호",
                     "본관914호",
                     "본914호"
                 ],
+                "color": "#e0defc",
                 "polygon": [
                     [
                         [
@@ -5320,12 +5320,12 @@
             {
                 "name": "915호",
                 "desc": "",
-                "color": "#e0defc",
                 "tags": [
                     "본관 915호",
                     "본관915호",
                     "본915호"
                 ],
+                "color": "#e0defc",
                 "polygon": [
                     [
                         [
@@ -5354,12 +5354,12 @@
             {
                 "name": "916호",
                 "desc": "",
-                "color": "#e0defc",
                 "tags": [
                     "본관 916호",
                     "본관916호",
                     "본916호"
                 ],
+                "color": "#e0defc",
                 "polygon": [
                     [
                         [
@@ -5388,12 +5388,12 @@
             {
                 "name": "917호",
                 "desc": "",
-                "color": "#e0defc",
                 "tags": [
                     "본관 917호",
                     "본관917호",
                     "본917호"
                 ],
+                "color": "#e0defc",
                 "polygon": [
                     [
                         [
@@ -5422,12 +5422,12 @@
             {
                 "name": "919호",
                 "desc": "",
-                "color": "#e0defc",
                 "tags": [
                     "본관 919호",
                     "본관919호",
                     "본919호"
                 ],
+                "color": "#e0defc",
                 "polygon": [
                     [
                         [
@@ -5456,12 +5456,12 @@
             {
                 "name": "918호",
                 "desc": "",
-                "color": "#e0defc",
                 "tags": [
                     "본관 918호",
                     "본관918호",
                     "본918호"
                 ],
+                "color": "#e0defc",
                 "polygon": [
                     [
                         [
@@ -5490,10 +5490,10 @@
             {
                 "name": "900-B호",
                 "desc": "",
-                "color": "#e0defc",
                 "tags": [
                     "본관 900B호"
                 ],
+                "color": "#e0defc",
                 "polygon": [
                     [
                         [
@@ -5645,10 +5645,9 @@
         [
             {
                 "name": "B201호",
-                "type": "기타",
                 "desc": "이론강의실",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289d8f",
                 "polygon": [
                     [
                         [
@@ -5676,14 +5675,13 @@
             },
             {
                 "name": "B202호",
-                "type": "기타",
                 "desc": "엑팅룸",
                 "tags": [
                     "음악관",
                     "음악관B202",
                     "음B202"
                 ],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -5711,7 +5709,6 @@
             },
             {
                 "name": "B203호",
-                "type": "기타",
                 "desc": "창고",
                 "tags": [
                     "음B203"
@@ -5744,12 +5741,11 @@
             },
             {
                 "name": "B204호",
-                "type": "기타",
                 "desc": "세트보관실",
                 "tags": [
                     "음B204"
                 ],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -5777,12 +5773,11 @@
             },
             {
                 "name": "B205호",
-                "type": "기타",
                 "desc": "댄싱룸",
                 "tags": [
                     "음B205"
                 ],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -5810,7 +5805,6 @@
             },
             {
                 "name": "화장실",
-                "type": "기타",
                 "desc": "화장실",
                 "tags": [],
                 "color": "#ecc5ca",
@@ -5841,10 +5835,9 @@
             },
             {
                 "name": "계단",
-                "type": "기타",
                 "desc": "계단",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#aab0b5",
                 "polygon": [
                     [
                         [
@@ -5872,10 +5865,9 @@
             },
             {
                 "name": "계단",
-                "type": "기타",
                 "desc": "계단",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#aab0b5",
                 "polygon": [
                     [
                         [
@@ -5903,10 +5895,9 @@
             },
             {
                 "name": "엘리베이터",
-                "type": "기타",
                 "desc": "엘리베이터",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#aab0b5",
                 "polygon": [
                     [
                         [
@@ -5936,7 +5927,6 @@
         [
             {
                 "name": "화장실",
-                "type": "기타",
                 "desc": "화장실",
                 "tags": [],
                 "color": "#ecc5ca",
@@ -5967,7 +5957,6 @@
             },
             {
                 "name": "B110호",
-                "type": "기타",
                 "desc": "교수연구실",
                 "tags": [
                     "음B"
@@ -6000,10 +5989,9 @@
             },
             {
                 "name": "B110호",
-                "type": "기타",
                 "desc": "공연예술학회실",
                 "tags": [],
-                "color": "#dce1e6",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -6031,10 +6019,9 @@
             },
             {
                 "name": "B104호",
-                "type": "기타",
                 "desc": "레슨실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -6070,10 +6057,9 @@
             },
             {
                 "name": "B102호",
-                "type": "기타",
                 "desc": "레슨실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -6109,10 +6095,9 @@
             },
             {
                 "name": "B105호",
-                "type": "기타",
                 "desc": "레슨실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -6140,10 +6125,9 @@
             },
             {
                 "name": "B108호",
-                "type": "기타",
                 "desc": "레슨실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -6171,10 +6155,9 @@
             },
             {
                 "name": "B101호",
-                "type": "기타",
                 "desc": "레슨실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -6202,10 +6185,9 @@
             },
             {
                 "name": "B103호",
-                "type": "기타",
                 "desc": "레슨실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -6233,10 +6215,9 @@
             },
             {
                 "name": "전기실",
-                "type": "기타",
                 "desc": "전기실",
                 "tags": [],
-                "color": "#01061e",
+                "color": "#aab0b5",
                 "polygon": [
                     [
                         [
@@ -6264,10 +6245,9 @@
             },
             {
                 "name": "B111호",
-                "type": "기타",
                 "desc": "한세문화홀",
                 "tags": [],
-                "color": "#ff9f1c",
+                "color": "#f4a261",
                 "polygon": [
                     [
                         [
@@ -6303,10 +6283,9 @@
             },
             {
                 "name": "B106호",
-                "type": "기타",
                 "desc": "레슨실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -6342,10 +6321,9 @@
             },
             {
                 "name": "B107호",
-                "type": "기타",
                 "desc": "레슨실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -6381,10 +6359,9 @@
             },
             {
                 "name": "계단",
-                "type": "기타",
                 "desc": "계단",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#aab0b5",
                 "polygon": [
                     [
                         [
@@ -6412,10 +6389,9 @@
             },
             {
                 "name": "엘리베이터",
-                "type": "기타",
                 "desc": "엘리베이터",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#aab0b5",
                 "polygon": [
                     [
                         [
@@ -6445,7 +6421,6 @@
         [
             {
                 "name": "장애인화장실(남)",
-                "type": "기타",
                 "desc": "장애인화장실(남)",
                 "tags": [],
                 "color": "#ecc5ca",
@@ -6476,10 +6451,9 @@
             },
             {
                 "name": "101호",
-                "type": "기타",
                 "desc": "한세달크로즈실행정실",
                 "tags": [],
-                "color": "#aab0b5",
+                "color": "#e86f51",
                 "polygon": [
                     [
                         [
@@ -6507,7 +6481,6 @@
             },
             {
                 "name": "102호",
-                "type": "기타",
                 "desc": "교수연구실",
                 "tags": [],
                 "color": "#e0defc",
@@ -6538,7 +6511,6 @@
             },
             {
                 "name": "103호",
-                "type": "기타",
                 "desc": "교수연구실",
                 "tags": [],
                 "color": "#e0defc",
@@ -6569,10 +6541,9 @@
             },
             {
                 "name": "104-A호",
-                "type": "기타",
                 "desc": "강의실",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289d8f",
                 "polygon": [
                     [
                         [
@@ -6600,7 +6571,6 @@
             },
             {
                 "name": "104호",
-                "type": "기타",
                 "desc": "교수연구실",
                 "tags": [],
                 "color": "#e0defc",
@@ -6631,10 +6601,9 @@
             },
             {
                 "name": "105호",
-                "type": "기타",
                 "desc": "강의실",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289d8f",
                 "polygon": [
                     [
                         [
@@ -6662,10 +6631,9 @@
             },
             {
                 "name": "106호",
-                "type": "기타",
                 "desc": "강의실",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289d8f",
                 "polygon": [
                     [
                         [
@@ -6693,7 +6661,6 @@
             },
             {
                 "name": "미화대기실",
-                "type": "기타",
                 "desc": "미화대기실",
                 "tags": [],
                 "color": "#aab0b5",
@@ -6724,7 +6691,6 @@
             },
             {
                 "name": "경비실",
-                "type": "기타",
                 "desc": "경비실",
                 "tags": [],
                 "color": "#aab0b5",
@@ -6755,10 +6721,9 @@
             },
             {
                 "name": "109호",
-                "type": "기타",
                 "desc": "강의실",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289d8f",
                 "polygon": [
                     [
                         [
@@ -6786,7 +6751,6 @@
             },
             {
                 "name": "110호",
-                "type": "기타",
                 "desc": "교수연구실",
                 "tags": [],
                 "color": "#e0defc",
@@ -6817,7 +6781,6 @@
             },
             {
                 "name": "111호",
-                "type": "기타",
                 "desc": "교수연구실",
                 "tags": [],
                 "color": "#e0defc",
@@ -6848,10 +6811,9 @@
             },
             {
                 "name": "112호",
-                "type": "기타",
                 "desc": "강의실",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289d8f",
                 "polygon": [
                     [
                         [
@@ -6879,10 +6841,9 @@
             },
             {
                 "name": "113호",
-                "type": "기타",
                 "desc": "강의실",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289d8f",
                 "polygon": [
                     [
                         [
@@ -6910,10 +6871,9 @@
             },
             {
                 "name": "114호",
-                "type": "기타",
                 "desc": "앙상블실",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289d8f",
                 "polygon": [
                     [
                         [
@@ -6941,7 +6901,6 @@
             },
             {
                 "name": "장애인화장실(여)",
-                "type": "기타",
                 "desc": "장애인화장실(여)",
                 "tags": [],
                 "color": "#ecc5ca",
@@ -6972,10 +6931,9 @@
             },
             {
                 "name": "계단",
-                "type": "기타",
                 "desc": "계단",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#aab0b5",
                 "polygon": [
                     [
                         [
@@ -7003,10 +6961,9 @@
             },
             {
                 "name": "계단",
-                "type": "기타",
                 "desc": "계단",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#aab0b5",
                 "polygon": [
                     [
                         [
@@ -7034,10 +6991,9 @@
             },
             {
                 "name": "엘리베이터",
-                "type": "기타",
                 "desc": "엘리베이터",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#aab0b5",
                 "polygon": [
                     [
                         [
@@ -7065,7 +7021,6 @@
             },
             {
                 "name": "입구",
-                "type": "기타",
                 "desc": "입구",
                 "tags": [],
                 "color": "#ffffff",
@@ -7096,7 +7051,6 @@
             },
             {
                 "name": "입구",
-                "type": "기타",
                 "desc": "입구",
                 "tags": [],
                 "color": "#ffffff",
@@ -7129,10 +7083,9 @@
         [
             {
                 "name": "201호",
-                "type": "기타",
                 "desc": "대학원 세미나실",
                 "tags": [],
-                "color": "#afb9c3",
+                "color": "#289d8f",
                 "polygon": [
                     [
                         [
@@ -7160,7 +7113,6 @@
             },
             {
                 "name": "202호",
-                "type": "기타",
                 "desc": "교수 연구실",
                 "tags": [],
                 "color": "#e0defc",
@@ -7199,7 +7151,6 @@
             },
             {
                 "name": "203호",
-                "type": "기타",
                 "desc": "교수 연구실",
                 "tags": [],
                 "color": "#e0defc",
@@ -7238,7 +7189,6 @@
             },
             {
                 "name": "204호",
-                "type": "기타",
                 "desc": "교수 연구실",
                 "tags": [],
                 "color": "#e0defc",
@@ -7277,7 +7227,6 @@
             },
             {
                 "name": "205호",
-                "type": "기타",
                 "desc": "교수 연구실",
                 "tags": [],
                 "color": "#e0defc",
@@ -7316,7 +7265,6 @@
             },
             {
                 "name": "206호",
-                "type": "기타",
                 "desc": "교수 연구실",
                 "tags": [],
                 "color": "#e0defc",
@@ -7347,10 +7295,9 @@
             },
             {
                 "name": "207호",
-                "type": "기타",
                 "desc": "강의실",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289d8f",
                 "polygon": [
                     [
                         [
@@ -7378,10 +7325,9 @@
             },
             {
                 "name": "208호",
-                "type": "기타",
                 "desc": "강의실",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289d8f",
                 "polygon": [
                     [
                         [
@@ -7409,10 +7355,9 @@
             },
             {
                 "name": "209호",
-                "type": "기타",
                 "desc": "강의실",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289d8f",
                 "polygon": [
                     [
                         [
@@ -7440,10 +7385,9 @@
             },
             {
                 "name": "208-A호",
-                "type": "기타",
                 "desc": "음악부 행정실",
                 "tags": [],
-                "color": "#aab0b5",
+                "color": "#e86f51",
                 "polygon": [
                     [
                         [
@@ -7471,10 +7415,9 @@
             },
             {
                 "name": "210호",
-                "type": "기타",
-                "desc": "음악합구 컴퓨터실",
+                "desc": "음악학과 컴퓨터실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -7502,7 +7445,6 @@
             },
             {
                 "name": "211호",
-                "type": "기타",
                 "desc": "교수 연구실",
                 "tags": [],
                 "color": "#e0defc",
@@ -7541,7 +7483,6 @@
             },
             {
                 "name": "212호",
-                "type": "기타",
                 "desc": "교수 연구실",
                 "tags": [],
                 "color": "#e0defc",
@@ -7580,7 +7521,6 @@
             },
             {
                 "name": "213호",
-                "type": "기타",
                 "desc": "교수 연구실",
                 "tags": [],
                 "color": "#e0defc",
@@ -7619,7 +7559,6 @@
             },
             {
                 "name": "214호",
-                "type": "기타",
                 "desc": "교수 연구실",
                 "tags": [],
                 "color": "#e0defc",
@@ -7658,10 +7597,9 @@
             },
             {
                 "name": "215호",
-                "type": "기타",
                 "desc": "디지털피아노실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -7689,7 +7627,6 @@
             },
             {
                 "name": "화장실",
-                "type": "기타",
                 "desc": "화장실",
                 "tags": [],
                 "color": "#ecc5ca",
@@ -7720,7 +7657,6 @@
             },
             {
                 "name": "화장실",
-                "type": "기타",
                 "desc": "화장실",
                 "tags": [],
                 "color": "#ecc5ca",
@@ -7751,10 +7687,9 @@
             },
             {
                 "name": "계단",
-                "type": "기타",
                 "desc": "계단",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#aab0b5",
                 "polygon": [
                     [
                         [
@@ -7782,10 +7717,9 @@
             },
             {
                 "name": "계단",
-                "type": "기타",
                 "desc": "계단",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#aab0b5",
                 "polygon": [
                     [
                         [
@@ -7813,10 +7747,9 @@
             },
             {
                 "name": "엘리베이터",
-                "type": "기타",
                 "desc": "엘리베이터",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#aab0b5",
                 "polygon": [
                     [
                         [
@@ -7846,7 +7779,6 @@
         [
             {
                 "name": "화장실",
-                "type": "기타",
                 "desc": "화장실",
                 "tags": [],
                 "color": "#ecc5ca",
@@ -7877,10 +7809,9 @@
             },
             {
                 "name": "308호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -7908,10 +7839,9 @@
             },
             {
                 "name": "307호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -7939,10 +7869,9 @@
             },
             {
                 "name": "306호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -7970,10 +7899,9 @@
             },
             {
                 "name": "305호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -8001,10 +7929,9 @@
             },
             {
                 "name": "304호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -8032,10 +7959,9 @@
             },
             {
                 "name": "303호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -8063,10 +7989,9 @@
             },
             {
                 "name": "302호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -8094,10 +8019,9 @@
             },
             {
                 "name": "301호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -8125,7 +8049,6 @@
             },
             {
                 "name": "329호",
-                "type": "기타",
                 "desc": "교수 연구실",
                 "tags": [],
                 "color": "#e0defc",
@@ -8156,7 +8079,6 @@
             },
             {
                 "name": "328호",
-                "type": "기타",
                 "desc": "교수 연구실",
                 "tags": [],
                 "color": "#e0defc",
@@ -8187,10 +8109,9 @@
             },
             {
                 "name": "327호",
-                "type": "기타",
                 "desc": "합창지휘레슨실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -8218,7 +8139,6 @@
             },
             {
                 "name": "326-A호",
-                "type": "기타",
                 "desc": "교수 연구실",
                 "tags": [],
                 "color": "#e0defc",
@@ -8249,7 +8169,6 @@
             },
             {
                 "name": "326-B호",
-                "type": "기타",
                 "desc": "교수 연구실",
                 "tags": [],
                 "color": "#e0defc",
@@ -8280,10 +8199,9 @@
             },
             {
                 "name": "325호",
-                "type": "기타",
                 "desc": "강사휴게실",
                 "tags": [],
-                "color": "#e8dcc4",
+                "color": "#e0defc",
                 "polygon": [
                     [
                         [
@@ -8311,7 +8229,6 @@
             },
             {
                 "name": "324호",
-                "type": "기타",
                 "desc": "교수 연구실",
                 "tags": [],
                 "color": "#e0defc",
@@ -8342,7 +8259,6 @@
             },
             {
                 "name": "323호",
-                "type": "기타",
                 "desc": "교수 연구실",
                 "tags": [],
                 "color": "#e0defc",
@@ -8373,7 +8289,6 @@
             },
             {
                 "name": "화장실",
-                "type": "기타",
                 "desc": "화장실",
                 "tags": [],
                 "color": "#ecc5ca",
@@ -8404,10 +8319,9 @@
             },
             {
                 "name": "309호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -8435,10 +8349,9 @@
             },
             {
                 "name": "310호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -8466,10 +8379,9 @@
             },
             {
                 "name": "311호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -8497,10 +8409,9 @@
             },
             {
                 "name": "313호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -8528,10 +8439,9 @@
             },
             {
                 "name": "314호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -8559,10 +8469,9 @@
             },
             {
                 "name": "315호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -8590,10 +8499,9 @@
             },
             {
                 "name": "316호",
-                "type": "기타",
                 "desc": "작곡 연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -8621,10 +8529,9 @@
             },
             {
                 "name": "317호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -8652,7 +8559,6 @@
             },
             {
                 "name": "318호",
-                "type": "기타",
                 "desc": "교수 연구실",
                 "tags": [],
                 "color": "#e0defc",
@@ -8683,10 +8589,9 @@
             },
             {
                 "name": "320호",
-                "type": "기타",
                 "desc": "오르간 연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -8714,10 +8619,9 @@
             },
             {
                 "name": "321호",
-                "type": "기타",
                 "desc": "오르간 연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -8745,7 +8649,6 @@
             },
             {
                 "name": "322호",
-                "type": "기타",
                 "desc": "교수 연구실",
                 "tags": [],
                 "color": "#e0defc",
@@ -8776,10 +8679,9 @@
             },
             {
                 "name": "글로벌 문화 협력 센",
-                "type": "기타",
                 "desc": "글로벌 문화 협력 센터",
                 "tags": [],
-                "color": "#44a4f3",
+                "color": "#e86f51",
                 "polygon": [
                     [
                         [
@@ -8807,10 +8709,9 @@
             },
             {
                 "name": "312호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -8838,10 +8739,9 @@
             },
             {
                 "name": "학생회관",
-                "type": "기타",
                 "desc": "학생회관(음악학과)",
                 "tags": [],
-                "color": "#44a4f3",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -8869,10 +8769,9 @@
             },
             {
                 "name": "페다고지 학회실",
-                "type": "기타",
                 "desc": "페다고지 학회실(대학원교학팀)",
                 "tags": [],
-                "color": "#44a4f3",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -8900,10 +8799,9 @@
             },
             {
                 "name": "학회실",
-                "type": "기타",
                 "desc": "학회실(평교원,교양)",
                 "tags": [],
-                "color": "#44a4f3",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -8931,10 +8829,9 @@
             },
             {
                 "name": "자료보관실",
-                "type": "기타",
                 "desc": "자료보관실",
                 "tags": [],
-                "color": "#44a4f3",
+                "color": "#e86f51",
                 "polygon": [
                     [
                         [
@@ -8962,10 +8859,9 @@
             },
             {
                 "name": "333호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -8993,10 +8889,9 @@
             },
             {
                 "name": "334호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -9024,10 +8919,9 @@
             },
             {
                 "name": "336호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -9055,10 +8949,9 @@
             },
             {
                 "name": "338호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -9086,10 +8979,9 @@
             },
             {
                 "name": "학회실",
-                "type": "기타",
                 "desc": "학회실(음악학과)",
                 "tags": [],
-                "color": "#44a4f3",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -9117,10 +9009,9 @@
             },
             {
                 "name": "335호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -9148,10 +9039,9 @@
             },
             {
                 "name": "계단",
-                "type": "기타",
                 "desc": "계단",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#aab0b5",
                 "polygon": [
                     [
                         [
@@ -9179,10 +9069,9 @@
             },
             {
                 "name": "엘리베이터",
-                "type": "기타",
                 "desc": "엘리베이터",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#aab0b5",
                 "polygon": [
                     [
                         [
@@ -9210,10 +9099,9 @@
             },
             {
                 "name": "계단",
-                "type": "기타",
                 "desc": "계단",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#aab0b5",
                 "polygon": [
                     [
                         [
@@ -9241,10 +9129,9 @@
             },
             {
                 "name": "계단",
-                "type": "기타",
                 "desc": "계단",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#aab0b5",
                 "polygon": [
                     [
                         [
@@ -9274,10 +9161,9 @@
         [
             {
                 "name": "420호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -9305,10 +9191,9 @@
             },
             {
                 "name": "421호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -9336,10 +9221,9 @@
             },
             {
                 "name": "422호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -9367,10 +9251,9 @@
             },
             {
                 "name": "423호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -9398,10 +9281,9 @@
             },
             {
                 "name": "424호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -9429,10 +9311,9 @@
             },
             {
                 "name": "413호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -9460,10 +9341,9 @@
             },
             {
                 "name": "417호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -9491,10 +9371,9 @@
             },
             {
                 "name": "418호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -9522,10 +9401,9 @@
             },
             {
                 "name": "419호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -9553,10 +9431,9 @@
             },
             {
                 "name": "409호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -9584,10 +9461,9 @@
             },
             {
                 "name": "410호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -9615,10 +9491,9 @@
             },
             {
                 "name": "411호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -9646,10 +9521,9 @@
             },
             {
                 "name": "412호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -9677,10 +9551,9 @@
             },
             {
                 "name": "413호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -9708,10 +9581,9 @@
             },
             {
                 "name": "414호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -9739,10 +9611,9 @@
             },
             {
                 "name": "415호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -9770,10 +9641,9 @@
             },
             {
                 "name": "402호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -9801,10 +9671,9 @@
             },
             {
                 "name": "408호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -9832,10 +9701,9 @@
             },
             {
                 "name": "407호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -9863,10 +9731,9 @@
             },
             {
                 "name": "406호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -9894,10 +9761,9 @@
             },
             {
                 "name": "405호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -9925,10 +9791,9 @@
             },
             {
                 "name": "404호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -9956,10 +9821,9 @@
             },
             {
                 "name": "403호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -9987,10 +9851,9 @@
             },
             {
                 "name": "401호",
-                "type": "기타",
                 "desc": "연습실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -10018,7 +9881,6 @@
             },
             {
                 "name": "화장실",
-                "type": "기타",
                 "desc": "화장실",
                 "tags": [],
                 "color": "#ecc5ca",
@@ -10049,10 +9911,9 @@
             },
             {
                 "name": "425호",
-                "type": "기타",
                 "desc": "실내악실",
                 "tags": [],
-                "color": "#ffdd59",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -10080,7 +9941,6 @@
             },
             {
                 "name": "창",
-                "type": "기타",
                 "desc": "창고",
                 "tags": [],
                 "color": "#a0785a",
@@ -10111,10 +9971,9 @@
             },
             {
                 "name": "준비실",
-                "type": "기타",
                 "desc": "준비실",
                 "tags": [],
-                "color": "#ff4d00",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -10166,10 +10025,9 @@
             },
             {
                 "name": "대연주홀",
-                "type": "기타",
                 "desc": "대연주홀",
                 "tags": [],
-                "color": "#ff9f1c",
+                "color": "#f4a261",
                 "polygon": [
                     [
                         [
@@ -10213,10 +10071,9 @@
             },
             {
                 "name": "계단",
-                "type": "기타",
                 "desc": "계단",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#aab0b5",
                 "polygon": [
                     [
                         [
@@ -10244,10 +10101,9 @@
             },
             {
                 "name": "계단 >",
-                "type": "기타",
                 "desc": "계단",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#aab0b5",
                 "polygon": [
                     [
                         [
@@ -10275,10 +10131,9 @@
             },
             {
                 "name": "계단",
-                "type": "기타",
                 "desc": "계단",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#aab0b5",
                 "polygon": [
                     [
                         [
@@ -10306,10 +10161,9 @@
             },
             {
                 "name": "엘리베이터",
-                "type": "기타",
                 "desc": "엘리베이터",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#aab0b5",
                 "polygon": [
                     [
                         [
@@ -10339,7 +10193,6 @@
         [
             {
                 "name": "505-A호",
-                "type": "기타",
                 "desc": "창고",
                 "tags": [],
                 "color": "#a0785a",
@@ -10370,10 +10223,9 @@
             },
             {
                 "name": "502호",
-                "type": "기타",
                 "desc": "물탱크실",
                 "tags": [],
-                "color": "#01061e",
+                "color": "#aab0b5",
                 "polygon": [
                     [
                         [
@@ -10409,7 +10261,6 @@
             },
             {
                 "name": "503호",
-                "type": "기타",
                 "desc": "미화대기실",
                 "tags": [],
                 "color": "#aab0b5",
@@ -10440,10 +10291,9 @@
             },
             {
                 "name": "501호",
-                "type": "기타",
                 "desc": "방송실",
                 "tags": [],
-                "color": "#aab0b5",
+                "color": "#e86f51",
                 "polygon": [
                     [
                         [
@@ -10471,7 +10321,6 @@
             },
             {
                 "name": "504호",
-                "type": "기타",
                 "desc": "공조실",
                 "tags": [],
                 "color": "#aab0b5",
@@ -10502,10 +10351,9 @@
             },
             {
                 "name": "엘리베이터",
-                "type": "기타",
                 "desc": "엘리베이터",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#aab0b5",
                 "polygon": [
                     [
                         [
@@ -10533,10 +10381,9 @@
             },
             {
                 "name": "계단",
-                "type": "기타",
                 "desc": "계단",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#aab0b5",
                 "polygon": [
                     [
                         [
@@ -10564,10 +10411,9 @@
             },
             {
                 "name": "계단",
-                "type": "기타",
                 "desc": "계단",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#aab0b5",
                 "polygon": [
                     [
                         [
@@ -11679,7 +11525,6 @@
         [
             {
                 "name": "B106호",
-                "type": "기타",
                 "desc": "창고",
                 "tags": [],
                 "color": "#a0785a",
@@ -11710,10 +11555,9 @@
             },
             {
                 "name": "B104호",
-                "type": "기타",
                 "desc": "비랩",
                 "tags": [],
-                "color": "#6200ea",
+                "color": "#f4a261",
                 "polygon": [
                     [
                         [
@@ -11741,7 +11585,6 @@
             },
             {
                 "name": "B103호",
-                "type": "기타",
                 "desc": "창고",
                 "tags": [],
                 "color": "#a0785a",
@@ -11772,7 +11615,6 @@
             },
             {
                 "name": "B105호",
-                "type": "기타",
                 "desc": "창고",
                 "tags": [],
                 "color": "#a0785a",
@@ -11803,10 +11645,9 @@
             },
             {
                 "name": "B101호",
-                "type": "기타",
                 "desc": "체력단련실",
                 "tags": [],
-                "color": "#2962ff",
+                "color": "#289d8f",
                 "polygon": [
                     [
                         [
@@ -11834,10 +11675,9 @@
             },
             {
                 "name": "B102호",
-                "type": "기타",
                 "desc": "댄싱룸",
                 "tags": [],
-                "color": "#6200ea",
+                "color": "#f4a261",
                 "polygon": [
                     [
                         [
@@ -11873,10 +11713,9 @@
             },
             {
                 "name": "계단",
-                "type": "기타",
                 "desc": "계단",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#dce1eb",
                 "polygon": [
                     [
                         [
@@ -11904,10 +11743,9 @@
             },
             {
                 "name": "계단",
-                "type": "기타",
                 "desc": "계단",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#dce1eb",
                 "polygon": [
                     [
                         [
@@ -11937,7 +11775,6 @@
         [
             {
                 "name": "108호",
-                "type": "기타",
                 "desc": "경비실",
                 "tags": [],
                 "color": "#dce1eb",
@@ -11968,10 +11805,9 @@
             },
             {
                 "name": "101호",
-                "type": "기타",
                 "desc": "세미나실",
                 "tags": [],
-                "color": "#dce1eb",
+                "color": "#289d8f",
                 "polygon": [
                     [
                         [
@@ -11999,10 +11835,9 @@
             },
             {
                 "name": "102호",
-                "type": "기타",
                 "desc": "예비군대대",
                 "tags": [],
-                "color": "#dce1eb",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -12030,10 +11865,9 @@
             },
             {
                 "name": "103호",
-                "type": "기타",
                 "desc": "보건실",
                 "tags": [],
-                "color": "#ffffff",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -12061,10 +11895,9 @@
             },
             {
                 "name": "104호",
-                "type": "기타",
                 "desc": "커피숍",
                 "tags": [],
-                "color": "#5d4037",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -12092,10 +11925,9 @@
             },
             {
                 "name": "105호",
-                "type": "기타",
                 "desc": "복사실",
                 "tags": [],
-                "color": "#00838f",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -12123,10 +11955,9 @@
             },
             {
                 "name": "107호",
-                "type": "기타",
                 "desc": "여학생 휴게실",
                 "tags": [],
-                "color": "#e8dcc4",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -12154,10 +11985,9 @@
             },
             {
                 "name": "106호",
-                "type": "기타",
                 "desc": "인터넷 카페",
                 "tags": [],
-                "color": "#5d4037",
+                "color": "#e8c46a",
                 "polygon": [
                     [
                         [
@@ -12185,7 +12015,6 @@
             },
             {
                 "name": "화장실",
-                "type": "기타",
                 "desc": "화장실",
                 "tags": [],
                 "color": "#ecc5ca",
@@ -12216,7 +12045,6 @@
             },
             {
                 "name": "화장실",
-                "type": "기타",
                 "desc": "화장실",
                 "tags": [],
                 "color": "#ecc5ca",
@@ -12247,10 +12075,9 @@
             },
             {
                 "name": "계단",
-                "type": "기타",
                 "desc": "계단",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#dce1eb",
                 "polygon": [
                     [
                         [
@@ -12278,10 +12105,9 @@
             },
             {
                 "name": "계단",
-                "type": "기타",
                 "desc": "계단",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#dce1eb",
                 "polygon": [
                     [
                         [
@@ -12311,7 +12137,6 @@
         [
             {
                 "name": "화장실",
-                "type": "기타",
                 "desc": "화장실",
                 "tags": [],
                 "color": "#ecc5ca",
@@ -12342,7 +12167,6 @@
             },
             {
                 "name": "화장실",
-                "type": "기타",
                 "desc": "화장실",
                 "tags": [],
                 "color": "#ecc5ca",
@@ -12373,10 +12197,9 @@
             },
             {
                 "name": "214호",
-                "type": "기타",
                 "desc": "HCC",
                 "tags": [],
-                "color": "#6200ea",
+                "color": "#f4a261",
                 "polygon": [
                     [
                         [
@@ -12404,10 +12227,9 @@
             },
             {
                 "name": "213호",
-                "type": "기타",
                 "desc": "DMZ",
                 "tags": [],
-                "color": "#6200ea",
+                "color": "#f4a261",
                 "polygon": [
                     [
                         [
@@ -12435,10 +12257,9 @@
             },
             {
                 "name": "212호",
-                "type": "기타",
                 "desc": "영필름",
                 "tags": [],
-                "color": "#6200ea",
+                "color": "#f4a261",
                 "polygon": [
                     [
                         [
@@ -12466,10 +12287,9 @@
             },
             {
                 "name": "211호",
-                "type": "기타",
                 "desc": "식구",
                 "tags": [],
-                "color": "#6200ea",
+                "color": "#f4a261",
                 "polygon": [
                     [
                         [
@@ -12497,10 +12317,9 @@
             },
             {
                 "name": "210호",
-                "type": "기타",
                 "desc": "신문사",
                 "tags": [],
-                "color": "#6200ea",
+                "color": "#f4a261",
                 "polygon": [
                     [
                         [
@@ -12528,10 +12347,9 @@
             },
             {
                 "name": "201호",
-                "type": "기타",
                 "desc": "햄",
                 "tags": [],
-                "color": "#6200ea",
+                "color": "#f4a261",
                 "polygon": [
                     [
                         [
@@ -12559,10 +12377,9 @@
             },
             {
                 "name": "202호",
-                "type": "기타",
                 "desc": "아이비",
                 "tags": [],
-                "color": "#6200ea",
+                "color": "#f4a261",
                 "polygon": [
                     [
                         [
@@ -12590,10 +12407,9 @@
             },
             {
                 "name": "203호",
-                "type": "기타",
                 "desc": "광고분자",
                 "tags": [],
-                "color": "#6200ea",
+                "color": "#f4a261",
                 "polygon": [
                     [
                         [
@@ -12621,10 +12437,9 @@
             },
             {
                 "name": "204호",
-                "type": "기타",
                 "desc": "광야",
                 "tags": [],
-                "color": "#6200ea",
+                "color": "#f4a261",
                 "polygon": [
                     [
                         [
@@ -12652,10 +12467,9 @@
             },
             {
                 "name": "205호",
-                "type": "기타",
                 "desc": "학생복지위원회",
                 "tags": [],
-                "color": "#7d0d54",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -12683,10 +12497,9 @@
             },
             {
                 "name": "209호",
-                "type": "기타",
                 "desc": "HS.RCY",
                 "tags": [],
-                "color": "#6200ea",
+                "color": "#f4a261",
                 "polygon": [
                     [
                         [
@@ -12714,10 +12527,9 @@
             },
             {
                 "name": "208호",
-                "type": "기타",
                 "desc": "메이저",
                 "tags": [],
-                "color": "#6200ea",
+                "color": "#f4a261",
                 "polygon": [
                     [
                         [
@@ -12745,10 +12557,9 @@
             },
             {
                 "name": "207호",
-                "type": "기타",
                 "desc": "중국어학과 학회실",
                 "tags": [],
-                "color": "#44a4f3",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -12776,10 +12587,9 @@
             },
             {
                 "name": "216호",
-                "type": "기타",
                 "desc": "대의원회",
                 "tags": [],
-                "color": "#7d0d54",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -12807,7 +12617,6 @@
             },
             {
                 "name": "215호",
-                "type": "기타",
                 "desc": "창고",
                 "tags": [],
                 "color": "#a0785a",
@@ -12846,10 +12655,9 @@
             },
             {
                 "name": "217호",
-                "type": "기타",
                 "desc": "총학생회사무실",
                 "tags": [],
-                "color": "#7d0d54",
+                "color": "#e86f51",
                 "polygon": [
                     [
                         [
@@ -12885,10 +12693,9 @@
             },
             {
                 "name": "206호",
-                "type": "기타",
                 "desc": "산업보안학과 학회실",
                 "tags": [],
-                "color": "#44a4f3",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -12916,7 +12723,6 @@
             },
             {
                 "name": "계단",
-                "type": "기타",
                 "desc": "계단",
                 "tags": [],
                 "color": "#007aff",
@@ -12947,7 +12753,6 @@
             },
             {
                 "name": "계단",
-                "type": "기타",
                 "desc": "계단",
                 "tags": [],
                 "color": "#007aff",
@@ -12980,7 +12785,6 @@
         [
             {
                 "name": "화장실",
-                "type": "기타",
                 "desc": "화장실",
                 "tags": [],
                 "color": "#ecc5ca",
@@ -13011,7 +12815,6 @@
             },
             {
                 "name": "화장실",
-                "type": "기타",
                 "desc": "화장실",
                 "tags": [],
                 "color": "#ecc5ca",
@@ -13042,10 +12845,9 @@
             },
             {
                 "name": "307호",
-                "type": "기타",
                 "desc": "이얼싼",
                 "tags": [],
-                "color": "#6200ea",
+                "color": "#f4a261",
                 "polygon": [
                     [
                         [
@@ -13073,10 +12875,9 @@
             },
             {
                 "name": "308호",
-                "type": "기타",
                 "desc": "대학원 동아리",
                 "tags": [],
-                "color": "#6200ea",
+                "color": "#f4a261",
                 "polygon": [
                     [
                         [
@@ -13104,10 +12905,9 @@
             },
             {
                 "name": "314호",
-                "type": "기타",
                 "desc": "투 혼",
                 "tags": [],
-                "color": "#6200ea",
+                "color": "#f4a261",
                 "polygon": [
                     [
                         [
@@ -13135,10 +12935,9 @@
             },
             {
                 "name": "313호",
-                "type": "기타",
                 "desc": "한 판",
                 "tags": [],
-                "color": "#6200ea",
+                "color": "#f4a261",
                 "polygon": [
                     [
                         [
@@ -13166,10 +12965,9 @@
             },
             {
                 "name": "312호",
-                "type": "기타",
                 "desc": "내가 갔다올게",
                 "tags": [],
-                "color": "#6200ea",
+                "color": "#f4a261",
                 "polygon": [
                     [
                         [
@@ -13197,10 +12995,9 @@
             },
             {
                 "name": "311호",
-                "type": "기타",
                 "desc": "헐레벌떡",
                 "tags": [],
-                "color": "#6200ea",
+                "color": "#f4a261",
                 "polygon": [
                     [
                         [
@@ -13228,10 +13025,9 @@
             },
             {
                 "name": "305호",
-                "type": "기타",
                 "desc": "어린이전도단",
                 "tags": [],
-                "color": "#6200ea",
+                "color": "#f4a261",
                 "polygon": [
                     [
                         [
@@ -13259,10 +13055,9 @@
             },
             {
                 "name": "304호",
-                "type": "기타",
                 "desc": "치즈스틱",
                 "tags": [],
-                "color": "#6200ea",
+                "color": "#f4a261",
                 "polygon": [
                     [
                         [
@@ -13290,10 +13085,9 @@
             },
             {
                 "name": "302호",
-                "type": "기타",
                 "desc": "캠",
                 "tags": [],
-                "color": "#6200ea",
+                "color": "#f4a261",
                 "polygon": [
                     [
                         [
@@ -13321,10 +13115,9 @@
             },
             {
                 "name": "301호",
-                "type": "기타",
                 "desc": "디에프씨",
                 "tags": [],
-                "color": "#6200ea",
+                "color": "#f4a261",
                 "polygon": [
                     [
                         [
@@ -13352,10 +13145,9 @@
             },
             {
                 "name": "306호",
-                "type": "기타",
                 "desc": "동아리연합회",
                 "tags": [],
-                "color": "#6200ea",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -13383,10 +13175,9 @@
             },
             {
                 "name": "309호",
-                "type": "기타",
                 "desc": "인터콥",
                 "tags": [],
-                "color": "#6200ea",
+                "color": "#f4a261",
                 "polygon": [
                     [
                         [
@@ -13414,10 +13205,9 @@
             },
             {
                 "name": "310호",
-                "type": "기타",
                 "desc": "셔틀콕",
                 "tags": [],
-                "color": "#6200ea",
+                "color": "#f4a261",
                 "polygon": [
                     [
                         [
@@ -13445,10 +13235,9 @@
             },
             {
                 "name": "316호",
-                "type": "기타",
                 "desc": "C C C",
                 "tags": [],
-                "color": "#6200ea",
+                "color": "#f4a261",
                 "polygon": [
                     [
                         [
@@ -13476,10 +13265,9 @@
             },
             {
                 "name": "300호",
-                "type": "기타",
                 "desc": "총학생회 회의실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#e86f51",
                 "polygon": [
                     [
                         [
@@ -13507,10 +13295,9 @@
             },
             {
                 "name": "315호",
-                "type": "기타",
                 "desc": "간호학과 학회실",
                 "tags": [],
-                "color": "#44a4f3",
+                "color": "#e86f51",
                 "polygon": [
                     [
                         [
@@ -13538,10 +13325,9 @@
             },
             {
                 "name": "계단",
-                "type": "기타",
                 "desc": "계단",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#dce1eb",
                 "polygon": [
                     [
                         [
@@ -13569,10 +13355,9 @@
             },
             {
                 "name": "계단",
-                "type": "기타",
                 "desc": "계단",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#dce1eb",
                 "polygon": [
                     [
                         [
@@ -13600,10 +13385,9 @@
             },
             {
                 "name": "방송국",
-                "type": "기타",
                 "desc": "아나운서실, 장비실",
                 "tags": [],
-                "color": "#ff1744",
+                "color": "#f4a261",
                 "polygon": [
                     [
                         [
