@@ -20,7 +20,8 @@ const floorSelect = el("floorSelect");
 const floorCoordsInput = el("floorCoordsInput");
 const applyFloorCoordsBtn = el("applyFloorCoordsBtn");
 const copyFloorCoordsBtn = el("copyFloorCoordsBtn");
-const applyUnsavedBtn = el("applyUnsavedBtn");
+const paletteApplyBtn = el("paletteApplyBtn");
+const saveRoomsBtn = el("saveRoomsBtn");
 const reloadRoomsBtn = el("reloadRoomsBtn");
 
 // New: dual lists & file controls
@@ -409,7 +410,7 @@ async function copyFloorCoords() {
 	}
 }
 
-// 팔레트 변경 등 미저장 상태를 rooms.json에 다시 반영
+// 팔레트 변경을 저장 목록에 일괄 적용 후 infos/rooms.json에 반영
 function applyPaletteAndSave() {
 	if (!Array.isArray(state.saved) || !state.saved.length) return;
 	let changed = false;
@@ -422,10 +423,17 @@ function applyPaletteAndSave() {
 		}
 	});
 	if (changed) {
-		writeSavedBackToDB();
+		writeSavedBackToDB(); // infos 및 rooms.json 동기화
 		refreshSavedList();
 		draw();
 	}
+}
+
+// 저장 목록을 그대로 infos/rooms.json에 저장
+function saveRoomsOnly() {
+	writeSavedBackToDB(); // infos 업데이트 + rooms.json POST
+	refreshSavedList();
+	draw();
 }
 
 // rooms.json이 외부에서 변경된 경우 최신 상태를 다시 불러오기
@@ -906,7 +914,8 @@ function bind() {
 	floorSelect.addEventListener("change", onFloorChange);
 	applyFloorCoordsBtn.addEventListener("click", applyManualFloorCoords);
 	copyFloorCoordsBtn.addEventListener("click", copyFloorCoords);
-	applyUnsavedBtn.addEventListener("click", applyPaletteAndSave);
+	paletteApplyBtn.addEventListener("click", applyPaletteAndSave);
+	saveRoomsBtn.addEventListener("click", saveRoomsOnly);
 	reloadRoomsBtn.addEventListener("click", reloadRoomsFromServer);
 
 	imageOpacityRange.addEventListener("input", () => {
