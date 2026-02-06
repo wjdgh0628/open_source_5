@@ -49,7 +49,13 @@
 	gap: 8px;
 }
 
-#applyUnsavedBtn
+.rooms-head-actions
+{
+	display: flex;
+	gap: 6px;
+}
+
+.rooms-section-head button
 {
 	font-size: 11px;
 	padding: 2px 8px;

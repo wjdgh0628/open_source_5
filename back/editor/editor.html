@@ -16,7 +16,10 @@
 				<div class="rooms-section">
 					<div class="rooms-section-head">
 						<h4>저장됨 (rooms.json)</h4>
-						<button id="applyUnsavedBtn" title="팔레트 색상 변경 등 rooms.json에 아직 반영되지 않은 내용을 저장">업데이트</button>
+						<div class="rooms-head-actions">
+							<button id="applyUnsavedBtn" title="팔레트 색상 변경 등 rooms.json에 아직 반영되지 않은 내용을 저장">업데이트</button>
+							<button id="reloadRoomsBtn" title="rooms.json이 외부에서 수정된 내용을 다시 불러옵니다">불러오기</button>
+						</div>
 					</div>
 					<div id="savedRoomList" class="rooms-list"></div>
 				</div>

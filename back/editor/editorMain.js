@@ -21,6 +21,7 @@ const floorCoordsInput = el("floorCoordsInput");
 const applyFloorCoordsBtn = el("applyFloorCoordsBtn");
 const copyFloorCoordsBtn = el("copyFloorCoordsBtn");
 const applyUnsavedBtn = el("applyUnsavedBtn");
+const reloadRoomsBtn = el("reloadRoomsBtn");
 
 // New: dual lists & file controls
 const savedRoomListEl = el("savedRoomList");
@@ -424,6 +425,27 @@ function applyPaletteAndSave() {
 		writeSavedBackToDB();
 		refreshSavedList();
 		draw();
+	}
+}
+
+// rooms.json이 외부에서 변경된 경우 최신 상태를 다시 불러오기
+async function reloadRoomsFromServer() {
+	try {
+		await updateInfos(); // buildings + rooms 최신화
+		const infosMap = getInfos();
+		if (!infosMap) return;
+		if (state.building && infosMap[state.building]) {
+			state.floorInfo = infosMap[state.building];
+			state.floorInfo.lvCount = state.floorInfo.flLevel + state.floorInfo.bmLevel;
+			ensureRoomsArrayForBuilding(state.building, state.floorInfo.lvCount);
+		}
+		// 현재 층의 saved 목록만 교체 (draft는 그대로 유지)
+		state.activeSavedIndex = null;
+		loadSavedRoomsForCurrent();
+		refreshSavedList();
+		draw();
+	} catch (e) {
+		console.error("rooms.json 재로딩 실패:", e);
 	}
 }
 
@@ -885,6 +907,7 @@ function bind() {
 	applyFloorCoordsBtn.addEventListener("click", applyManualFloorCoords);
 	copyFloorCoordsBtn.addEventListener("click", copyFloorCoords);
 	applyUnsavedBtn.addEventListener("click", applyPaletteAndSave);
+	reloadRoomsBtn.addEventListener("click", reloadRoomsFromServer);
 
 	imageOpacityRange.addEventListener("input", () => {
 		const v = Number(imageOpacityRange.value) || 0;
