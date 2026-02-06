@@ -17997,9 +17997,10 @@
         [
             {
                 "name": "계단",
+                "type": "계단,엘베,입구",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#FFFFFF",
                 "polygon": [
                     [
                         [
@@ -18027,9 +18028,10 @@
             },
             {
                 "name": "B106호",
+                "type": "특수구역",
                 "desc": "치료실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#E86F51",
                 "polygon": [
                     [
                         [
@@ -18057,9 +18059,10 @@
             },
             {
                 "name": "B107호",
+                "type": "특수구역",
                 "desc": "치료실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#E86F51",
                 "polygon": [
                     [
                         [
@@ -18087,9 +18090,10 @@
             },
             {
                 "name": "B105호",
+                "type": "특수구역",
                 "desc": "치료실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#E86F51",
                 "polygon": [
                     [
                         [
@@ -18117,9 +18121,10 @@
             },
             {
                 "name": "B104호",
+                "type": "특수구역",
                 "desc": "치료실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#E86F51",
                 "polygon": [
                     [
                         [
@@ -18147,9 +18152,10 @@
             },
             {
                 "name": "B103호",
+                "type": "특수구역",
                 "desc": "치료실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#E86F51",
                 "polygon": [
                     [
                         [
@@ -18177,9 +18183,10 @@
             },
             {
                 "name": "B102호",
+                "type": "특수구역",
                 "desc": "학부모 대기실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#E86F51",
                 "polygon": [
                     [
                         [
@@ -18206,10 +18213,11 @@
                 ]
             },
             {
-                "name": "화장실(추정)",
+                "name": "화장실",
+                "type": "화장실",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#F4A261",
                 "polygon": [
                     [
                         [
@@ -18237,9 +18245,10 @@
             },
             {
                 "name": "B101호",
+                "type": "특수구역",
                 "desc": "통합치료상담센터행정실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#E86F51",
                 "polygon": [
                     [
                         [
@@ -18267,9 +18276,10 @@
             },
             {
                 "name": "B108호",
+                "type": "경비실,전기실,기계실,관리자구역",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#b7b7b7",
                 "polygon": [
                     [
                         [
@@ -18297,13 +18307,14 @@
             },
             {
                 "name": "C104호",
+                "type": "편의점,플라타너스,복사실,서점,식당",
                 "desc": "BURGUR iNG & CAFE",
                 "tags": [
                     "버거잉",
                     "버거",
                     "카페"
                 ],
-                "color": "#007aff",
+                "color": "#F4A261",
                 "polygon": [
                     [
                         [
@@ -18331,9 +18342,10 @@
             },
             {
                 "name": "계단",
+                "type": "계단,엘베,입구",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#FFFFFF",
                 "polygon": [
                     [
                         [
@@ -18369,9 +18381,10 @@
             },
             {
                 "name": "계단",
+                "type": "계단,엘베,입구",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#FFFFFF",
                 "polygon": [
                     [
                         [
@@ -18399,9 +18412,10 @@
             },
             {
                 "name": "A101호",
+                "type": "경비실,전기실,기계실,관리자구역",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#b7b7b7",
                 "polygon": [
                     [
                         [
@@ -18429,9 +18443,10 @@
             },
             {
                 "name": "A102호",
+                "type": "경비실,전기실,기계실,관리자구역",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#b7b7b7",
                 "polygon": [
                     [
                         [
@@ -18459,9 +18474,10 @@
             },
             {
                 "name": "A103호",
+                "type": "경비실,전기실,기계실,관리자구역",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#b7b7b7",
                 "polygon": [
                     [
                         [
@@ -18489,9 +18505,10 @@
             },
             {
                 "name": "A104호",
+                "type": "경비실,전기실,기계실,관리자구역",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#b7b7b7",
                 "polygon": [
                     [
                         [
@@ -18519,9 +18536,10 @@
             },
             {
                 "name": "A105호",
+                "type": "경비실,전기실,기계실,관리자구역",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#b7b7b7",
                 "polygon": [
                     [
                         [
@@ -18548,10 +18566,11 @@
                 ]
             },
             {
-                "name": "화장실(추정)",
+                "name": "화장실",
+                "type": "화장실",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#F4A261",
                 "polygon": [
                     [
                         [
@@ -18579,9 +18598,10 @@
             },
             {
                 "name": "A106호",
+                "type": "경비실,전기실,기계실,관리자구역",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#b7b7b7",
                 "polygon": [
                     [
                         [
@@ -18609,9 +18629,10 @@
             },
             {
                 "name": "A107호",
+                "type": "경비실,전기실,기계실,관리자구역",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#b7b7b7",
                 "polygon": [
                     [
                         [
@@ -18639,9 +18660,10 @@
             },
             {
                 "name": "A108호",
+                "type": "경비실,전기실,기계실,관리자구역",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#b7b7b7",
                 "polygon": [
                     [
                         [
@@ -18669,9 +18691,10 @@
             },
             {
                 "name": "A109호",
+                "type": "경비실,전기실,기계실,관리자구역",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#b7b7b7",
                 "polygon": [
                     [
                         [
@@ -18699,9 +18722,10 @@
             },
             {
                 "name": "A110호",
+                "type": "경비실,전기실,기계실,관리자구역",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#b7b7b7",
                 "polygon": [
                     [
                         [
@@ -18729,9 +18753,10 @@
             },
             {
                 "name": "A111호",
+                "type": "경비실,전기실,기계실,관리자구역",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#b7b7b7",
                 "polygon": [
                     [
                         [
@@ -18759,9 +18784,10 @@
             },
             {
                 "name": "A112호",
+                "type": "경비실,전기실,기계실,관리자구역",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#b7b7b7",
                 "polygon": [
                     [
                         [
@@ -18789,9 +18815,10 @@
             },
             {
                 "name": "A113호",
+                "type": "경비실,전기실,기계실,관리자구역",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#b7b7b7",
                 "polygon": [
                     [
                         [
@@ -18819,9 +18846,10 @@
             },
             {
                 "name": "A114호",
+                "type": "경비실,전기실,기계실,관리자구역",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#b7b7b7",
                 "polygon": [
                     [
                         [
@@ -18849,9 +18877,10 @@
             },
             {
                 "name": "계단",
+                "type": "계단,엘베,입구",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#FFFFFF",
                 "polygon": [
                     [
                         [
@@ -18889,9 +18918,10 @@
         [
             {
                 "name": "C201호",
+                "type": "행정실,사무실,센터",
                 "desc": "재무팀",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#E8C46A",
                 "polygon": [
                     [
                         [
@@ -18919,9 +18949,10 @@
             },
             {
                 "name": "계단",
+                "type": "계단,엘베,입구",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#FFFFFF",
                 "polygon": [
                     [
                         [
@@ -18949,9 +18980,10 @@
             },
             {
                 "name": "계단",
+                "type": "계단,엘베,입구",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#FFFFFF",
                 "polygon": [
                     [
                         [
@@ -18979,9 +19011,10 @@
             },
             {
                 "name": "B201호",
+                "type": "행정실,사무실,센터",
                 "desc": "인사총무팀",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#E8C46A",
                 "polygon": [
                     [
                         [
@@ -19009,9 +19042,10 @@
             },
             {
                 "name": "B202호",
+                "type": "총장실,비서실,이사장실,임원회의실",
                 "desc": "행정부처장실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#b7b7b7",
                 "polygon": [
                     [
                         [
@@ -19039,9 +19073,10 @@
             },
             {
                 "name": "B203호",
+                "type": "총장실,비서실,이사장실,임원회의실",
                 "desc": "팀장실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#b7b7b7",
                 "polygon": [
                     [
                         [
@@ -19069,9 +19104,10 @@
             },
             {
                 "name": "B204호",
+                "type": "창고",
                 "desc": "시설창고",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#a0785a",
                 "polygon": [
                     [
                         [
@@ -19099,9 +19135,10 @@
             },
             {
                 "name": "B205호",
+                "type": "행정실,사무실,센터",
                 "desc": "시설관리팀",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#E8C46A",
                 "polygon": [
                     [
                         [
@@ -19137,9 +19174,10 @@
             },
             {
                 "name": "화장실",
+                "type": "화장실",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#F4A261",
                 "polygon": [
                     [
                         [
@@ -19167,9 +19205,10 @@
             },
             {
                 "name": "계단",
+                "type": "계단,엘베,입구",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#FFFFFF",
                 "polygon": [
                     [
                         [
@@ -19197,9 +19236,10 @@
             },
             {
                 "name": "A208호",
+                "type": "교수연구실",
                 "desc": "교수실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -19227,9 +19267,10 @@
             },
             {
                 "name": "화장실",
+                "type": "화장실",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#F4A261",
                 "polygon": [
                     [
                         [
@@ -19257,9 +19298,10 @@
             },
             {
                 "name": "계단",
+                "type": "계단,엘베,입구",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#FFFFFF",
                 "polygon": [
                     [
                         [
@@ -19287,9 +19329,10 @@
             },
             {
                 "name": "A201호",
+                "type": "행정실,사무실,센터",
                 "desc": "융합예술교육센터",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#E8C46A",
                 "polygon": [
                     [
                         [
@@ -19317,9 +19360,10 @@
             },
             {
                 "name": "A202호",
+                "type": "행정실,사무실,센터",
                 "desc": "행정처장실 대학본부",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#E8C46A",
                 "polygon": [
                     [
                         [
@@ -19347,9 +19391,10 @@
             },
             {
                 "name": "A209호",
+                "type": "교수연구실",
                 "desc": "산학협력단 연구소",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -19377,9 +19422,10 @@
             },
             {
                 "name": "A203호",
+                "type": "교수연구실",
                 "desc": "교수실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -19407,9 +19453,10 @@
             },
             {
                 "name": "A204호",
+                "type": "교수연구실",
                 "desc": "교수실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -19437,9 +19484,10 @@
             },
             {
                 "name": "A205호",
+                "type": "교수연구실",
                 "desc": "교수실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -19467,9 +19515,10 @@
             },
             {
                 "name": "A206호",
+                "type": "교수연구실",
                 "desc": "교수실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -19497,9 +19546,10 @@
             },
             {
                 "name": "A207호",
+                "type": "교수연구실",
                 "desc": "교수실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -24365,10 +24415,8 @@
             {
                 "name": "300호",
                 "type": "학회실,의원회실,학과회실",
-                "type": "학회실,의원회실,학과회실",
                 "desc": "총학생회 회의실",
                 "tags": [],
-                "color": "#E8C46A",
                 "color": "#E8C46A",
                 "polygon": [
                     [
@@ -24398,10 +24446,8 @@
             {
                 "name": "315호",
                 "type": "학회실,의원회실,학과회실",
-                "type": "학회실,의원회실,학과회실",
                 "desc": "간호학과 학회실",
                 "tags": [],
-                "color": "#E8C46A",
                 "color": "#E8C46A",
                 "polygon": [
                     [
@@ -24434,7 +24480,6 @@
                 "desc": "계단",
                 "tags": [],
                 "color": "#ffffff",
-                "color": "#ffffff",
                 "polygon": [
                     [
                         [
@@ -24465,7 +24510,6 @@
                 "type": "기타",
                 "desc": "계단",
                 "tags": [],
-                "color": "#ffffff",
                 "color": "#ffffff",
                 "polygon": [
                     [
