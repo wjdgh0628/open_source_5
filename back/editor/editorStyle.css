@@ -178,9 +178,11 @@ textarea
 
 #floorCoordsInput
 {
-	width: 260px;
-	min-height: 70px;
+	width: 100%;
+	min-width: 420px;
+	min-height: 140px;
 	resize: vertical;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 .row
@@ -188,6 +190,37 @@ textarea
 	display: flex;
 	gap: 6px;
 	align-items: center;
+}
+
+#floorEditToggleBtn[aria-pressed="true"] {
+	background: #0a8f3e;
+	color: #fff;
+	border-color: #0a8f3e;
+}
+
+.floor-input-wrap {
+	display: flex;
+	align-items: stretch;
+	gap: 8px;
+}
+
+.floor-input-actions {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	min-width: 130px;
+	justify-content: flex-start;
+	margin-left: auto;
+}
+
+.floor-help-note {
+	font-size: 11px;
+	color: #666;
+	line-height: 1.4;
+}
+
+#leftRoomsPanel.readonly {
+	opacity: 0.65;
 }
 
 #middlePanel

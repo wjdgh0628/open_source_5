@@ -20,6 +20,8 @@ const floorSelect = el("floorSelect");
 const floorCoordsInput = el("floorCoordsInput");
 const applyFloorCoordsBtn = el("applyFloorCoordsBtn");
 const copyFloorCoordsBtn = el("copyFloorCoordsBtn");
+const floorEditToggleBtn = el("floorEditToggleBtn");
+const leftRoomsPanel = el("leftRoomsPanel");
 const paletteApplyBtn = el("paletteApplyBtn");
 const saveRoomsBtn = el("saveRoomsBtn");
 const reloadRoomsBtn = el("reloadRoomsBtn");
@@ -35,6 +37,7 @@ export const state = {
 	floorIndex: null,
 	floorInfo: null,
 	floorPolygon: null, // [[lon,lat], ...]
+	floorEditMode: false,
 	worldOrigin: { x: 0, y: 0 },
 	view: { scale: 1, panX: 0, panY: 0, rotation: 0 },
 
@@ -237,6 +240,30 @@ function fitViewToFloor() {
 	fitViewTo(state.floorPolygon);
 }
 
+function applyRoomsReadonlyState() {
+	if (!leftRoomsPanel) return;
+	const on = !!state.floorEditMode;
+	leftRoomsPanel.classList.toggle("readonly", on);
+	const controls = leftRoomsPanel.querySelectorAll("button, input, select, textarea");
+	controls.forEach((node) => {
+		node.disabled = on;
+	});
+}
+
+function refreshFloorEditToggleUI() {
+	if (!floorEditToggleBtn) return;
+	const on = !!state.floorEditMode;
+	floorEditToggleBtn.setAttribute("aria-pressed", on ? "true" : "false");
+	floorEditToggleBtn.textContent = on ? "층 수정 모드 ON" : "층 수정 모드 OFF";
+	applyRoomsReadonlyState();
+}
+
+function toggleFloorEditMode() {
+	state.floorEditMode = !state.floorEditMode;
+	refreshFloorEditToggleUI();
+	draw();
+}
+
 function computeFidForCurrent() {
 	if (!state.floorInfo || state.floorIndex == null) return null;
 	const levelNum = idRules.level(state.floorInfo.bmLevel, state.floorIndex);
@@ -276,7 +303,9 @@ function loadFloorImage() {
 }
 
 function formatFloorCoords() {
-	return formatCoords(state.floorPolygon, { decimals: COORD_DECIMALS, close: true });
+	const closedOuter = JSON.parse(formatCoords(state.floorPolygon, { decimals: COORD_DECIMALS, close: true }));
+	const pointLines = closedOuter.map((pt) => `    [${pt[0]}, ${pt[1]}]`);
+	return `[\n  [\n${pointLines.join(",\n")}\n  ]\n]`;
 }
 
 export function pushHistory() {
@@ -365,7 +394,7 @@ async function onFloorChange() {
 		// Take outer ring
 		poly = poly[0];
 	}
-	state.floorPolygon = poly;
+	state.floorPolygon = stripClosingPoint(poly);
 	loadFloorImage();
 	fitViewToFloor();
 
@@ -383,7 +412,7 @@ async function onFloorChange() {
 }
 
 // ==== Floor: input/output shared helpers ============================================
-function refreshFloorInput() {
+export function refreshFloorInput() {
 	floorCoordsInput.value = formatFloorCoords();
 }
 
@@ -393,7 +422,17 @@ function applyManualFloorCoords() {
 	try {
 		const arr = JSON.parse(t);
 		if (!Array.isArray(arr) || !arr.length) return;
-		state.floorPolygon = arr;
+		let outer = arr;
+		// Accept both [[lon,lat], ...] and [[[lon,lat], ...], ...]
+		if (
+			Array.isArray(arr[0]) &&
+			arr[0].length &&
+			Array.isArray(arr[0][0])
+		) {
+			outer = arr[0];
+		}
+		state.floorPolygon = stripClosingPoint(outer);
+		refreshFloorInput();
 		fitViewToFloor();
 		draw();
 	} catch (e) {
@@ -898,6 +937,7 @@ export function refreshSavedList() {
 		const item = createRoomItem(room, idx, "saved");
 		savedRoomListEl.appendChild(item);
 	});
+	applyRoomsReadonlyState();
 }
 
 export function refreshDraftList() {
@@ -906,6 +946,7 @@ export function refreshDraftList() {
 		const item = createRoomItem(room, idx, "draft");
 		draftRoomListEl.appendChild(item);
 	});
+	applyRoomsReadonlyState();
 }
 
 // ==== Init ==========================================================================
@@ -914,6 +955,7 @@ function bind() {
 	floorSelect.addEventListener("change", onFloorChange);
 	applyFloorCoordsBtn.addEventListener("click", applyManualFloorCoords);
 	copyFloorCoordsBtn.addEventListener("click", copyFloorCoords);
+	floorEditToggleBtn.addEventListener("click", toggleFloorEditMode);
 	paletteApplyBtn.addEventListener("click", applyPaletteAndSave);
 	saveRoomsBtn.addEventListener("click", saveRoomsOnly);
 	reloadRoomsBtn.addEventListener("click", reloadRoomsFromServer);
@@ -938,6 +980,7 @@ async function init() {
 	initDraw(canvas, state);
 	resizeCanvas();
 	bind();
+	refreshFloorEditToggleUI();
 	await initBuildings();
 }
 init();

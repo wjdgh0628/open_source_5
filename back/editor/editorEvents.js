@@ -1,5 +1,5 @@
-import { hitTestFilledRoom, screenToWorld, findNearestVertex, draw, getWorldCenterFromLonLatPoints, lonLatToWorld, worldToLonLat, applyTransformToLonLatPoints, worldToScreen, bboxOf } from "./editorDraw.js";
-import { canvas, state, pushHistory, setActiveDraft, setActiveRoom, modDown, getOrCreateActiveOpenDraft, refreshDraftList, getRoom, refreshSavedList, undo, deleteDraft, isMac, getActiveOpenRoomOrNull, closeActiveRoom, writeSavedBackToDB } from "./editorMain.js";
+import { hitTestFilledRoom, screenToWorld, findNearestVertex, findNearestFloorVertex, draw, getWorldCenterFromLonLatPoints, lonLatToWorld, worldToLonLat, applyTransformToLonLatPoints, worldToScreen, bboxOf } from "./editorDraw.js";
+import { canvas, state, pushHistory, setActiveDraft, setActiveRoom, modDown, getOrCreateActiveOpenDraft, refreshDraftList, getRoom, refreshSavedList, refreshFloorInput, undo, deleteDraft, isMac, getActiveOpenRoomOrNull, closeActiveRoom, writeSavedBackToDB } from "./editorMain.js";
 
 // History: snapshot once per Shift operation
 function ensureHistoryStartForShiftOp(e) {
@@ -37,6 +37,32 @@ export function onMouseDown(e) {
 	state.mouse.lastY = y;
 	state.mouse.dragTarget = null;
 	state.mouse.savedChanged = false;
+
+	if (state.floorEditMode) {
+		if (e.button === 0) {
+			const hitFloor = findNearestFloorVertex(x, y);
+			if (hitFloor) {
+				state.mouse.dragTarget = {
+					type: "floor-point",
+					pointIndex: hitFloor.pointIndex
+				};
+			} else {
+				state.mouse.dragTarget = { type: "pan" };
+			}
+			return;
+		}
+		if (e.button === 2) {
+			const cx = canvas.width / 2;
+			const cy = canvas.height / 2;
+			const [wx, wy] = screenToWorld(cx, cy);
+			state.mouse.dragTarget = {
+				type: "rotate",
+				anchorWorld: [wx, wy],
+				anchorScreen: { x: cx, y: cy }
+			};
+			return;
+		}
+	}
 
 	if (e.button === 0) {
 		const shiftHeld = e.shiftKey;
@@ -263,6 +289,14 @@ export function onMouseMove(e) {
 				}
 			}
 			draw();
+		} else if (t.type === "floor-point") {
+			const [wx, wy] = screenToWorld(x, y);
+			if (Array.isArray(state.floorPolygon) && state.floorPolygon[t.pointIndex]) {
+				state.floorPolygon[t.pointIndex][0] = wx;
+				state.floorPolygon[t.pointIndex][1] = wy;
+				refreshFloorInput();
+				draw();
+			}
 		} else if (t.type === "room-move") {
 			const [wx, wy] = screenToWorld(x, y);
 			const last = t.lastWorld || t.startWorld;
@@ -347,6 +381,7 @@ export function onMouseUp() {
 	state.mouse.dragTarget = null;
 }
 export function onKeyDown(e) {
+	if (state.floorEditMode) return;
 	const tag = document.activeElement && document.activeElement.tagName;
 	// Don't steal shortcuts when typing in inputs/textarea
 	if (tag === "INPUT" || tag === "TEXTAREA") return;
@@ -453,6 +488,20 @@ export function onWheel(e) {
 	if (e.altKey && state.image.loaded && state.image.img) {
 		const zoomImg = Math.exp(-e.deltaY * 0.002);
 		state.image.scale *= zoomImg;
+		draw();
+		return;
+	}
+
+	if (state.floorEditMode) {
+		const cx = canvas.width / 2;
+		const cy = canvas.height / 2;
+		const [wx, wy] = screenToWorld(cx, cy);
+		const before = worldToScreen(wx, wy);
+		const zoom = Math.exp(-e.deltaY * 0.002);
+		state.view.scale *= zoom;
+		const after = worldToScreen(wx, wy);
+		state.view.panX += before.x - after.x;
+		state.view.panY += before.y - after.y;
 		draw();
 		return;
 	}

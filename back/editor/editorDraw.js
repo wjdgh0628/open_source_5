@@ -250,6 +250,23 @@ export function findNearestVertex(screenX, screenY, thresholdPx = 20) {
 	return best;
 }
 
+export function findNearestFloorVertex(screenX, screenY, thresholdPx = 20) {
+	if (!Array.isArray(stateRef.floorPolygon)) return null;
+	let best = null;
+	let bestDist = Infinity;
+	stateRef.floorPolygon.forEach((pt, pIndex) => {
+		const s = worldToScreen(pt[0], pt[1]);
+		const dx = s.x - screenX;
+		const dy = s.y - screenY;
+		const d = Math.hypot(dx, dy);
+		if (d <= thresholdPx && d < bestDist) {
+			bestDist = d;
+			best = { pointIndex: pIndex };
+		}
+	});
+	return best;
+}
+
 export function draw() {
 	if (!canvasRef || !ctxRef || !stateRef) return;
 	const ctx = ctxRef;
@@ -266,6 +283,29 @@ export function draw() {
 	ctx.fillStyle = "rgba(0,128,0,.05)";
 	ctx.fill();
 	ctx.stroke();
+
+	if (stateRef.floorEditMode) {
+		stateRef.floorPolygon.forEach(([wx, wy], idx) => {
+			const s = worldToScreen(wx, wy);
+			ctx.beginPath();
+			ctx.arc(s.x, s.y, 4, 0, Math.PI * 2);
+			ctx.fillStyle = "#0a8f3e";
+			ctx.fill();
+			ctx.strokeStyle = "#fff";
+			ctx.lineWidth = 1;
+			ctx.stroke();
+
+			const label = String(idx);
+			ctx.font = "12px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
+			const tw = ctx.measureText(label).width;
+			const tx = s.x - tw / 2;
+			const ty = s.y - 10;
+			ctx.fillStyle = "rgba(255,255,255,0.9)";
+			ctx.fillRect(tx - 3, ty - 11, tw + 6, 14);
+			ctx.fillStyle = "#0a8f3e";
+			ctx.fillText(label, tx, ty);
+		});
+	}
 
 	// Saved Rooms (rooms.json) — editable, stronger color
 	stateRef.saved.forEach((room, idx) => {
