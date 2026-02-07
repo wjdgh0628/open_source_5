@@ -1,4 +1,4 @@
-import { COORD_DECIMALS, PALETTE } from "./editorConfig.js";
+import { COORD_DECIMALS, EC, PALETTE } from "./editorConfig.js";
 import { idRules } from "../shared/rules.js";
 import { initDraw, draw, bboxOfWorld, formatCoords, fitViewTo } from "./editorDraw.js";
 import { onMouseDown, onMouseMove, onWheel, onMouseUp, onKeyDown, onKeyUp } from "./editorEvents.js";
@@ -32,6 +32,10 @@ const savedRoomListEl = el("savedRoomList");
 const draftRoomListEl = el("draftRoomList");
 
 const imageOpacityRange = el("imageOpacity");
+const configuredFloorplanOpacity = Number(EC?.floorplanOpacity);
+const defaultFloorplanOpacity = Number.isFinite(configuredFloorplanOpacity)
+	? Math.max(0, Math.min(1, configuredFloorplanOpacity))
+	: 0.5;
 
 export const state = {
 	building: null,
@@ -57,7 +61,7 @@ export const state = {
 	floorHistory: [],
 	floorRedoHistory: [],
 	clipboard: null,
-	image: { img: null, loaded: false, pos: { x: 0, y: 0 }, scale: 1, rotation: 0, opacity: 0.6 },
+	image: { img: null, loaded: false, pos: { x: 0, y: 0 }, scale: 1, rotation: 0, opacity: defaultFloorplanOpacity },
 
 	roomIdCounter: 1
 };
@@ -289,6 +293,24 @@ function computeFidForCurrent() {
 	return idRules.fid(state.building, levelNum);
 }
 
+function extractOuterFloorPolygon(floorInfo, floorIndex) {
+	if (!floorInfo || floorIndex == null) return [];
+	const { flList, flVars } = floorInfo;
+	const flVarIndex = flList[floorIndex];
+	let poly = flVars[flVarIndex];
+	// Allow either [[lon,lat], ...] or [[[lon,lat], ...], ...] (GeoJSON Polygon)
+	if (
+		Array.isArray(poly) &&
+		poly.length &&
+		Array.isArray(poly[0]) &&
+		Array.isArray(poly[0][0])
+	) {
+		// Take outer ring
+		poly = poly[0];
+	}
+	return stripClosingPoint(poly);
+}
+
 function loadFloorImage() {
 	const fid = computeFidForCurrent();
 	state.image.loaded = false;
@@ -466,20 +488,7 @@ async function onFloorChange() {
 	const idx = parseInt(floorSelect.value, 10);
 	if (Number.isNaN(idx)) return;
 	state.floorIndex = idx;
-	const { flList, flVars } = state.floorInfo;
-	const flVarIndex = flList[idx];
-	let poly = flVars[flVarIndex];
-	// Allow either [[lon,lat], ...] or [[[lon,lat], ...], ...] (GeoJSON Polygon)
-	if (
-		Array.isArray(poly) &&
-		poly.length &&
-		Array.isArray(poly[0]) &&
-		Array.isArray(poly[0][0])
-	) {
-		// Take outer ring
-		poly = poly[0];
-	}
-	const baseFloor = stripClosingPoint(poly);
+	const baseFloor = extractOuterFloorPolygon(state.floorInfo, idx);
 	state.floorPolygon = clonePoints(baseFloor);
 	state.floorPolygonOriginal = clonePoints(baseFloor);
 	loadFloorImage();
@@ -542,15 +551,31 @@ async function copyFloorCoords() {
 	}
 }
 
-function resetFloorCoords() {
-	if (!Array.isArray(state.floorPolygonOriginal) || !state.floorPolygonOriginal.length) return;
-	if (!isSamePoints(state.floorPolygon, state.floorPolygonOriginal)) {
-		pushFloorHistory();
+async function resetFloorCoords() {
+	if (!state.building || state.floorIndex == null) return;
+	const before = clonePoints(state.floorPolygon);
+	try {
+		await updateInfos(); // reload latest buildings.geojson + rooms.json
+		const infosMap = getInfos();
+		const latestFloorInfo = infosMap ? infosMap[state.building] : null;
+		if (!latestFloorInfo) return;
+		latestFloorInfo.lvCount = latestFloorInfo.flLevel + latestFloorInfo.bmLevel;
+		state.floorInfo = latestFloorInfo;
+		ensureRoomsArrayForBuilding(state.building, state.floorInfo.lvCount);
+
+		const latest = extractOuterFloorPolygon(state.floorInfo, state.floorIndex);
+		if (!latest.length) return;
+		if (!isSamePoints(before, latest)) {
+			pushFloorHistory();
+		}
+		state.floorPolygon = clonePoints(latest);
+		state.floorPolygonOriginal = clonePoints(latest);
+		state.floorHistory = [];
+		refreshFloorInput();
+		draw();
+	} catch (e) {
+		console.error("층 좌표 초기화(재로딩) 실패:", e);
 	}
-	state.floorPolygon = clonePoints(state.floorPolygonOriginal);
-	refreshFloorInput();
-	fitViewToFloor();
-	draw();
 }
 
 // 팔레트 변경을 저장 목록에 일괄 적용 후 infos/rooms.json에 반영
@@ -1065,6 +1090,7 @@ function bind() {
 	saveRoomsBtn.addEventListener("click", saveRoomsOnly);
 	reloadRoomsBtn.addEventListener("click", reloadRoomsFromServer);
 
+	imageOpacityRange.value = String(Math.round(defaultFloorplanOpacity * 100));
 	imageOpacityRange.addEventListener("input", () => {
 		const v = Number(imageOpacityRange.value) || 0;
 		state.image.opacity = Math.max(0, Math.min(1, v / 100));

@@ -1,4 +1,7 @@
-export const EC = {};
+export const EC = {
+	// Floorplan image opacity in editor (0 ~ 1)
+	floorplanOpacity: 0.5
+};
 
 // draw.js: 좌표 변환, 폴리곤 그리기/히트테스트 모듈
 
