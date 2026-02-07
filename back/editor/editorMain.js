@@ -1,4 +1,4 @@
-import { COORD_DECIMALS, PALETTE } from "./editorConfig.js";
+import { COORD_DECIMALS, EC, PALETTE } from "./editorConfig.js";
 import { idRules } from "../shared/rules.js";
 import { initDraw, draw, bboxOfWorld, formatCoords, fitViewTo } from "./editorDraw.js";
 import { onMouseDown, onMouseMove, onWheel, onMouseUp, onKeyDown, onKeyUp } from "./editorEvents.js";
@@ -19,19 +19,31 @@ const buildingSelect = el("buildingSelect");
 const floorSelect = el("floorSelect");
 const floorCoordsInput = el("floorCoordsInput");
 const applyFloorCoordsBtn = el("applyFloorCoordsBtn");
+const resetFloorCoordsBtn = el("resetFloorCoordsBtn");
 const copyFloorCoordsBtn = el("copyFloorCoordsBtn");
+const floorEditToggleBtn = el("floorEditToggleBtn");
+const leftRoomsPanel = el("leftRoomsPanel");
+const paletteApplyBtn = el("paletteApplyBtn");
+const saveRoomsBtn = el("saveRoomsBtn");
+const reloadRoomsBtn = el("reloadRoomsBtn");
 
 // New: dual lists & file controls
 const savedRoomListEl = el("savedRoomList");
 const draftRoomListEl = el("draftRoomList");
 
 const imageOpacityRange = el("imageOpacity");
+const configuredFloorplanOpacity = Number(EC?.floorplanOpacity);
+const defaultFloorplanOpacity = Number.isFinite(configuredFloorplanOpacity)
+	? Math.max(0, Math.min(1, configuredFloorplanOpacity))
+	: 0.5;
 
 export const state = {
 	building: null,
 	floorIndex: null,
 	floorInfo: null,
 	floorPolygon: null, // [[lon,lat], ...]
+	floorPolygonOriginal: null, // 현재 층 원본(초기화 기준)
+	floorEditMode: false,
 	worldOrigin: { x: 0, y: 0 },
 	view: { scale: 1, panX: 0, panY: 0, rotation: 0 },
 
@@ -45,8 +57,11 @@ export const state = {
 
 	mouse: { isDown: false, lastX: 0, lastY: 0, dragTarget: null, savedChanged: false, _histShiftOp: false },
 	history: [],
+	redoHistory: [],
+	floorHistory: [],
+	floorRedoHistory: [],
 	clipboard: null,
-	image: { img: null, loaded: false, pos: { x: 0, y: 0 }, scale: 1, rotation: 0, opacity: 0.6 },
+	image: { img: null, loaded: false, pos: { x: 0, y: 0 }, scale: 1, rotation: 0, opacity: defaultFloorplanOpacity },
 
 	roomIdCounter: 1
 };
@@ -77,6 +92,20 @@ function stripClosingPoint(points) {
 		return points.slice(0, -1);
 	}
 	return points.slice();
+}
+
+function clonePoints(points) {
+	return Array.isArray(points) ? points.map((p) => [p[0], p[1]]) : [];
+}
+
+function isSamePoints(a, b) {
+	if (!Array.isArray(a) || !Array.isArray(b)) return false;
+	if (a.length !== b.length) return false;
+	for (let i = 0; i < a.length; i++) {
+		if (!Array.isArray(a[i]) || !Array.isArray(b[i])) return false;
+		if (a[i][0] !== b[i][0] || a[i][1] !== b[i][1]) return false;
+	}
+	return true;
 }
 
 function ensureClosedPolygon(points) {
@@ -234,10 +263,52 @@ function fitViewToFloor() {
 	fitViewTo(state.floorPolygon);
 }
 
+function applyRoomsReadonlyState() {
+	if (!leftRoomsPanel) return;
+	const on = !!state.floorEditMode;
+	leftRoomsPanel.classList.toggle("readonly", on);
+	const controls = leftRoomsPanel.querySelectorAll("button, input, select, textarea");
+	controls.forEach((node) => {
+		node.disabled = on;
+	});
+}
+
+function refreshFloorEditToggleUI() {
+	if (!floorEditToggleBtn) return;
+	const on = !!state.floorEditMode;
+	floorEditToggleBtn.setAttribute("aria-pressed", on ? "true" : "false");
+	floorEditToggleBtn.textContent = on ? "층 수정 모드 ON" : "층 수정 모드 OFF";
+	applyRoomsReadonlyState();
+}
+
+function toggleFloorEditMode() {
+	state.floorEditMode = !state.floorEditMode;
+	refreshFloorEditToggleUI();
+	draw();
+}
+
 function computeFidForCurrent() {
 	if (!state.floorInfo || state.floorIndex == null) return null;
 	const levelNum = idRules.level(state.floorInfo.bmLevel, state.floorIndex);
 	return idRules.fid(state.building, levelNum);
+}
+
+function extractOuterFloorPolygon(floorInfo, floorIndex) {
+	if (!floorInfo || floorIndex == null) return [];
+	const { flList, flVars } = floorInfo;
+	const flVarIndex = flList[floorIndex];
+	let poly = flVars[flVarIndex];
+	// Allow either [[lon,lat], ...] or [[[lon,lat], ...], ...] (GeoJSON Polygon)
+	if (
+		Array.isArray(poly) &&
+		poly.length &&
+		Array.isArray(poly[0]) &&
+		Array.isArray(poly[0][0])
+	) {
+		// Take outer ring
+		poly = poly[0];
+	}
+	return stripClosingPoint(poly);
 }
 
 function loadFloorImage() {
@@ -273,7 +344,9 @@ function loadFloorImage() {
 }
 
 function formatFloorCoords() {
-	return formatCoords(state.floorPolygon, { decimals: COORD_DECIMALS, close: true });
+	const closedOuter = JSON.parse(formatCoords(state.floorPolygon, { decimals: COORD_DECIMALS, close: true }));
+	const pointLines = closedOuter.map((pt) => `    [${pt[0]}, ${pt[1]}]`);
+	return `[\n  [\n${pointLines.join(",\n")}\n  ]\n]`;
 }
 
 export function pushHistory() {
@@ -284,10 +357,18 @@ export function pushHistory() {
 		activeSavedIndex: state.activeSavedIndex
 	});
 	if (state.history.length > 100) state.history.shift();
+	state.redoHistory = [];
 }
 export function undo() {
 	if (!state.history.length) return;
 	const prevSavedJSON = JSON.stringify(state.saved);
+	state.redoHistory.push({
+		rooms: JSON.parse(JSON.stringify(state.rooms)),
+		saved: JSON.parse(JSON.stringify(state.saved)),
+		activeRoomIndex: state.activeRoomIndex,
+		activeSavedIndex: state.activeSavedIndex
+	});
+	if (state.redoHistory.length > 100) state.redoHistory.shift();
 	const snap = state.history.pop();
 	state.rooms = snap.rooms;
 	state.saved = snap.saved || state.saved;
@@ -299,6 +380,64 @@ export function undo() {
 	}
 	refreshSavedList();
 	refreshDraftList();
+	draw();
+}
+
+export function redo() {
+	if (!state.redoHistory.length) return;
+	const prevSavedJSON = JSON.stringify(state.saved);
+	state.history.push({
+		rooms: JSON.parse(JSON.stringify(state.rooms)),
+		saved: JSON.parse(JSON.stringify(state.saved)),
+		activeRoomIndex: state.activeRoomIndex,
+		activeSavedIndex: state.activeSavedIndex
+	});
+	if (state.history.length > 100) state.history.shift();
+	const snap = state.redoHistory.pop();
+	state.rooms = snap.rooms;
+	state.saved = snap.saved || state.saved;
+	state.activeRoomIndex = snap.activeRoomIndex;
+	state.activeSavedIndex = snap.activeSavedIndex;
+	const newSavedJSON = JSON.stringify(state.saved);
+	if (prevSavedJSON !== newSavedJSON) {
+		writeSavedBackToDB();
+	}
+	refreshSavedList();
+	refreshDraftList();
+	draw();
+}
+
+export function pushFloorHistory() {
+	const snap = clonePoints(state.floorPolygon);
+	if (!snap.length) return;
+	const last = state.floorHistory[state.floorHistory.length - 1];
+	if (last && isSamePoints(last, snap)) return;
+	state.floorHistory.push(snap);
+	if (state.floorHistory.length > 100) state.floorHistory.shift();
+	state.floorRedoHistory = [];
+}
+
+export function undoFloor() {
+	if (!state.floorHistory.length) return;
+	const current = clonePoints(state.floorPolygon);
+	if (current.length) {
+		state.floorRedoHistory.push(current);
+		if (state.floorRedoHistory.length > 100) state.floorRedoHistory.shift();
+	}
+	state.floorPolygon = state.floorHistory.pop();
+	refreshFloorInput();
+	draw();
+}
+
+export function redoFloor() {
+	if (!state.floorRedoHistory.length) return;
+	const current = clonePoints(state.floorPolygon);
+	if (current.length) {
+		state.floorHistory.push(current);
+		if (state.floorHistory.length > 100) state.floorHistory.shift();
+	}
+	state.floorPolygon = state.floorRedoHistory.pop();
+	refreshFloorInput();
 	draw();
 }
 
@@ -349,20 +488,9 @@ async function onFloorChange() {
 	const idx = parseInt(floorSelect.value, 10);
 	if (Number.isNaN(idx)) return;
 	state.floorIndex = idx;
-	const { flList, flVars } = state.floorInfo;
-	const flVarIndex = flList[idx];
-	let poly = flVars[flVarIndex];
-	// Allow either [[lon,lat], ...] or [[[lon,lat], ...], ...] (GeoJSON Polygon)
-	if (
-		Array.isArray(poly) &&
-		poly.length &&
-		Array.isArray(poly[0]) &&
-		Array.isArray(poly[0][0])
-	) {
-		// Take outer ring
-		poly = poly[0];
-	}
-	state.floorPolygon = poly;
+	const baseFloor = extractOuterFloorPolygon(state.floorInfo, idx);
+	state.floorPolygon = clonePoints(baseFloor);
+	state.floorPolygonOriginal = clonePoints(baseFloor);
 	loadFloorImage();
 	fitViewToFloor();
 
@@ -371,6 +499,9 @@ async function onFloorChange() {
 	state.activeRoomIndex = null;
 	state.activeSavedIndex = null;
 	state.history = [];
+	state.redoHistory = [];
+	state.floorHistory = [];
+	state.floorRedoHistory = [];
 	loadSavedRoomsForCurrent();
 
 	refreshFloorInput();
@@ -380,7 +511,7 @@ async function onFloorChange() {
 }
 
 // ==== Floor: input/output shared helpers ============================================
-function refreshFloorInput() {
+export function refreshFloorInput() {
 	floorCoordsInput.value = formatFloorCoords();
 }
 
@@ -390,8 +521,21 @@ function applyManualFloorCoords() {
 	try {
 		const arr = JSON.parse(t);
 		if (!Array.isArray(arr) || !arr.length) return;
-		state.floorPolygon = arr;
-		fitViewToFloor();
+		let outer = arr;
+		// Accept both [[lon,lat], ...] and [[[lon,lat], ...], ...]
+		if (
+			Array.isArray(arr[0]) &&
+			arr[0].length &&
+			Array.isArray(arr[0][0])
+		) {
+			outer = arr[0];
+		}
+		const next = stripClosingPoint(outer);
+		if (!isSamePoints(state.floorPolygon, next)) {
+			pushFloorHistory();
+		}
+		state.floorPolygon = next;
+		refreshFloorInput();
 		draw();
 	} catch (e) {
 		console.error("수동 층 폴리곤 파싱 실패:", e);
@@ -404,6 +548,80 @@ async function copyFloorCoords() {
 		await navigator.clipboard.writeText(text);
 	} catch (e) {
 		console.error("클립보드 복사 실패", e);
+	}
+}
+
+async function resetFloorCoords() {
+	if (!state.building || state.floorIndex == null) return;
+	const before = clonePoints(state.floorPolygon);
+	try {
+		await updateInfos(); // reload latest buildings.geojson + rooms.json
+		const infosMap = getInfos();
+		const latestFloorInfo = infosMap ? infosMap[state.building] : null;
+		if (!latestFloorInfo) return;
+		latestFloorInfo.lvCount = latestFloorInfo.flLevel + latestFloorInfo.bmLevel;
+		state.floorInfo = latestFloorInfo;
+		ensureRoomsArrayForBuilding(state.building, state.floorInfo.lvCount);
+
+		const latest = extractOuterFloorPolygon(state.floorInfo, state.floorIndex);
+		if (!latest.length) return;
+		if (!isSamePoints(before, latest)) {
+			pushFloorHistory();
+		}
+		state.floorPolygon = clonePoints(latest);
+		state.floorPolygonOriginal = clonePoints(latest);
+		state.floorHistory = [];
+		refreshFloorInput();
+		draw();
+	} catch (e) {
+		console.error("층 좌표 초기화(재로딩) 실패:", e);
+	}
+}
+
+// 팔레트 변경을 저장 목록에 일괄 적용 후 infos/rooms.json에 반영
+function applyPaletteAndSave() {
+	if (!Array.isArray(state.saved) || !state.saved.length) return;
+	let changed = false;
+	state.saved.forEach((room) => {
+		const t = (room.type && String(room.type).trim()) ? String(room.type).trim() : "기타";
+		const paletteColor = (t !== "기타" && PALETTE && PALETTE[t]) ? PALETTE[t] : null;
+		if (paletteColor && room.color !== paletteColor) {
+			room.color = paletteColor;
+			changed = true;
+		}
+	});
+	if (changed) {
+		writeSavedBackToDB(); // infos 및 rooms.json 동기화
+		refreshSavedList();
+		draw();
+	}
+}
+
+// 저장 목록을 그대로 infos/rooms.json에 저장
+function saveRoomsOnly() {
+	writeSavedBackToDB(); // infos 업데이트 + rooms.json POST
+	refreshSavedList();
+	draw();
+}
+
+// rooms.json이 외부에서 변경된 경우 최신 상태를 다시 불러오기
+async function reloadRoomsFromServer() {
+	try {
+		await updateInfos(); // buildings + rooms 최신화
+		const infosMap = getInfos();
+		if (!infosMap) return;
+		if (state.building && infosMap[state.building]) {
+			state.floorInfo = infosMap[state.building];
+			state.floorInfo.lvCount = state.floorInfo.flLevel + state.floorInfo.bmLevel;
+			ensureRoomsArrayForBuilding(state.building, state.floorInfo.lvCount);
+		}
+		// 현재 층의 saved 목록만 교체 (draft는 그대로 유지)
+		state.activeSavedIndex = null;
+		loadSavedRoomsForCurrent();
+		refreshSavedList();
+		draw();
+	} catch (e) {
+		console.error("rooms.json 재로딩 실패:", e);
 	}
 }
 
@@ -848,6 +1066,7 @@ export function refreshSavedList() {
 		const item = createRoomItem(room, idx, "saved");
 		savedRoomListEl.appendChild(item);
 	});
+	applyRoomsReadonlyState();
 }
 
 export function refreshDraftList() {
@@ -856,6 +1075,7 @@ export function refreshDraftList() {
 		const item = createRoomItem(room, idx, "draft");
 		draftRoomListEl.appendChild(item);
 	});
+	applyRoomsReadonlyState();
 }
 
 // ==== Init ==========================================================================
@@ -863,8 +1083,14 @@ function bind() {
 	buildingSelect.addEventListener("change", onBuildingChange);
 	floorSelect.addEventListener("change", onFloorChange);
 	applyFloorCoordsBtn.addEventListener("click", applyManualFloorCoords);
+	resetFloorCoordsBtn.addEventListener("click", resetFloorCoords);
 	copyFloorCoordsBtn.addEventListener("click", copyFloorCoords);
+	floorEditToggleBtn.addEventListener("click", toggleFloorEditMode);
+	paletteApplyBtn.addEventListener("click", applyPaletteAndSave);
+	saveRoomsBtn.addEventListener("click", saveRoomsOnly);
+	reloadRoomsBtn.addEventListener("click", reloadRoomsFromServer);
 
+	imageOpacityRange.value = String(Math.round(defaultFloorplanOpacity * 100));
 	imageOpacityRange.addEventListener("input", () => {
 		const v = Number(imageOpacityRange.value) || 0;
 		state.image.opacity = Math.max(0, Math.min(1, v / 100));
@@ -885,6 +1111,7 @@ async function init() {
 	initDraw(canvas, state);
 	resizeCanvas();
 	bind();
+	refreshFloorEditToggleUI();
 	await initBuildings();
 }
 init();
