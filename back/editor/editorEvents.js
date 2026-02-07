@@ -1,5 +1,5 @@
 import { hitTestFilledRoom, hitTestFilledRoomByRef, screenToWorld, findNearestVertex, findNearestVertexByRef, findNearestFloorVertex, draw, getWorldCenterFromLonLatPoints, lonLatToWorld, worldToLonLat, applyTransformToLonLatPoints, worldToScreen, bboxOf } from "./editorDraw.js";
-import { canvas, state, pushHistory, setActiveDraft, setActiveRoom, modDown, getOrCreateActiveOpenDraft, refreshDraftList, getRoom, refreshSavedList, refreshFloorInput, undo, deleteDraft, isMac, getActiveOpenRoomOrNull, closeActiveRoom, writeSavedBackToDB } from "./editorMain.js";
+import { canvas, state, pushHistory, pushFloorHistory, setActiveDraft, setActiveRoom, modDown, getOrCreateActiveOpenDraft, refreshDraftList, getRoom, refreshSavedList, refreshFloorInput, undo, redo, undoFloor, redoFloor, deleteDraft, isMac, getActiveOpenRoomOrNull, closeActiveRoom, writeSavedBackToDB } from "./editorMain.js";
 
 // History: snapshot once per Shift operation
 function ensureHistoryStartForShiftOp(e) {
@@ -52,6 +52,7 @@ export function onMouseDown(e) {
 		if (e.button === 0) {
 			const hitFloor = findNearestFloorVertex(x, y);
 			if (hitFloor) {
+				pushFloorHistory();
 				state.mouse.dragTarget = {
 					type: "floor-point",
 					pointIndex: hitFloor.pointIndex
@@ -392,16 +393,37 @@ export function onMouseUp() {
 	state.mouse.dragTarget = null;
 }
 export function onKeyDown(e) {
-	if (state.floorEditMode) return;
 	const tag = document.activeElement && document.activeElement.tagName;
+	const key = e.key.toLowerCase();
+
+	if (state.floorEditMode) {
+		if ((e.ctrlKey || e.metaKey) && key === "z" && tag !== "INPUT" && tag !== "TEXTAREA") {
+			e.preventDefault();
+			if (e.shiftKey) {
+				redoFloor();
+			} else {
+				undoFloor();
+			}
+		} else if ((e.ctrlKey || e.metaKey) && key === "y" && tag !== "INPUT" && tag !== "TEXTAREA") {
+			e.preventDefault();
+			redoFloor();
+		}
+		return;
+	}
+
 	// Don't steal shortcuts when typing in inputs/textarea
 	if (tag === "INPUT" || tag === "TEXTAREA") return;
 
-	const key = e.key.toLowerCase();
-
 	if ((e.ctrlKey || e.metaKey) && key === "z") {
 		e.preventDefault();
-		undo();
+		if (e.shiftKey) {
+			redo();
+		} else {
+			undo();
+		}
+	} else if ((e.ctrlKey || e.metaKey) && key === "y") {
+		e.preventDefault();
+		redo();
 	} else if ((e.ctrlKey || e.metaKey) && key === "c") {
 		// Copy from active draft or saved room
 		let src = null;
