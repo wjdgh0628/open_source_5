@@ -8575,10 +8575,10 @@
         [
             {
                 "name": "101호",
-                "type": "실습실-호수",
+                "type": "실습실",
                 "desc": "목공제작실",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -8628,10 +8628,10 @@
             },
             {
                 "name": "도색실",
-                "type": "기타",
+                "type": "실습실",
                 "desc": "도색실",
                 "tags": [],
-                "color": "#00c7fc",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -8659,10 +8659,10 @@
             },
             {
                 "name": "102호",
-                "type": "실습실-호수",
+                "type": "실습실",
                 "desc": "포토스튜디오",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -8712,10 +8712,10 @@
             },
             {
                 "name": "스튜디오",
-                "type": "기타",
+                "type": "실습실",
                 "desc": "스튜디오",
                 "tags": [],
-                "color": "#00c7fc",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -8743,10 +8743,10 @@
             },
             {
                 "name": "103호",
-                "type": "실습실-호수",
+                "type": "실습실",
                 "desc": "실크스크린실",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -8774,10 +8774,10 @@
             },
             {
                 "name": "104호",
-                "type": "기계실 등 설비실-이름",
+                "type": "경비실,전기실,기계실,관리자구역",
                 "desc": "전기실",
                 "tags": [],
-                "color": "#01061e",
+                "color": "#b7b7b7",
                 "polygon": [
                     [
                         [
@@ -8805,10 +8805,10 @@
             },
             {
                 "name": "105호",
-                "type": "기계실 등 설비실-이름",
+                "type": "경비실,전기실,기계실,관리자구역",
                 "desc": "기계실",
                 "tags": [],
-                "color": "#01061e",
+                "color": "#b7b7b7",
                 "polygon": [
                     [
                         [
@@ -8836,10 +8836,10 @@
             },
             {
                 "name": "엘리베이터",
-                "type": "계단, 엘리베이터-이름",
+                "type": "계단,엘베,입구",
                 "desc": "",
                 "tags": [],
-                "color": "#afb9c3",
+                "color": "#FFFFFF",
                 "polygon": [
                     [
                         [
@@ -8867,10 +8867,10 @@
             },
             {
                 "name": "계단",
-                "type": "계단, 엘리베이터-이름",
+                "type": "계단,엘베,입구",
                 "desc": "",
                 "tags": [],
-                "color": "#afb9c3",
+                "color": "#FFFFFF",
                 "polygon": [
                     [
                         [
@@ -8898,10 +8898,10 @@
             },
             {
                 "name": "화장실",
-                "type": "계단, 엘리베이터-이름",
+                "type": "화장실",
                 "desc": "",
                 "tags": [],
-                "color": "#afb9c3",
+                "color": "#F4A261",
                 "polygon": [
                     [
                         [
@@ -8931,9 +8931,10 @@
         [
             {
                 "name": "200호",
+                "type": "편의점,플라타너스,복사실,서점,식당",
                 "desc": "플라타너스",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#F4A261",
                 "polygon": [
                     [
                         [
@@ -8985,9 +8986,10 @@
             },
             {
                 "name": "201호",
+                "type": "강의실,세미나실,멀티실",
                 "desc": "종합강의실",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -9015,9 +9017,10 @@
             },
             {
                 "name": "202호",
+                "type": "강의실,세미나실,멀티실",
                 "desc": "시청각실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -9045,9 +9048,10 @@
             },
             {
                 "name": "203호",
+                "type": "강의실,세미나실,멀티실",
                 "desc": "강의실",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -9075,9 +9079,10 @@
             },
             {
                 "name": "204호",
+                "type": "교수연구실",
                 "desc": "교수연구실",
                 "tags": [],
-                "color": "#00ff11",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -9105,9 +9110,10 @@
             },
             {
                 "name": "205호",
+                "type": "교수연구실",
                 "desc": "교수실",
                 "tags": [],
-                "color": "#00ff11",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -9135,9 +9141,10 @@
             },
             {
                 "name": "계단",
+                "type": "계단,엘베,입구",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#FFFFFF",
                 "polygon": [
                     [
                         [
@@ -9165,9 +9172,10 @@
             },
             {
                 "name": "계단",
+                "type": "계단,엘베,입구",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#FFFFFF",
                 "polygon": [
                     [
                         [
@@ -9195,9 +9203,10 @@
             },
             {
                 "name": "화장실",
+                "type": "화장실",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#F4A261",
                 "polygon": [
                     [
                         [
@@ -9225,9 +9234,10 @@
             },
             {
                 "name": "엘리베이터",
+                "type": "계단,엘베,입구",
                 "desc": "",
                 "tags": [],
-                "color": "#ffffff",
+                "color": "#FFFFFF",
                 "polygon": [
                     [
                         [
@@ -9257,9 +9267,10 @@
         [
             {
                 "name": "301호",
+                "type": "교수연구실",
                 "desc": "박사과정연구실",
                 "tags": [],
-                "color": "#00ff11",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -9287,9 +9298,10 @@
             },
             {
                 "name": "301-A호",
+                "type": "학회실,의원회실,학과회실",
                 "desc": "산학협력단",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#E8C46A",
                 "polygon": [
                     [
                         [
@@ -9317,9 +9329,10 @@
             },
             {
                 "name": "301-B호",
+                "type": "강의실,세미나실,멀티실",
                 "desc": "강의실",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -9347,9 +9360,10 @@
             },
             {
                 "name": "301-C호",
+                "type": "교수연구실",
                 "desc": "유시티박사과정 연구실",
                 "tags": [],
-                "color": "#00ff11",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -9377,9 +9391,10 @@
             },
             {
                 "name": "302호",
+                "type": "총장실,비서실,이사장실,임원회의실",
                 "desc": "산학협력단 단장실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#b7b7b7",
                 "polygon": [
                     [
                         [
@@ -9407,9 +9422,10 @@
             },
             {
                 "name": "303호",
+                "type": "교수연구실",
                 "desc": "교수실",
                 "tags": [],
-                "color": "#00ff11",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -9437,9 +9453,10 @@
             },
             {
                 "name": "304호",
+                "type": "강의실,세미나실,멀티실",
                 "desc": "강의실",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -9467,9 +9484,10 @@
             },
             {
                 "name": "305호",
+                "type": "강의실,세미나실,멀티실",
                 "desc": "세미나실, 강의실",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -9497,9 +9515,10 @@
             },
             {
                 "name": "화장실",
+                "type": "화장실",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#F4A261",
                 "polygon": [
                     [
                         [
@@ -9527,9 +9546,10 @@
             },
             {
                 "name": "계단",
+                "type": "계단,엘베,입구",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#FFFFFF",
                 "polygon": [
                     [
                         [
@@ -9557,9 +9577,10 @@
             },
             {
                 "name": "계단",
+                "type": "계단,엘베,입구",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#FFFFFF",
                 "polygon": [
                     [
                         [
@@ -9587,9 +9608,10 @@
             },
             {
                 "name": "엘리베이터",
+                "type": "계단,엘베,입구",
                 "desc": "",
                 "tags": [],
-                "color": "#ffffff",
+                "color": "#FFFFFF",
                 "polygon": [
                     [
                         [
@@ -9619,9 +9641,10 @@
         [
             {
                 "name": "401-A호",
+                "type": "강의실,세미나실,멀티실",
                 "desc": "강의실",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -9649,9 +9672,10 @@
             },
             {
                 "name": "401-B호",
+                "type": "교수연구실",
                 "desc": "한세한국어학당 강사실",
                 "tags": [],
-                "color": "#00ff11",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -9679,9 +9703,10 @@
             },
             {
                 "name": "402-A호",
+                "type": "강의실,세미나실,멀티실",
                 "desc": "강의실",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -9709,9 +9734,10 @@
             },
             {
                 "name": "402-B호",
+                "type": "강의실,세미나실,멀티실",
                 "desc": "한세한국어학당 강의실",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -9739,9 +9765,10 @@
             },
             {
                 "name": "403호",
+                "type": "강의실,세미나실,멀티실",
                 "desc": "강의실",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -9769,9 +9796,10 @@
             },
             {
                 "name": "404호",
+                "type": "강의실,세미나실,멀티실",
                 "desc": "멀티실 강의실",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -9799,9 +9827,10 @@
             },
             {
                 "name": "405호",
+                "type": "강의실,세미나실,멀티실",
                 "desc": "멀티실 강의실",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -9829,9 +9858,10 @@
             },
             {
                 "name": "406-A호",
+                "type": "강의실,세미나실,멀티실",
                 "desc": "멀티실 강의실",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -9859,9 +9889,10 @@
             },
             {
                 "name": "406-B호",
+                "type": "강의실,세미나실,멀티실",
                 "desc": "강의실",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -9889,9 +9920,10 @@
             },
             {
                 "name": "407호",
+                "type": "강의실,세미나실,멀티실",
                 "desc": "강의실",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -9919,9 +9951,10 @@
             },
             {
                 "name": "계단",
+                "type": "계단,엘베,입구",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#FFFFFF",
                 "polygon": [
                     [
                         [
@@ -9949,9 +9982,10 @@
             },
             {
                 "name": "계단",
+                "type": "계단,엘베,입구",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#FFFFFF",
                 "polygon": [
                     [
                         [
@@ -9979,6 +10013,7 @@
             },
             {
                 "name": "엘리베이터",
+                "type": "기타",
                 "desc": "",
                 "tags": [],
                 "color": "#ffffff",
@@ -10009,9 +10044,10 @@
             },
             {
                 "name": "화장실",
+                "type": "화장실",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#F4A261",
                 "polygon": [
                     [
                         [
@@ -10041,9 +10077,10 @@
         [
             {
                 "name": "501호",
+                "type": "실습실",
                 "desc": "전산실습실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -10071,9 +10108,10 @@
             },
             {
                 "name": "502호",
+                "type": "실습실",
                 "desc": "디지털스튜디오2 실습실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -10101,9 +10139,10 @@
             },
             {
                 "name": "503호",
+                "type": "행정실,사무실,센터",
                 "desc": "디자인학부행정실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#E8C46A",
                 "polygon": [
                     [
                         [
@@ -10131,9 +10170,10 @@
             },
             {
                 "name": "504호",
+                "type": "교수연구실",
                 "desc": "교수실",
                 "tags": [],
-                "color": "#00ff11",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -10161,9 +10201,10 @@
             },
             {
                 "name": "505호",
+                "type": "실습실",
                 "desc": "DTP 실습실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -10191,9 +10232,10 @@
             },
             {
                 "name": "506호",
+                "type": "학회실,의원회실,학과회실",
                 "desc": "시각디자인 학회실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#E8C46A",
                 "polygon": [
                     [
                         [
@@ -10221,9 +10263,10 @@
             },
             {
                 "name": "507호",
+                "type": "강의실,세미나실,멀티실",
                 "desc": "디지털스튜디오 강의실",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -10251,9 +10294,10 @@
             },
             {
                 "name": "508호",
+                "type": "교수연구실",
                 "desc": "IT융합전자공학과 석사과정연구실",
                 "tags": [],
-                "color": "#00ff11",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -10281,9 +10325,10 @@
             },
             {
                 "name": "화장실",
+                "type": "화장실",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#F4A261",
                 "polygon": [
                     [
                         [
@@ -10311,9 +10356,10 @@
             },
             {
                 "name": "계단",
+                "type": "계단,엘베,입구",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#FFFFFF",
                 "polygon": [
                     [
                         [
@@ -10341,9 +10387,10 @@
             },
             {
                 "name": "계단",
+                "type": "계단,엘베,입구",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#FFFFFF",
                 "polygon": [
                     [
                         [
@@ -10371,9 +10418,10 @@
             },
             {
                 "name": "엘리베이터",
+                "type": "계단,엘베,입구",
                 "desc": "",
                 "tags": [],
-                "color": "#ffffff",
+                "color": "#FFFFFF",
                 "polygon": [
                     [
                         [
@@ -10403,9 +10451,10 @@
         [
             {
                 "name": "601호",
+                "type": "실습실",
                 "desc": "디자인스튜디오3 실습실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -10433,9 +10482,10 @@
             },
             {
                 "name": "602호",
+                "type": "실습실",
                 "desc": "시각메세지실습실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -10463,9 +10513,10 @@
             },
             {
                 "name": "603호",
+                "type": "실습실",
                 "desc": "디자인스튜디오4 실습실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -10493,9 +10544,10 @@
             },
             {
                 "name": "604호",
+                "type": "교수연구실",
                 "desc": "교수실",
                 "tags": [],
-                "color": "#00ff11",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -10523,9 +10575,10 @@
             },
             {
                 "name": "605호",
+                "type": "특수구역",
                 "desc": "작품출력실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#E86F51",
                 "polygon": [
                     [
                         [
@@ -10553,9 +10606,10 @@
             },
             {
                 "name": "606호",
+                "type": "강의실,세미나실,멀티실",
                 "desc": "복합강의상담실",
                 "tags": [],
-                "color": "#bedceb",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -10583,9 +10637,10 @@
             },
             {
                 "name": "607호",
+                "type": "휴게실,회의실,스터디룸,원우회실",
                 "desc": "ICT환경공학과 원우회실",
                 "tags": [],
-                "color": "#afb9c3",
+                "color": "#F4A261",
                 "polygon": [
                     [
                         [
@@ -10613,9 +10668,10 @@
             },
             {
                 "name": "608호",
+                "type": "실습실",
                 "desc": "출판디자인실습실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -10643,9 +10699,10 @@
             },
             {
                 "name": "609호",
+                "type": "동아리실",
                 "desc": "취업동아리실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#89ceec",
                 "polygon": [
                     [
                         [
@@ -10673,9 +10730,10 @@
             },
             {
                 "name": "계단",
+                "type": "계단,엘베,입구",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#FFFFFF",
                 "polygon": [
                     [
                         [
@@ -10703,9 +10761,10 @@
             },
             {
                 "name": "계단",
+                "type": "계단,엘베,입구",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#FFFFFF",
                 "polygon": [
                     [
                         [
@@ -10733,9 +10792,10 @@
             },
             {
                 "name": "엘리베이터",
+                "type": "계단,엘베,입구",
                 "desc": "",
                 "tags": [],
-                "color": "#ffffff",
+                "color": "#FFFFFF",
                 "polygon": [
                     [
                         [
@@ -10763,9 +10823,10 @@
             },
             {
                 "name": "화장실",
+                "type": "화장실",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#F4A261",
                 "polygon": [
                     [
                         [
@@ -10795,9 +10856,10 @@
         [
             {
                 "name": "701호",
+                "type": "강의실,세미나실,멀티실",
                 "desc": "디자인스튜디오5 멀티실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -10825,9 +10887,10 @@
             },
             {
                 "name": "702호",
+                "type": "강의실,세미나실,멀티실",
                 "desc": "디자인스튜디오6 멀티실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -10855,9 +10918,10 @@
             },
             {
                 "name": "703호",
+                "type": "교수연구실",
                 "desc": "교수실",
                 "tags": [],
-                "color": "#00ff11",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -10885,9 +10949,10 @@
             },
             {
                 "name": "704호",
+                "type": "교수연구실",
                 "desc": "교수실",
                 "tags": [],
-                "color": "#00ff11",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -10915,9 +10980,10 @@
             },
             {
                 "name": "705호",
+                "type": "교수연구실",
                 "desc": "교수실",
                 "tags": [],
-                "color": "#00ff11",
+                "color": "#284553",
                 "polygon": [
                     [
                         [
@@ -10945,9 +11011,10 @@
             },
             {
                 "name": "706호",
+                "type": "창고",
                 "desc": "기자재 보관실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#a0785a",
                 "polygon": [
                     [
                         [
@@ -10975,9 +11042,10 @@
             },
             {
                 "name": "707호",
+                "type": "실습실",
                 "desc": "패키지디자인실습실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#289D8F",
                 "polygon": [
                     [
                         [
@@ -11005,9 +11073,10 @@
             },
             {
                 "name": "708호",
+                "type": "행정실,사무실,센터",
                 "desc": "산학 및 공모전 지원실",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#E8C46A",
                 "polygon": [
                     [
                         [
@@ -11035,9 +11104,10 @@
             },
             {
                 "name": "계단",
+                "type": "계단,엘베,입구",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#FFFFFF",
                 "polygon": [
                     [
                         [
@@ -11065,9 +11135,10 @@
             },
             {
                 "name": "계단",
+                "type": "계단,엘베,입구",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#FFFFFF",
                 "polygon": [
                     [
                         [
@@ -11095,9 +11166,10 @@
             },
             {
                 "name": "엘리베이터",
+                "type": "계단,엘베,입구",
                 "desc": "",
                 "tags": [],
-                "color": "#ffffff",
+                "color": "#FFFFFF",
                 "polygon": [
                     [
                         [
@@ -11125,9 +11197,10 @@
             },
             {
                 "name": "화장실",
+                "type": "화장실",
                 "desc": "",
                 "tags": [],
-                "color": "#007aff",
+                "color": "#F4A261",
                 "polygon": [
                     [
                         [
