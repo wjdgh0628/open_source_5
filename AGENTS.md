@@ -26,3 +26,9 @@
 - For editor requests: start from `back/editor/editorMain.js` and `back/editor/editor.html`.
 - For server requests: start from `back/server/server.js`, then `back/server/scripts/*` and `back/server/data/*`.
 - If a change affects both front and back contracts, update `back/shared/*` first and align both sides.
+
+## AGENTS.md Maintenance Rules
+- Treat this file as a living guide. During work, suggest additions when discovering useful structure or conventions not documented here.
+- If directory structure, entrypoints, or data contract locations change, update this file in the same task.
+- Keep updates concise and practical (focus on where to edit, where not to edit, and what to check first).
+- When uncertain whether a detail is stable, propose it first and only document after confirmation from user or repeated usage.

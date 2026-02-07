@@ -1,4 +1,4 @@
-import { hitTestFilledRoom, screenToWorld, findNearestVertex, findNearestFloorVertex, draw, getWorldCenterFromLonLatPoints, lonLatToWorld, worldToLonLat, applyTransformToLonLatPoints, worldToScreen, bboxOf } from "./editorDraw.js";
+import { hitTestFilledRoom, hitTestFilledRoomByRef, screenToWorld, findNearestVertex, findNearestVertexByRef, findNearestFloorVertex, draw, getWorldCenterFromLonLatPoints, lonLatToWorld, worldToLonLat, applyTransformToLonLatPoints, worldToScreen, bboxOf } from "./editorDraw.js";
 import { canvas, state, pushHistory, setActiveDraft, setActiveRoom, modDown, getOrCreateActiveOpenDraft, refreshDraftList, getRoom, refreshSavedList, refreshFloorInput, undo, deleteDraft, isMac, getActiveOpenRoomOrNull, closeActiveRoom, writeSavedBackToDB } from "./editorMain.js";
 
 // History: snapshot once per Shift operation
@@ -8,6 +8,16 @@ function ensureHistoryStartForShiftOp(e) {
 		pushHistory();
 		state.mouse._histShiftOp = true;
 	}
+}
+
+function getShiftLockedRoomRef() {
+	if (state.activeRoomIndex != null) {
+		return { list: "draft", roomIndex: state.activeRoomIndex };
+	}
+	if (state.activeSavedIndex != null) {
+		return { list: "saved", roomIndex: state.activeSavedIndex };
+	}
+	return null;
 }
 
 // ==== Input (mouse/keyboard) ========================================================
@@ -66,10 +76,13 @@ export function onMouseDown(e) {
 
 	if (e.button === 0) {
 		const shiftHeld = e.shiftKey;
+		const lockedRef = shiftHeld ? getShiftLockedRoomRef() : null;
 
 		// Shift + Left: move whole room polygon when clicking on a filled room
 		if (shiftHeld) {
-			const hitRoom = hitTestFilledRoom(x, y);
+			const hitRoom = lockedRef
+				? hitTestFilledRoomByRef(x, y, lockedRef.list, lockedRef.roomIndex)
+				: hitTestFilledRoom(x, y);
 			if (hitRoom) {
 				ensureHistoryStartForShiftOp(e);
 				const [wx, wy] = screenToWorld(x, y);
@@ -81,18 +94,13 @@ export function onMouseDown(e) {
 					lastWorld: [wx, wy]
 				};
 				state.mouse.savedChanged = false;
-
-				// Select that room as active
-				if (hitRoom.list === "draft") {
-					setActiveDraft(hitRoom.roomIndex);
-				} else if (hitRoom.list === "saved") {
-					setActiveRoom("saved", hitRoom.roomIndex);
-				}
 				return;
 			}
 		}
 
-		const hit = findNearestVertex(x, y);
+		const hit = lockedRef
+			? findNearestVertexByRef(x, y, lockedRef.list, lockedRef.roomIndex)
+			: findNearestVertex(x, y);
 
 		if (modDown(e)) {
 			// Cmd/Ctrl + Left: click adds a point, drag creates a rectangular room
@@ -119,13 +127,20 @@ export function onMouseDown(e) {
 					pointIndex: hit.pointIndex
 				};
 				state.mouse.savedChanged = false;
-				if (hit.list === "draft") {
-					setActiveDraft(hit.roomIndex);
-				} else if (hit.list === "saved") {
-					setActiveRoom("saved", hit.roomIndex);
+				if (!lockedRef) {
+					if (hit.list === "draft") {
+						setActiveDraft(hit.roomIndex);
+					} else if (hit.list === "saved") {
+						setActiveRoom("saved", hit.roomIndex);
+					}
 				}
 			}
 		} else {
+			if (shiftHeld && lockedRef) {
+				// While Shift-locking an active room, prevent selecting other rooms.
+				state.mouse.dragTarget = { type: "pan" };
+				return;
+			}
 			// Left on a filled polygon: select that room but still allow panning
 			const filled = hitTestFilledRoom(x, y);
 			if (filled) {
@@ -145,7 +160,10 @@ export function onMouseDown(e) {
 		// Right button
 		// Shift + Right: rotate whole room polygon around its center
 		if (e.shiftKey) {
-			const hitRoom = hitTestFilledRoom(x, y);
+			const lockedRef = getShiftLockedRoomRef();
+			const hitRoom = lockedRef
+				? hitTestFilledRoomByRef(x, y, lockedRef.list, lockedRef.roomIndex)
+				: hitTestFilledRoom(x, y);
 			if (hitRoom) {
 				const room = getRoom(hitRoom.list, hitRoom.roomIndex);
 
@@ -165,13 +183,6 @@ export function onMouseDown(e) {
 						totalAngle: 0
 					};
 					state.mouse.savedChanged = hitRoom.list === "saved";
-
-					// Select room
-					if (hitRoom.list === "draft") {
-						setActiveDraft(hitRoom.roomIndex);
-					} else if (hitRoom.list === "saved") {
-						setActiveRoom("saved", hitRoom.roomIndex);
-					}
 					return;
 				}
 			}
@@ -508,7 +519,10 @@ export function onWheel(e) {
 
 	// Shift + wheel: scale room polygon under cursor
 	if (e.shiftKey) {
-		const hit = hitTestFilledRoom(x, y);
+		const lockedRef = getShiftLockedRoomRef();
+		const hit = lockedRef
+			? hitTestFilledRoomByRef(x, y, lockedRef.list, lockedRef.roomIndex)
+			: hitTestFilledRoom(x, y);
 		if (hit) {
 			ensureHistoryStartForShiftOp(e);
 			const room = getRoom(hit.list, hit.roomIndex);

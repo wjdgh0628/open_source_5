@@ -159,6 +159,8 @@ function toScreenPathLonLat(lonLatPts) {
 	return lonLatPts.map(([lon, lat]) => worldToScreen(lon, lat));
 }
 
+const ROOM_VERTEX_HIT_THRESHOLD_PX = 36;
+
 export function formatCoords(points, { decimals = COORD_DECIMALS, close = false } = {}) {
 	if (!Array.isArray(points)) return "[]";
 	const out = points.map(([x, y]) => [Number(x.toFixed(decimals)), Number(y.toFixed(decimals))]);
@@ -179,6 +181,21 @@ px < ((xj - xi) * (py - yi)) / ((yj - yi) || 1e-12) + xi;
 		if (intersect) inside = !inside;
 	}
 	return inside;
+}
+
+function getRoomByRef(list, roomIndex) {
+	if (list === "draft") return stateRef.rooms[roomIndex] || null;
+	if (list === "saved") return stateRef.saved[roomIndex] || null;
+	return null;
+}
+
+function isPointInRoomScreen(screenX, screenY, room) {
+	if (!room || !room.points || room.points.length < 3) return false;
+	const outer = toScreenPathLonLat(room.points);
+	const holes = Array.isArray(room.holes) ? room.holes.map((h) => toScreenPathLonLat(h)) : [];
+	const inOuter = pointInPolygonScreen(screenX, screenY, outer);
+	const inHole = holes.some((hp) => pointInPolygonScreen(screenX, screenY, hp));
+	return inOuter && !inHole;
 }
 
 export function hitTestFilledRoom(screenX, screenY) {
@@ -207,6 +224,12 @@ export function hitTestFilledRoom(screenX, screenY) {
 	});
 	return hit;
 }
+
+export function hitTestFilledRoomByRef(screenX, screenY, list, roomIndex) {
+	const room = getRoomByRef(list, roomIndex);
+	if (!room) return null;
+	return isPointInRoomScreen(screenX, screenY, room) ? { list, roomIndex } : null;
+}
 function drawRingsScreen(screenRings, close = true) {
 	if (!Array.isArray(screenRings) || !screenRings.length) return;
 	const ctx = ctxRef;
@@ -218,7 +241,7 @@ function drawRingsScreen(screenRings, close = true) {
 	}
 }
 
-export function findNearestVertex(screenX, screenY, thresholdPx = 20) {
+export function findNearestVertex(screenX, screenY, thresholdPx = ROOM_VERTEX_HIT_THRESHOLD_PX) {
 	let best = null;
 	let bestDist = Infinity;
 	// Draft rooms
@@ -246,6 +269,25 @@ export function findNearestVertex(screenX, screenY, thresholdPx = 20) {
 				best = { list: "saved", roomIndex: rIndex, pointIndex: pIndex };
 			}
 		});
+	});
+	return best;
+}
+
+export function findNearestVertexByRef(screenX, screenY, list, roomIndex, thresholdPx = ROOM_VERTEX_HIT_THRESHOLD_PX) {
+	const room = getRoomByRef(list, roomIndex);
+	if (!room || !Array.isArray(room.points)) return null;
+
+	let best = null;
+	let bestDist = Infinity;
+	room.points.forEach((pt, pointIndex) => {
+		const s = worldToScreen(pt[0], pt[1]);
+		const dx = s.x - screenX;
+		const dy = s.y - screenY;
+		const d = Math.hypot(dx, dy);
+		if (d <= thresholdPx && d < bestDist) {
+			bestDist = d;
+			best = { list, roomIndex, pointIndex };
+		}
 	});
 	return best;
 }
