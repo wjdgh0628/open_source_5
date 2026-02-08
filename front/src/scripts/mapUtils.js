@@ -6,6 +6,27 @@ import { handleFloorClick } from './mapHandlers.js';
 
 let popup = null;
 
+function roomFillLayerId(fid) {
+	return `${idRules.roomSid(fid)}_fill`;
+}
+
+function roomLabelLayerId(fid) {
+	return `${idRules.roomSid(fid)}_label`;
+}
+
+function parseLngLat(value) {
+	if (Array.isArray(value) && value.length === 2) return value;
+	if (typeof value === "string") {
+		try {
+			const parsed = JSON.parse(value);
+			if (Array.isArray(parsed) && parsed.length === 2) return parsed;
+		} catch {
+			return null;
+		}
+	}
+	return null;
+}
+
 /**카메라 이동 함수*/
 export function flyCamera(mode, center, bearing = null, lvI = null) {
 	const modeConfig = { ...MC.camera[mode] };
@@ -168,8 +189,10 @@ export async function hideFloorsByBid(bid) {
 } */
 /**층 내 전체 방 숨기기*/
 export async function hideAllRooms(bid, lvI) {
+	const fid = idRules.fid(bid, lvI);
 	hideLayer(idRules.clickedFloor(bid, lvI));
-	await allRooms(bid, lvI, (rid) => hideLayer(rid));
+	hideLayer(roomFillLayerId(fid));
+	hideLayer(roomLabelLayerId(fid));
 }
 
 
@@ -180,12 +203,6 @@ function allFloors(lvCount, bid, cb) {
 		cb(fid, i);
 	}
 }
-/**층 내 전체 방에 대해 콜백*/
-async function allRooms(bid, lvI, cb) {
-	const rooms = infos()[bid].rooms[lvI];
-	rooms.forEach((r, i) => cb(idRules.rid(bid, lvI, i)));
-}
-
 /**
  * 층 생성/보이기
  * info: bid, flList, flVars, flLevel, bmLevel
@@ -207,8 +224,9 @@ export function setFloors(info) {
 export async function setRooms(bid, lvI, info) {
 	const fid = idRules.fid(bid, lvI);
 	if (Map().getSource(idRules.roomSid(fid))) {
-		await allRooms(bid, lvI, (rid) => showLayer(rid));
 		showLayer(idRules.clickedFloor(bid, lvI));
+		showLayer(roomFillLayerId(fid));
+		showLayer(roomLabelLayerId(fid));
 	}
 	else {
 		generateRooms(info, fid, lvI);
@@ -260,7 +278,7 @@ function generateFloors(info) {
  */
 async function generateRooms(info, fid, lvI) {
 	const bid = info.bid;
-	const { floorThickness, floorGap, colorPalette, baseThickness, roomThickness } = MC.layerProps;
+	const { floorThickness, floorGap, baseThickness, roomThickness } = MC.layerProps;
 	const base = (lvI * (floorThickness + floorGap));
 	const rooms = infos()[bid].rooms[lvI];
 	let roomsSpec = [];
@@ -268,11 +286,12 @@ async function generateRooms(info, fid, lvI) {
 	roomsSpec.push({
 		type: "Feature",
 		properties: {
+			isBase: true,
 			base: base,
 			height: base + baseThickness,
 			color: MC.layerProps.clickedFloorColor,
-			// offset: 0,
-			layerId: idRules.clickedFloor(bid, lvI)
+			layerId: idRules.clickedFloor(bid, lvI),
+			anchor: "center"
 		},
 		geometry: { type: "Polygon", coordinates: info.flVars[info.flList[lvI]] }
 	});
@@ -280,12 +299,12 @@ async function generateRooms(info, fid, lvI) {
 		roomsSpec.push({
 			type: "Feature",
 			properties: {
+				isBase: false,
 				name: room.name,
 				base: base + baseThickness,
 				height: base + baseThickness + roomThickness,
-				color: room.color ? room.color : "#0088ff",// 임시 컬러
+				color: room.color ? room.color : "#0088ff",
 				anchor: "bottom",
-				// offset: 0,
 				layerId: idRules.rid(bid, lvI, i),
 				popup: room.desc ? room.desc : "상세설명 없음",
 				center: calCenter(room.polygon)
@@ -294,10 +313,95 @@ async function generateRooms(info, fid, lvI) {
 		});
 	});
 
-	setLayers(idRules.roomSid(fid), roomsSpec);
-	// 핸들러 지정
-	roomsSpec.forEach((r, i) => {
-		if (i === 0) return; // 클릭된 층 베이스는 핸들러 지정 안함
-		const rid = r.properties.layerId;
+	const sourceId = idRules.roomSid(fid);
+	Map().addSource(sourceId, {
+		type: "geojson",
+		data: ({
+			type: "FeatureCollection",
+			features: roomsSpec
+		})
+	});
+
+	Map().addLayer({
+		id: idRules.clickedFloor(bid, lvI),
+		type: "fill-extrusion",
+		source: sourceId,
+		filter: ["==", ["get", "isBase"], true],
+		paint: {
+			"fill-extrusion-color": ["get", "color"],
+			"fill-extrusion-base": ["get", "base"],
+			"fill-extrusion-height": ["get", "height"],
+			"fill-extrusion-opacity": 1
+		}
+	});
+
+	Map().addLayer({
+		id: roomFillLayerId(fid),
+		type: "fill-extrusion",
+		source: sourceId,
+		filter: ["==", ["get", "isBase"], false],
+		paint: {
+			"fill-extrusion-color": ["get", "color"],
+			"fill-extrusion-base": ["get", "base"],
+			"fill-extrusion-height": ["get", "height"],
+			"fill-extrusion-opacity": 1
+		}
+	});
+
+	Map().addLayer({
+		id: roomLabelLayerId(fid),
+		type: 'symbol',
+		source: sourceId,
+		filter: [
+			"all",
+			["==", ["get", "isBase"], false],
+			["has", "name"]
+		],
+		layout: {
+			'text-field': ["get", "name"],
+			'text-size': 14,
+			'text-anchor': ["get", "anchor"],
+			'text-allow-overlap': true,
+			'symbol-placement': 'point',
+			'symbol-z-order': "source"
+		},
+		paint: {
+			'symbol-z-offset': ["get", "height"],
+			'text-color': '#000000',
+			'text-halo-color': '#ffffff',
+			'text-halo-width': 2
+		}
+	});
+
+	Map().on('mouseenter', roomFillLayerId(fid), () => {
+		Map().getCanvas().style.cursor = "pointer";
+	});
+	Map().on('mousemove', roomFillLayerId(fid), (e) => {
+		const feature = e.features?.[0];
+		if (!feature) return;
+		const isPerspective = Map().getCamera()["camera-projection"] == "perspective";
+		const isPitched = Map().getPitch() != 0;
+		const center = parseLngLat(feature.properties?.center);
+		const html = feature.properties?.popup;
+		const baseVal = Number(feature.properties?.base ?? 0);
+		if (!center || !html) return;
+
+		if (!popup) {
+			popup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false, closeOnMove: true })
+				.setMaxWidth("300px");
+		}
+		popup
+			.setLngLat(center)
+			.setHTML(html)
+			.setAltitude(isPerspective || isPitched ? baseVal + MC.layerProps.roomThickness : 0)
+			.addTo(Map());
+	});
+	Map().on('mouseleave', roomFillLayerId(fid), (e) => {
+		Map().getCanvas().style.cursor = "";
+		const intoPopup = e.originalEvent.relatedTarget?.classList.contains('mapboxgl-popup-content');
+		if (popup && !intoPopup) {
+			popup.remove();
+			popup = null;
+		}
 	});
 }
