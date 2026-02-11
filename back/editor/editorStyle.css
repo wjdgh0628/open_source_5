@@ -41,6 +41,26 @@
 	color: #333;
 }
 
+.rooms-section-head
+{
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.rooms-head-actions
+{
+	display: flex;
+	gap: 6px;
+}
+
+.rooms-section-head button
+{
+	font-size: 11px;
+	padding: 2px 8px;
+}
+
 .rooms-list
 {
 	flex: 1;
@@ -60,6 +80,13 @@
 }
 
 .room-name
+{
+	width: 100%;
+	font-size: 12px;
+	padding: 2px 4px;
+}
+
+.room-type
 {
 	width: 100%;
 	font-size: 12px;
@@ -151,9 +178,11 @@ textarea
 
 #floorCoordsInput
 {
-	width: 260px;
-	min-height: 70px;
+	width: 100%;
+	min-width: 420px;
+	min-height: 140px;
 	resize: vertical;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 .row
@@ -161,6 +190,37 @@ textarea
 	display: flex;
 	gap: 6px;
 	align-items: center;
+}
+
+#floorEditToggleBtn[aria-pressed="true"] {
+	background: #0a8f3e;
+	color: #fff;
+	border-color: #0a8f3e;
+}
+
+.floor-input-wrap {
+	display: flex;
+	align-items: stretch;
+	gap: 8px;
+}
+
+.floor-input-actions {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	min-width: 130px;
+	justify-content: flex-start;
+	margin-left: auto;
+}
+
+.floor-help-note {
+	font-size: 11px;
+	color: #666;
+	line-height: 1.4;
+}
+
+#leftRoomsPanel.readonly {
+	opacity: 0.65;
 }
 
 #middlePanel
@@ -285,4 +345,76 @@ textarea
 	height: 18px;
 	padding: 0;
 	border: none;
+}
+
+/* --- Room holes UI --- */
+.room-holes {
+	margin-top: 6px;
+	border-top: 1px dashed #ddd;
+	padding-top: 6px;
+}
+
+.room-holes-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	margin-bottom: 6px;
+}
+
+.room-holes-title {
+	font-size: 12px;
+	color: #333;
+}
+
+.room-holes-list {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.room-hole-item {
+	border: 1px solid #eee;
+	border-radius: 4px;
+	padding: 6px;
+	background: #fafafa;
+}
+
+.room-hole-head {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 6px;
+}
+
+.room-hole-label {
+	font-size: 11px;
+	color: #555;
+	margin-right: auto;
+}
+
+.room-hole-coords {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+	font-size: 11px;
+	white-space: pre;
+	max-height: 80px;
+	overflow: auto;
+	margin: 0;
+}
+
+.room-hole-textarea {
+	width: 100%;
+	min-height: 84px;
+	resize: vertical;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+	font-size: 11px;
+	white-space: pre;
+}
+
+/* --- Compact icon buttons (no external fonts) --- */
+.room-actions-row button {
+	min-width: 26px;
+	height: 22px;
+	padding: 0 6px;
+	line-height: 20px;
 }

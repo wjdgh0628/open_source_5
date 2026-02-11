@@ -159,6 +159,8 @@ function toScreenPathLonLat(lonLatPts) {
 	return lonLatPts.map(([lon, lat]) => worldToScreen(lon, lat));
 }
 
+const ROOM_VERTEX_HIT_THRESHOLD_PX = 36;
+
 export function formatCoords(points, { decimals = COORD_DECIMALS, close = false } = {}) {
 	if (!Array.isArray(points)) return "[]";
 	const out = points.map(([x, y]) => [Number(x.toFixed(decimals)), Number(y.toFixed(decimals))]);
@@ -181,28 +183,65 @@ px < ((xj - xi) * (py - yi)) / ((yj - yi) || 1e-12) + xi;
 	return inside;
 }
 
+function getRoomByRef(list, roomIndex) {
+	if (list === "draft") return stateRef.rooms[roomIndex] || null;
+	if (list === "saved") return stateRef.saved[roomIndex] || null;
+	return null;
+}
+
+function isPointInRoomScreen(screenX, screenY, room) {
+	if (!room || !room.points || room.points.length < 3) return false;
+	const outer = toScreenPathLonLat(room.points);
+	const holes = Array.isArray(room.holes) ? room.holes.map((h) => toScreenPathLonLat(h)) : [];
+	const inOuter = pointInPolygonScreen(screenX, screenY, outer);
+	const inHole = holes.some((hp) => pointInPolygonScreen(screenX, screenY, hp));
+	return inOuter && !inHole;
+}
+
 export function hitTestFilledRoom(screenX, screenY) {
 	let hit = null;
 	// Saved rooms first
 	stateRef.saved.forEach((room, idx) => {
 		if (!room.points || room.points.length < 3) return;
-		const pts = toScreenPathLonLat(room.points);
-		if (pointInPolygonScreen(screenX, screenY, pts)) {
+		const outer = toScreenPathLonLat(room.points);
+		const holes = Array.isArray(room.holes) ? room.holes.map((h) => toScreenPathLonLat(h)) : [];
+		const inOuter = pointInPolygonScreen(screenX, screenY, outer);
+		const inHole = holes.some((hp) => pointInPolygonScreen(screenX, screenY, hp));
+		if (inOuter && !inHole) {
 			hit = { list: "saved", roomIndex: idx };
 		}
 	});
 	// Draft rooms (closed ones) drawn on top
 	stateRef.rooms.forEach((room, idx) => {
 		if (!room.closed || !room.points || room.points.length < 3) return;
-		const pts = toScreenPathLonLat(room.points);
-		if (pointInPolygonScreen(screenX, screenY, pts)) {
+		const outer = toScreenPathLonLat(room.points);
+		const holes = Array.isArray(room.holes) ? room.holes.map((h) => toScreenPathLonLat(h)) : [];
+		const inOuter = pointInPolygonScreen(screenX, screenY, outer);
+		const inHole = holes.some((hp) => pointInPolygonScreen(screenX, screenY, hp));
+		if (inOuter && !inHole) {
 			hit = { list: "draft", roomIndex: idx };
 		}
 	});
 	return hit;
 }
 
-export function findNearestVertex(screenX, screenY, thresholdPx = 20) {
+export function hitTestFilledRoomByRef(screenX, screenY, list, roomIndex) {
+	const room = getRoomByRef(list, roomIndex);
+	if (!room) return null;
+	return isPointInRoomScreen(screenX, screenY, room) ? { list, roomIndex } : null;
+}
+function drawRingsScreen(screenRings, close = true) {
+	if (!Array.isArray(screenRings) || !screenRings.length) return;
+	const ctx = ctxRef;
+	ctx.beginPath();
+	for (const ring of screenRings) {
+		if (!ring || !ring.length) continue;
+		ring.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)));
+		if (close && ring.length >= 3) ctx.closePath();
+	}
+}
+
+export function findNearestVertex(screenX, screenY, thresholdPx = ROOM_VERTEX_HIT_THRESHOLD_PX) {
 	let best = null;
 	let bestDist = Infinity;
 	// Draft rooms
@@ -234,6 +273,42 @@ export function findNearestVertex(screenX, screenY, thresholdPx = 20) {
 	return best;
 }
 
+export function findNearestVertexByRef(screenX, screenY, list, roomIndex, thresholdPx = ROOM_VERTEX_HIT_THRESHOLD_PX) {
+	const room = getRoomByRef(list, roomIndex);
+	if (!room || !Array.isArray(room.points)) return null;
+
+	let best = null;
+	let bestDist = Infinity;
+	room.points.forEach((pt, pointIndex) => {
+		const s = worldToScreen(pt[0], pt[1]);
+		const dx = s.x - screenX;
+		const dy = s.y - screenY;
+		const d = Math.hypot(dx, dy);
+		if (d <= thresholdPx && d < bestDist) {
+			bestDist = d;
+			best = { list, roomIndex, pointIndex };
+		}
+	});
+	return best;
+}
+
+export function findNearestFloorVertex(screenX, screenY, thresholdPx = 20) {
+	if (!Array.isArray(stateRef.floorPolygon)) return null;
+	let best = null;
+	let bestDist = Infinity;
+	stateRef.floorPolygon.forEach((pt, pIndex) => {
+		const s = worldToScreen(pt[0], pt[1]);
+		const dx = s.x - screenX;
+		const dy = s.y - screenY;
+		const d = Math.hypot(dx, dy);
+		if (d <= thresholdPx && d < bestDist) {
+			bestDist = d;
+			best = { pointIndex: pIndex };
+		}
+	});
+	return best;
+}
+
 export function draw() {
 	if (!canvasRef || !ctxRef || !stateRef) return;
 	const ctx = ctxRef;
@@ -251,11 +326,34 @@ export function draw() {
 	ctx.fill();
 	ctx.stroke();
 
+	if (stateRef.floorEditMode) {
+		stateRef.floorPolygon.forEach(([wx, wy], idx) => {
+			const s = worldToScreen(wx, wy);
+			ctx.beginPath();
+			ctx.arc(s.x, s.y, 4, 0, Math.PI * 2);
+			ctx.fillStyle = "#0a8f3e";
+			ctx.fill();
+			ctx.strokeStyle = "#fff";
+			ctx.lineWidth = 1;
+			ctx.stroke();
+
+			const label = String(idx);
+			ctx.font = "12px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
+			const tw = ctx.measureText(label).width;
+			const tx = s.x - tw / 2;
+			const ty = s.y - 10;
+			ctx.fillStyle = "rgba(255,255,255,0.9)";
+			ctx.fillRect(tx - 3, ty - 11, tw + 6, 14);
+			ctx.fillStyle = "#0a8f3e";
+			ctx.fillText(label, tx, ty);
+		});
+	}
+
 	// Saved Rooms (rooms.json) — editable, stronger color
 	stateRef.saved.forEach((room, idx) => {
 		if (!room.points.length) return;
-		const screenPts = toScreenPathLonLat(room.points);
-		drawPathScreen(screenPts, true);
+		const rings = [toScreenPathLonLat(room.points), ...(Array.isArray(room.holes) ? room.holes.map((h) => toScreenPathLonLat(h)) : [])];
+		drawRingsScreen(rings, true);
 		const active = idx === stateRef.activeSavedIndex;
 		if (active) {
 			ctx.lineWidth = 3;
@@ -266,8 +364,20 @@ export function draw() {
 			ctx.strokeStyle = "#ff9500";
 			ctx.fillStyle = "rgba(255,149,0,.08)";
 		}
-		ctx.fill();
+		ctx.fill("evenodd");
 		ctx.stroke();
+		// Hole outlines (visual only)
+		if (Array.isArray(room.holes) && room.holes.length) {
+			ctx.save();
+			ctx.setLineDash([4, 3]);
+			ctx.lineWidth = 1;
+			room.holes.forEach((h) => {
+				const hp = toScreenPathLonLat(h);
+				drawPathScreen(hp, true);
+				ctx.stroke();
+			});
+			ctx.restore();
+		}
 	});
 
 	// Saved vertices (editable)
@@ -287,15 +397,27 @@ export function draw() {
 	// Draft Rooms (editable)
 	stateRef.rooms.forEach((room, idx) => {
 		if (!room.points.length) return;
-		const screenPts = toScreenPathLonLat(room.points);
-		drawPathScreen(screenPts, room.closed);
+		const rings = [toScreenPathLonLat(room.points), ...(Array.isArray(room.holes) ? room.holes.map((h) => toScreenPathLonLat(h)) : [])];
+		drawRingsScreen(rings, room.closed);
 		const active = idx === stateRef.activeRoomIndex;
 		ctx.lineWidth = active ? 2 : 1.5;
 		ctx.strokeStyle = active ? "#007aff" : "#e53935";
 		ctx.stroke();
 		if (room.closed) {
 			ctx.fillStyle = "rgba(0,122,255,.08)";
-			ctx.fill();
+			ctx.fill("evenodd");
+			// Hole outlines (visual only)
+			if (Array.isArray(room.holes) && room.holes.length) {
+				ctx.save();
+				ctx.setLineDash([4, 3]);
+				ctx.lineWidth = 1;
+				room.holes.forEach((h) => {
+					const hp = toScreenPathLonLat(h);
+					drawPathScreen(hp, true);
+					ctx.stroke();
+				});
+				ctx.restore();
+			}
 		}
 	});
 
