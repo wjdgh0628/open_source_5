@@ -3,7 +3,7 @@ import React, { useMemo, useState, useRef } from 'react';
 /**
  * 강의실 검색 컴포넌트
  * props:
- *  - roomsIndex: { [rid]: { bid, buildingName, lvI, bmLevel, name, tags? } }
+ *  - roomsIndex: { [rid]: { bid, buildingName, lvI, bmLevel, name, tags?, desc? } }
  *  - favorites: string[] (rid 배열)
  *  - onToggleFavorite(rid)
  *  - onRoomClick(rid)
@@ -24,8 +24,8 @@ export default function Search({ roomsIndex, favorites, onToggleFavorite, onRoom
 
 		return entries
 			.map(([rid, info]) => ({ rid, ...info }))
-			.filter(({ name = '', tags = [] }) => {
-				const text = [name, ...(Array.isArray(tags) ? tags : [])]
+			.filter(({ name = '', tags = [], desc = '' }) => {
+				const text = [name, ...(Array.isArray(tags) ? tags : []), desc]
 					.join(' ')
 					.toLowerCase();
 				return words.every((w) => text.includes(w));
@@ -59,7 +59,7 @@ export default function Search({ roomsIndex, favorites, onToggleFavorite, onRoom
 						value={query}
 						onChange={(e) => setQuery(e.target.value)}
 						className="nav__search-input"
-						placeholder="강의실 이름·태그 검색"
+						placeholder="강의실 이름·태그·상세설명 검색"
 					/>
 				</div>
 
