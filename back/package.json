@@ -9,18 +9,18 @@
     "mac": "open http://localhost:4000/ && node server/server.js"
   },
   "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^17.2.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
     "express": "^5.2.1",
-    "express-session": "^1.18.2",
+    "express-session": "^1.19.0",
     "google-auth-library": "^10.5.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.1",
-    "eslint": "^9.39.1",
+    "@eslint/js": "^9.39.2",
+    "eslint": "^9.39.2",
     "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-react-refresh": "^0.4.24",
-    "globals": "^16.5.0"
+    "eslint-plugin-react-refresh": "^0.5.0",
+    "globals": "^17.3.0"
   },
   "imports": {
     "#shared/*": "./shared/*",
